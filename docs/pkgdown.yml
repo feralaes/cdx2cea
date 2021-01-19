@@ -1,0 +1,16 @@
+pandoc: 1.19.2.1
+pkgdown: 1.3.0
+pkgdown_sha: ~
+articles:
+  aa-introduction: aa-introduction.html
+  bb-inputs: bb-inputs.html
+  cc-model: cc-model.html
+  darthpack: darthpack.html
+  dd-calibration: dd-calibration.html
+  ee-validation: ee-validation.html
+  ff-analysis: ff-analysis.html
+  zz-testing: zz-testing.html
+urls:
+  reference: https://darth-git.github.io/darthpack/reference
+  article: https://darth-git.github.io/darthpack/articles
+
