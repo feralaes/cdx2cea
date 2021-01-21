@@ -4,9 +4,12 @@
 \alias{sample.prior}
 \title{Sample from prior distributions of calibrated parameters}
 \usage{
-sample.prior(n_samp, v_param_names = c("p_S1S2", "hr_S1", "hr_S2"),
-  v_lb = c(p_S1S2 = 0.01, hr_S1 = 1, hr_S2 = 5), v_ub = c(p_S1S2 = 0.5,
-  hr_S1 = 4.5, hr_S2 = 15))
+sample.prior(
+  n_samp,
+  v_param_names = c("p_S1S2", "hr_S1", "hr_S2"),
+  v_lb = c(p_S1S2 = 0.01, hr_S1 = 1, hr_S2 = 5),
+  v_ub = c(p_S1S2 = 0.5, hr_S1 = 4.5, hr_S2 = 15)
+)
 }
 \arguments{
 \item{n_samp}{Number of samples.}

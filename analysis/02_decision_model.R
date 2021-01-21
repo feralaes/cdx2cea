@@ -17,12 +17,12 @@ rm(list = ls()) # to clean the workspace
 
 #### 02.1 Load packages and functions ####
 #### 02.1.1 Load packages and functions ####
+library(ggplot2) # For visualization
 library(dplyr)    # For data manipulation
 library(survival) # For plotting state-transition diagram
 
 #### 02.1.2 Load inputs ####
-l_params_all <- load_all_params(file.init = "data-raw/01_init_params.csv",
-                                file.mort = "data-raw/01_all_cause_mortality.csv") # function in darthpack
+l_params_all <- load_all_params() # function in darthpack
 
 #### 02.1.3 Load functions ####
 # no functions required
@@ -32,15 +32,11 @@ l_params_all <- load_all_params(file.init = "data-raw/01_init_params.csv",
 l_out_stm <- decision_model(l_params_all = l_params_all)
 
 ### Plot Markov cohort trace
-png("figs/02_trace_plot.png")
-  matplot(l_out_stm$m_M,
-          xlab = "Cycle", ylab = "Proportion")
-  legend("right", legend = l_params_all$v_n, 
-         pch = as.character(1:4), col = 1:4)
-dev.off()
+gg_trace <- plot_trace(l_params_all, m_M = l_out_stm$m_M)
+gg_trace
 
 ### Plot state-transition diagram
 png("figs/02_model_diagram.png")
   connect <- (l_out_stm$a_P[,,1] > 0)
-  survival::statefig(layout = c(2, 2), connect = connect )
+  survival::statefig(layout = c(3, 2, 1), connect = connect)
 dev.off()

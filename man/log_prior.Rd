@@ -4,9 +4,12 @@
 \alias{log_prior}
 \title{Evaluate log-prior of calibrated parameters}
 \usage{
-log_prior(v_params, v_param_names = c("p_S1S2", "hr_S1", "hr_S2"),
-  v_lb = c(p_S1S2 = 0.01, hr_S1 = 1, hr_S2 = 5), v_ub = c(p_S1S2 = 0.5,
-  hr_S1 = 4.5, hr_S2 = 15))
+log_prior(
+  v_params,
+  v_param_names = c("p_S1S2", "hr_S1", "hr_S2"),
+  v_lb = c(p_S1S2 = 0.01, hr_S1 = 1, hr_S2 = 5),
+  v_ub = c(p_S1S2 = 0.5, hr_S1 = 4.5, hr_S2 = 15)
+)
 }
 \arguments{
 \item{v_params}{Vector (or matrix) of model parameters.}

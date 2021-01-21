@@ -19,9 +19,12 @@ rm(list = ls()) # to clean the workspace
 #### 03.1 Load packages, data and functions ####
 #### 03.1.1 Load packages and functions ####
 # Dependencies have been loaded with 'darthpack'
+library(logitnorm)
 
 #### 03.1.2 Load inputs ####
-l_params_all <- load_all_params()
+l_params_inmit_calib <- load_params_init(n_age_init = 75, 
+                                         n_age_max = 80)
+l_params_all_calib <- load_all_params(l_params_init = l_params_inmit_calib)
 
 #### 03.1.3 Load functions ####
 # no required functions
@@ -57,8 +60,12 @@ plotrix::plotCI(x    = SickSicker_targets$PropSick$Time,
 
 #### 03.3 Run calibration algorithms ####
 # Check that it works
-v_params_calib <- c(p_S1S2 = 0.105, hr_S1 = 3, hr_S2 = 10)
-calibration_out(v_params_calib = v_params_calib, l_params_all = l_params_all)
+v_params_calib <- c(r_DieMets = 0.042, # 0.03870286, 
+                    r_RecurCDX2pos = (-log(0.80)/60),#0.003328773, 
+                    hr_RecurCDX2neg = 2.73, # 3.601069078,
+                    p_Mets  = 0.9)#0.980840626)
+calibration_out(v_params_calib = v_params_calib, 
+                l_params_all = l_params_all_calib)
 
 #### 03.3.1 Specify calibration parameters ####
 ### Specify seed (for reproducible sequence of random numbers)
@@ -68,15 +75,28 @@ set.seed(072218)
 n_resamp <- 1000
 
 ### Names and number of input parameters to be calibrated
-v_param_names  <- c("p_S1S2", "hr_S1", "hr_S2")
+v_param_names  <- names(v_params_calib)
 n_param        <- length(v_param_names)
 
 ### Vector with range on input search space
-v_lb <- c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5)  # lower bound
-v_ub <- c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15) # upper bound
+# Lower bound
+v_lb <- c(r_DieMets       = 0.037, # O'Connell 2004 JNCI Stg IV Fig1 & Fig2;
+          r_RecurCDX2pos  = 0.001,
+          hr_RecurCDX2neg = 1.58, 
+          p_Mets          = 0.9)  
+# Upper bound
+v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, # Rutter 2013 JNCI Table 4 5yr RS Colon cancer Stage IV 80+ Lower bound
+          r_RecurCDX2pos  = 0.03,
+          hr_RecurCDX2neg = 4.72, 
+          p_Mets          = 0.99)  
 
 ### Number of calibration targets
-v_target_names <- c("Surv", "Prev", "PropSick")
+v_target_names <- c("DFS CDX2neg",
+                    "DFS CDX2pos",
+                    "OS CDX2neg",
+                    "OS CDX2pos",
+                    "DSS CDX2neg",
+                    "DSS CDX2pos")
 n_target       <- length(v_target_names)
 
 #### 03.3.2 Run IMIS algorithm ####

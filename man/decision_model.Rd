@@ -4,14 +4,28 @@
 \alias{decision_model}
 \title{Decision Model}
 \usage{
-decision_model(l_params_all, err_stop = FALSE, verbose = FALSE)
+decision_model(
+  l_params_all,
+  p_CDX2neg_init = NULL,
+  Trt = FALSE,
+  err_stop = FALSE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{l_params_all}{List with all parameters of decision model}
 
-\item{err_stop}{Logical variable to stop model run if set up as TRUE. Default = FALSE.}
+\item{p_CDX2neg_init}{Initial proportion of CDX2-negative patients. Default
+is NULL and will take the value of \code{p_CDX2neg} defined in
+\code{load_all_params()}}
 
-\item{verbose}{Logical variable to indicate print out of messages. Default = FALSE}
+\item{Trt}{is this the Treat All strategy? (default is FALSE)}
+
+\item{err_stop}{Logical variable to stop model run if set up as TRUE. Default
+= FALSE.}
+
+\item{verbose}{Logical variable to indicate print out of messages. Default
+= FALSE}
 }
 \value{
 The transition probability array and the cohort trace matrix.

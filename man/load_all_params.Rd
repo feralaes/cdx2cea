@@ -4,7 +4,11 @@
 \alias{load_all_params}
 \title{Load all parameters}
 \usage{
-load_all_params(file.init = NULL, file.mort = NULL)
+load_all_params(
+  l_params_init = load_params_init(),
+  file_init = NULL,
+  file_mort = NULL
+)
 }
 \arguments{
 \item{file.init}{String with the location and name of the file with initial set of parameters}

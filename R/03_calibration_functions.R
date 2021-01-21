@@ -14,23 +14,34 @@ calibration_out <- function(v_params_calib, l_params_all){ # User defined
   # calibrated values
   l_params_all <- update_param_list(l_params_all = l_params_all, params_updated = v_params_calib)
   
-  # Run model with updated calibrated parameters
-  l_out_stm <- decision_model(l_params_all = l_params_all)
+  ## Run model with updated calibrated parameters by CDX2 status
+  # For CDX2-negative patients
+  l_out_stm_CDX2neg <- decision_model(l_params_all = l_params_all, 
+                                      p_CDX2neg_init = 1)
+  # For CDX2-positive patients
+  l_out_stm_CDX2pos <- decision_model(l_params_all = l_params_all, 
+                                      p_CDX2neg_init = 0)
   
   ####### Epidemiological Output ###########################################
+  #### Disease-Free Survival (DSF) ####
+  v_dfs_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Dead_OC")])
+  v_dfs_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Dead_OC")])
+  
   #### Overall Survival (OS) ####
-  v_os <- 1 - l_out_stm$m_M[, "D"]
+  v_os_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Local", "Mets")])
+  v_os_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Local", "Mets")])
   
-  #### Disease prevalence #####
-  v_prev <- rowSums(l_out_stm$m_M[, c("S1", "S2")])/v_os
-  
-  #### Proportion of sick in S1 state #####
-  v_prop_S2 <- l_out_stm$m_M[, "S2"] / rowSums(l_out_stm$m_M[, c("S1", "S2")])
+  #### Disease-Specific Survival (DSS) ####
+  v_dss_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Local", "Mets", "Dead_OC")])
+  v_dss_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Local", "Mets", "Dead_OC")])
   
   ####### Return Output ###########################################
-  l_out <- list(Surv = v_os[c(11, 21, 31)],
-                Prev = v_prev[c(11, 21, 31)],
-                PropSicker = v_prop_S2[c(11, 21, 31)])
+  l_out <- list(v_dfs_CDX2neg = v_dfs_CDX2neg,
+                v_dfs_CDX2pos = v_dfs_CDX2pos,
+                v_os_CDX2neg  = v_os_CDX2neg,
+                v_os_CDX2pos  = v_os_CDX2pos,
+                v_dss_CDX2neg = v_dss_CDX2neg,
+                v_dss_CDX2pos = v_dss_CDX2pos)
   return(l_out)
 }
 
@@ -46,29 +57,63 @@ calibration_out <- function(v_params_calib, l_params_all){ # User defined
 #' A matrix with 3 rows and \code{n_samp} rows. Each row corresponds to a 
 #' parameter set sampled from their prior distributions
 #' @examples 
-#' v_param_names  <- c("p_S1S2", "hr_S1", "hr_S2")
+#' v_param_names  <- c("r_DieMets",
+#'                     "r_RecurCDX2pos",
+#'                     "hr_RecurCDX2neg",
+#'                     "p_Mets")
 #' n_param        <- length(v_param_names)
-#' v_lb <- c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5)  # lower bound
-#' v_ub <- c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15) # upper bound
+#' v_lb <- c(r_DieMets       = 0.037, 
+#'           r_RecurCDX2pos  = 0.001,
+#'           hr_RecurCDX2neg = 1.58, 
+#'           p_Mets          = 0.9))  # lower bound
+#' v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, 
+#'           r_RecurCDX2pos  = 0.03,
+#'           hr_RecurCDX2neg = 4.72, 
+#'           p_Mets          = 0.99) # upper bound
 #' sample.prior(2)
 #' @export
 sample.prior <- function(n_samp,
-                         v_param_names = c("p_S1S2", "hr_S1", "hr_S2"),
-                         v_lb = c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5),
-                         v_ub = c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15)){
+                         v_param_names = c("r_DieMets",
+                                           "r_RecurCDX2pos",
+                                           "hr_RecurCDX2neg",
+                                           "p_Mets"),
+                         v_lb = c(r_DieMets       = 0.037, # O'Connell 2004 JNCI Stg IV Fig1 & Fig2;
+                                  r_RecurCDX2pos  = 0.001,
+                                  hr_RecurCDX2neg = 1.58, 
+                                  p_Mets          = 0.9),
+                         v_ub = c(r_DieMets       = -log(1-(1-0.03))/60, # Rutter 2013 JNCI Table 4 5yr RS Colon cancer Stage IV 80+ Lower bound
+                                  r_RecurCDX2pos  = 0.03,
+                                  hr_RecurCDX2neg = 4.72, 
+                                  p_Mets          = 0.99)){
   n_param <- length(v_param_names)
-  m_lhs_unit   <- lhs::randomLHS(n = n_samp, k = n_param)
-  m_param_samp <- matrix(nrow = n_samp, ncol = n_param)
-  colnames(m_param_samp) <- v_param_names
+
+  ### Transformed design 
+  ## Transformed bounds
+  v_lb_transf <- c(log(v_lb[1:3]), logitnorm::logit(v_lb[4]))
+  v_ub_transf <- c(log(v_ub[1:3]), logitnorm::logit(v_ub[4]))
+  # Find means and SDs of logit-normal and log-normal based on bounds 
+  # assuming bounds are represent the 95% equal tailed interval for these 
+  # distributions
+  v_mu_transf <- (v_ub_transf + v_lb_transf)/2
+  v_sd_transf <- (v_ub_transf - v_lb_transf)/(2*2) # *1.96
+  
+  ### Draw LHS from Uniform[0,1] distributions
+  m_lhs_unif   <- lhs::randomLHS(n = n_samp, k = n_param)
+  colnames(m_lhs_unif) <- v_param_names
+  
+  ### Transformed LHS
+  ## Get values in Normal scale
+  m_lhs_normal <- m_lhs_unif
   for (i in 1:n_param){
-    m_param_samp[, i] <- qunif(m_lhs_unit[,i],
-                               min = v_lb[i],
-                               max = v_ub[i])
-    # ALTERNATIVE prior using beta (or other) distributions
-    # m_param_samp[, i] <- qbeta(m_lhs_unit[,i],
-    #                            min = 1,
-    #                            max = 1)
+    m_lhs_normal[, i] <- qnorm(m_lhs_unif[,i], v_mu_transf[i], v_sd_transf[i])
   }
+  
+  m_param_samp <- m_lhs_normal
+  colnames(m_param_samp) <- v_param_names
+  ## Get values in Original scale
+  m_param_samp[, 1:3] <- exp(m_lhs_normal[, 1:3])
+  m_param_samp[, 4]   <- logitnorm::invlogit(m_lhs_normal[, 4])
+  
   return(m_param_samp)
 }
 
@@ -83,34 +128,58 @@ sample.prior <- function(n_samp,
 #' @return 
 #' A scalar (or vector) with log-prior values.
 #' @examples 
-#' v_param_names  <- c("p_S1S2", "hr_S1", "hr_S2")
+#' v_param_names  <- c("r_DieMets",
+#'                     "r_RecurCDX2pos",
+#'                     "hr_RecurCDX2neg",
+#'                     "p_Mets")
 #' n_param        <- length(v_param_names)
-#' v_lb <- c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5)  # lower bound
-#' v_ub <- c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15) # upper bound
+#' v_lb <- c(r_DieMets       = 0.037, 
+#'           r_RecurCDX2pos  = 0.001,
+#'           hr_RecurCDX2neg = 1.58, 
+#'           p_Mets          = 0.9))  # lower bound
+#' v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, 
+#'           r_RecurCDX2pos  = 0.03,
+#'           hr_RecurCDX2neg = 4.72, 
+#'           p_Mets          = 0.99) # upper bound
 #' log_prior(v_params = sample.prior(n_samp = 5))
 #' @export
 log_prior <- function(v_params, 
-                      v_param_names = c("p_S1S2", "hr_S1", "hr_S2"),
-                      v_lb = c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5),
-                      v_ub = c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15)){
+                      v_param_names = c("r_DieMets",
+                                        "r_RecurCDX2pos",
+                                        "hr_RecurCDX2neg",
+                                        "p_Mets"),
+                      v_lb = c(r_DieMets       = 0.037, # O'Connell 2004 JNCI Stg IV Fig1 & Fig2;
+                               r_RecurCDX2pos  = 0.001,
+                               hr_RecurCDX2neg = 1.58, 
+                               p_Mets          = 0.9),
+                      v_ub = c(r_DieMets       = -log(1-(1-0.03))/60, # Rutter 2013 JNCI Table 4 5yr RS Colon cancer Stage IV 80+ Lower bound
+                               r_RecurCDX2pos  = 0.03,
+                               hr_RecurCDX2neg = 4.72, 
+                               p_Mets          = 0.99)){
   if(is.null(dim(v_params))) { # If vector, change to matrix
     v_params <- t(v_params) 
   }
-  n_param <- length(v_param_names)
-  n_samp <- nrow(v_params)
   colnames(v_params) <- v_param_names
+  ## Number of parameters
+  n_param <- length(v_param_names)
+  ## Number of samples
+  n_samp <- nrow(v_params)
+  
+  ### Transformed design 
+  ## Transformed bounds
+  v_lb_transf <- c(log(v_lb[1:3]), logitnorm::logit(v_lb[4]))
+  v_ub_transf <- c(log(v_ub[1:3]), logitnorm::logit(v_ub[4]))
+  # Find means and SDs of logit-normal and log-normal based on bounds 
+  # assuming bounds are represent the 95% equal tailed interval for these 
+  # distributions
+  v_mu_transf <- (v_ub_transf + v_lb_transf)/2
+  v_sd_transf <- (v_ub_transf - v_lb_transf)/(2*2) # *1.96
+  
   lprior <- rep(0, n_samp)
-  for (i in 1:n_param){
-    lprior <- lprior + dunif(v_params[, i],
-                             min = v_lb[i],
-                             max = v_ub[i], 
-                             log = T)
-    # ALTERNATIVE prior using beta distributions
-    # lprior <- lprior + dbeta(v_params[, i],
-    #                          min = 1,
-    #                          max = 1, 
-    #                          log = T)
-  }
+  lprior <- lprior + dlnorm(v_params[, 1], v_mu_transf[1], v_sd_transf[1], log = T)
+  lprior <- lprior + dlnorm(v_params[, 2], v_mu_transf[2], v_sd_transf[2], log = T)
+  lprior <- lprior + dlnorm(v_params[, 3], v_mu_transf[3], v_sd_transf[3], log = T)
+  lprior <- lprior + logitnorm::dlogitnorm(v_params[, 4], v_mu_transf[4], v_sd_transf[4], log = T)
   return(lprior)
 }
 
