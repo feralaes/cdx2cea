@@ -6,9 +6,11 @@
 \usage{
 sample.prior(
   n_samp,
-  v_param_names = c("p_S1S2", "hr_S1", "hr_S2"),
-  v_lb = c(p_S1S2 = 0.01, hr_S1 = 1, hr_S2 = 5),
-  v_ub = c(p_S1S2 = 0.5, hr_S1 = 4.5, hr_S2 = 15)
+  v_param_names = c("r_DieMets", "r_RecurCDX2pos", "hr_RecurCDX2neg", "p_Mets"),
+  v_lb = c(r_DieMets = 0.037, r_RecurCDX2pos = 0.001, hr_RecurCDX2neg = 1.58, p_Mets =
+    0.9),
+  v_ub = c(r_DieMets = -log(1 - (1 - 0.03))/60, r_RecurCDX2pos = 0.03, hr_RecurCDX2neg
+    = 4.72, p_Mets = 0.99)
 )
 }
 \arguments{
@@ -29,9 +31,18 @@ parameter set sampled from their prior distributions
 distribution.
 }
 \examples{
-v_param_names  <- c("p_S1S2", "hr_S1", "hr_S2")
+v_param_names  <- c("r_DieMets",
+                    "r_RecurCDX2pos",
+                    "hr_RecurCDX2neg",
+                    "p_Mets")
 n_param        <- length(v_param_names)
-v_lb <- c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5)  # lower bound
-v_ub <- c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15) # upper bound
+v_lb <- c(r_DieMets       = 0.037, 
+          r_RecurCDX2pos  = 0.001,
+          hr_RecurCDX2neg = 1.58, 
+          p_Mets          = 0.9))  # lower bound
+v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, 
+          r_RecurCDX2pos  = 0.03,
+          hr_RecurCDX2neg = 4.72, 
+          p_Mets          = 0.99) # upper bound
 sample.prior(2)
 }

@@ -34,6 +34,15 @@ l_out_stm <- decision_model(l_params_all = l_params_all)
 ### Plot Markov cohort trace
 gg_trace <- plot_trace(l_params_all, m_M = l_out_stm$m_M)
 gg_trace
+ggsave(gg_trace,
+       filename = "figs/02_trace_plot.pdf",
+       width = 8, height = 6)
+ggsave(gg_trace,
+       filename = "figs/02_trace_plot.png",
+       width = 8, height = 6)
+ggsave(gg_trace,
+       filename = "figs/02_trace_plot.jpg",
+       width = 8, height = 6)
 
 ### Plot state-transition diagram
 png("figs/02_model_diagram.png")

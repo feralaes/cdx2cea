@@ -19,11 +19,13 @@ rm(list = ls()) # to clean the workspace
 
 #### 04.1 Load packages and functions ####
 #### 04.1.1 Load packages ####
-# Dependencies have been loaded with 'darthpack'
+# Dependencies have been loaded with 'cdx2cea'
 
 #### 04.1.2 Load inputs ####
-l_params_all <- load_all_params(file.init = "data-raw/01_init_params.csv",
-                                file.mort = "data-raw/01_all_cause_mortality.csv") # function in darthpack
+l_params_init_valid <- load_params_init(n_age_init = 75, 
+                                        n_age_max = 80)
+l_params_all_valid <- load_all_params(l_params_init = l_params_init_valid)
+
 
 #### 04.1.3 Load functions ####
 # no required functions
@@ -39,129 +41,92 @@ data("v_calib_post_map")
 n_samp <- nrow(m_calib_post)
 
 ### Define matrices to store model outputs
-m_out_surv <- matrix(NA, nrow = n_samp, ncol = nrow(SickSicker_targets$Surv))
-colnames(m_out_surv) <- SickSicker_targets$Surv$Time
-m_out_prev <- matrix(NA, nrow = n_samp, ncol = nrow(SickSicker_targets$Prev))
-colnames(m_out_prev) <- SickSicker_targets$Prev$Time
-m_out_prop <- matrix(NA, nrow = n_samp, ncol = nrow(SickSicker_targets$PropSicker))
-colnames(m_out_prop) <- SickSicker_targets$PropSicker$Time
+m_dfs_neg <- matrix(NA, nrow = n_samp, ncol = 61)
+m_dfs_pos <- matrix(NA, nrow = n_samp, ncol = 61)
+m_os_neg  <- matrix(NA, nrow = n_samp, ncol = 61)
+m_os_pos  <- matrix(NA, nrow = n_samp, ncol = 61)
+m_dss_neg <- matrix(NA, nrow = n_samp, ncol = 61)
+m_dss_pos <- matrix(NA, nrow = n_samp, ncol = 61)
+
+### Create data frames with model predicted outputs
+df_dfs_neg <- data.frame(Outcome = "DFS", CDX2 = "Negative", m_dfs_neg)
+df_dfs_pos <- data.frame(Outcome = "DFS", CDX2 = "Positive", m_dfs_pos)
+df_os_neg  <- data.frame(Outcome = "OS",  CDX2 = "Negative", m_os_neg)
+df_os_pos  <- data.frame(Outcome = "OS",  CDX2 = "Positive", m_os_pos)
+df_dss_neg <- data.frame(Outcome = "DSS", CDX2 = "Negative", m_dss_neg)
+df_dss_pos <- data.frame(Outcome = "DSS", CDX2 = "Positive", m_dss_pos)
 
 ### Evaluate model at each posterior sample and store results
 for(i in 1:n_samp){ # i = 1
   l_out_post <- calibration_out(v_params_calib = m_calib_post[i, ], 
-                                  l_params_all = l_params_all)
-  m_out_surv[i, ] <- l_out_post$Surv
-  m_out_prev[i, ] <- l_out_post$Prev
-  m_out_prop[i, ] <- l_out_post$PropSicker
+                                  l_params_all = l_params_all_valid)
+  df_dfs_neg[i, -c(1, 2)] <- l_out_post$v_dfs_CDX2neg
+  df_dfs_pos[i, -c(1, 2)] <- l_out_post$v_dfs_CDX2pos
+  df_os_neg[i, -c(1, 2)]  <- l_out_post$v_os_CDX2neg
+  df_os_pos[i, -c(1, 2)]  <- l_out_post$v_os_CDX2pos
+  df_dss_neg[i, -c(1, 2)] <- l_out_post$v_dss_CDX2neg 
+  df_dss_pos[i, -c(1, 2)] <- l_out_post$v_dss_CDX2pos 
   cat('\r', paste(round(i/n_samp * 100), "% done", sep = " ")) # display progress
 }
 
-### Create data frames with model predicted outputs
-df_out_surv <- data.frame(Type = "Model", 
-                          Target = "Survival",
-                          m_out_surv, 
-                          check.names = FALSE)
-df_out_prev <- data.frame(Type = "Model", 
-                          Target = "Prevalence",
-                          m_out_prev, 
-                          check.names = FALSE)
-df_out_prop <- data.frame(Type = "Model", 
-                          Target = "Proportion of Sicker",
-                          m_out_prop, 
-                          check.names = FALSE)
+### Combine all outputs
+df_out_valid <- dplyr::bind_rows(df_dfs_neg,
+                                 df_dfs_pos,
+                                 df_os_pos ,
+                                 df_os_neg ,
+                                 df_dss_pos,
+                                 df_dss_neg)
+### Rename time variable
+colnames(df_out_valid)[3:ncol(df_out_valid)] <- 0:60
 
-### Transform data frames to long format
-df_out_surv_lng <- reshape2::melt(df_out_surv, 
-                         id.vars = c("Type", "Target"), 
-                         variable.name = "Time")
-df_out_prev_lng <- reshape2::melt(df_out_prev, 
-                         id.vars = c("Type", "Target"), 
-                         variable.name = "Time")
-df_out_prop_lng <- reshape2::melt(df_out_prop, 
-                         id.vars = c("Type", "Target"), 
-                         variable.name = "Time")
+### Transform data.frame to long format
+df_out_valid_lng <- reshape2::melt(df_out_valid,
+                                   id.vars = c("Outcome", "CDX2"))
+### Compute posterior-predicted 95% CI
+df_out_valid_sum <- data_summary(df_out_valid_lng, varname = "value",
+                                 groupnames = c("Outcome", "CDX2", "variable"))
+df_out_valid_sum$Time <- as.numeric(df_out_valid_sum$variable)
 
-### Compute posterior model-predicted 95% CI
-df_out_surv_sum <- data_summary(df_out_surv_lng, varname = "value",
-                                groupnames = c("Type", "Target", "Time"))
-df_out_prev_sum <- data_summary(df_out_prev_lng, varname = "value",
-                                groupnames = c("Type", "Target", "Time"))
-df_out_prop_sum <- data_summary(df_out_prop_lng, varname = "value",
-                                groupnames = c("Type", "Target", "Time"))
+### Only 5-yr survival
+df_out_valid_5yr_sum <- df_out_valid_sum %>% 
+  dplyr::filter(Time == 60) %>%
+  dplyr::mutate(Source = "Model",
+                N = NaN) %>%
+  dplyr::select(Source, Outcome, CDX2, Time, S = value, se = sd, lb, ub)
+df_out_valid_5yr_sum$Time <- df_out_valid_5yr_sum$Time-1
 
-#### 04.3.2 Compute model-predicted outputs at MAP estimate ####
-l_out_calib_map <- calibration_out(v_params_calib = v_calib_post_map, 
-                                   l_params_all = l_params_all)
+### Combine model-predicted outputs with targets
+df_model_n_targets <- dplyr::bind_rows(df_out_valid_5yr_sum,
+                                       df_calibration_targets)
+levels(df_model_n_targets$CDX2) <- c("CDX2-negative","CDX2-positive")
 
 #### 04.4 Internal validation: Model-predicted outputs vs. targets ####
-### TARGET 1: Survival ("Surv")
-png("figs/04_posterior_vs_targets_survival.png", 
-    width = 8, height = 6, units = 'in', res = 300)
-plotrix::plotCI(x = SickSicker_targets$Surv$Time, y = SickSicker_targets$Surv$value, 
-                ui = SickSicker_targets$Surv$ub,
-                li = SickSicker_targets$Surv$lb,
-                ylim = c(0, 1), 
-                xlab = "Time", ylab = "Pr(Alive)")
-lines(x = SickSicker_targets$Surv$Time,
-      y = df_out_surv_sum$lb, col = "red", lty = 2)
-lines(x = SickSicker_targets$Surv$Time,
-      y = df_out_surv_sum$ub, col = "red", lty = 2)
-points(x = SickSicker_targets$Surv$Time, 
-       y = l_out_calib_map$Surv, 
-       pch = 8, col = "red")
-legend("bottomright", 
-       legend = c("Target", 
-                  "Model-predicted 95% CrI",
-                  "Model-predicted output at MAP"),
-       col = c("black", "red", "red"), 
-       pch = c(1, NA, 8),
-       lty = c(NA, 2, NA))
-dev.off()
-
-### TARGET 2: Prevalence ("Prev")
-png("figs/04_posterior_vs_targets_prevalence.png", 
-    width = 8, height = 6, units = 'in', res = 300)
-plotrix::plotCI(x = SickSicker_targets$Prev$Time, y = SickSicker_targets$Prev$value, 
-                ui = SickSicker_targets$Prev$ub,
-                li = SickSicker_targets$Prev$lb,
-                ylim = c(0, 1), 
-                xlab = "Time", ylab = "Pr(Sick+Sicker)")
-lines(x = SickSicker_targets$Prev$Time,
-      y = df_out_prev_sum$lb, col = "red", lty = 2)
-lines(x = SickSicker_targets$Prev$Time,
-      y = df_out_prev_sum$ub, col = "red", lty = 2)
-points(x = SickSicker_targets$Prev$Time, 
-       y = l_out_calib_map$Prev, 
-       pch = 8, col = "red")
-legend("bottomright", 
-       legend = c("Target", 
-                  "Model-predicted 95% CrI",
-                  "Model-predicted output at MAP"),
-       col = c("black", "red", "red"), 
-       pch = c(1, NA, 8),
-       lty = c(NA, 2, NA))
-dev.off()
-
-### TARGET 3: Proportion who are Sicker ("PropSicker"), among all those afflicted (Sick+Sicker)
-png("figs/04_posterior_vs_targets_proportion_sicker.png", 
-    width = 8, height = 6, units = 'in', res = 300)
-plotrix::plotCI(x = SickSicker_targets$PropSick$Time, y = SickSicker_targets$PropSick$value, 
-                ui = SickSicker_targets$PropSick$ub,
-                li = SickSicker_targets$PropSick$lb,
-                ylim = c(0, 1), 
-                xlab = "Time", ylab = "Pr(Sicker | Sick+Sicker)")
-lines(x = SickSicker_targets$PropSicker$Time,
-      y = df_out_prop_sum$lb, col = "red", lty = 2)
-lines(x = SickSicker_targets$PropSicker$Time,
-      y = df_out_prop_sum$ub, col = "red", lty = 2)
-points(x = SickSicker_targets$PropSicker$Time, 
-       y = l_out_calib_map$PropSicker, 
-       pch = 8, col = "red")
-legend("bottomright", 
-       legend = c("Target", 
-                  "Model-predicted 95% CrI",
-                  "Model-predicted output at MAP"),
-       col = c("black", "red", "red"), 
-       pch = c(1, NA, 8),
-       lty = c(NA, 2, NA))
-dev.off()
+gg_valid <- ggplot(df_model_n_targets,
+       aes(x = Outcome, y = S,
+           ymin = lb, ymax = ub,
+           fill = Source, 
+           shape = Source)) +
+  # geom_point(position = position_dodge()) +
+  facet_wrap(~CDX2) +
+  # geom_bar(position = position_dodge(), 
+  #          stat = "identity", alpha = 0.4) +
+  geom_errorbar(aes(color = Source), 
+                position = position_dodge2(width = 0.5, padding = 0.7)) +
+  scale_color_manual(values = c("Calibration target" = "black", "Model" = "red")) +
+  scale_fill_manual(values = c("Calibration target" = "black", "Model" = "red")) +
+  scale_shape_manual(values = c("Calibration target" = 1, "Model" = 8)) +
+  xlab("") +
+  ylab("5-year survival") +
+  theme_bw(base_size = 16) +
+  theme(legend.position = "bottom",
+        legend.title = element_blank())
+gg_valid
+ggsave(gg_valid,
+       filename = "figs/04_validation_posterior_vs_targets.pdf",
+       width = 8, height = 6)
+ggsave(gg_valid,
+       filename = "figs/04_validation_posterior_vs_targets.png",
+       width = 8, height = 6)
+ggsave(gg_valid,
+       filename = "figs/04_validation_posterior_vs_targets.jpg",
+       width = 8, height = 6)

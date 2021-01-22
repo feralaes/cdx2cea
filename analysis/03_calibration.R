@@ -18,13 +18,16 @@ rm(list = ls()) # to clean the workspace
 
 #### 03.1 Load packages, data and functions ####
 #### 03.1.1 Load packages and functions ####
-# Dependencies have been loaded with 'darthpack'
+# Dependencies have been loaded with 'cdx2cea'
 library(logitnorm)
+library(ggplot2)
+library(doParallel)
+library(GGally)
 
 #### 03.1.2 Load inputs ####
-l_params_inmit_calib <- load_params_init(n_age_init = 75, 
-                                         n_age_max = 80)
-l_params_all_calib <- load_all_params(l_params_init = l_params_inmit_calib)
+l_params_init_calib <- load_params_init(n_age_init = 75, 
+                                        n_age_max = 80)
+l_params_all_calib <- load_all_params(l_params_init = l_params_init_calib)
 
 #### 03.1.3 Load functions ####
 # no required functions
@@ -33,30 +36,35 @@ l_params_all_calib <- load_all_params(l_params_init = l_params_inmit_calib)
 data("03_calibration_targets")
 
 #### 03.2 Visualize targets ####
-### TARGET 1: Survival ("Surv")
-plotrix::plotCI(x    = SickSicker_targets$Surv$Time, 
-                y    = SickSicker_targets$Surv$value, 
-                ui   = SickSicker_targets$Surv$ub,
-                li   = SickSicker_targets$Surv$lb,
-                ylim = c(0, 1), 
-                xlab = "Time", ylab = "Pr(Alive)")
-
-### TARGET 2: Prevalence ("Prev")
-plotrix::plotCI(x    = SickSicker_targets$Prev$Time, 
-                y    = SickSicker_targets$Prev$value, 
-                ui   = SickSicker_targets$Prev$ub,
-                li   = SickSicker_targets$Prev$lb,
-                ylim = c(0, 1), 
-                xlab = "Time", ylab = "Pr(Sick+Sicker)")
-
-### TARGET 3: Proportion who are Sicker ("PropSicker"), among all those 
-###           afflicted (Sick+Sicker)
-plotrix::plotCI(x    = SickSicker_targets$PropSick$Time, 
-                y    = SickSicker_targets$PropSick$value, 
-                ui   = SickSicker_targets$PropSick$ub,
-                li   = SickSicker_targets$PropSick$lb,
-                ylim = c(0, 1), 
-                xlab = "Time", ylab = "Pr(Sicker | Sick+Sicker)")
+gg_targets <- ggplot(df_calibration_targets,
+       aes(x = Outcome, y = S,
+           ymin = lb, ymax = ub,
+           fill = Source, 
+           shape = Source)) +
+  # geom_point(position = position_dodge()) +
+  facet_wrap(~CDX2) +
+  # geom_bar(position = position_dodge(), 
+  #          stat = "identity", alpha = 0.4) +
+  geom_errorbar(aes(color = Source), 
+                position = position_dodge2(width = 0.5, padding = 0.7)) +
+  scale_color_manual(values = c("Calibration target" = "black", "Model" = "red")) +
+  scale_fill_manual(values = c("Calibration target" = "black", "Model" = "red")) +
+  scale_shape_manual(values = c("Calibration target" = 1, "Model" = 8)) +
+  xlab("") +
+  ylab("5-year survival") +
+  theme_bw(base_size = 16) +
+  theme(legend.position = "bottom",
+        legend.title = element_blank())
+gg_targets
+ggsave(gg_targets,
+       filename = "figs/03_calibration_targets.pdf",
+       width = 8, height = 6)
+ggsave(gg_targets,
+       filename = "figs/03_calibration_targets.png",
+       width = 8, height = 6)
+ggsave(gg_targets,
+       filename = "figs/03_calibration_targets.jpg",
+       width = 8, height = 6)
 
 #### 03.3 Run calibration algorithms ####
 # Check that it works
@@ -69,7 +77,7 @@ calibration_out(v_params_calib = v_params_calib,
 
 #### 03.3.1 Specify calibration parameters ####
 ### Specify seed (for reproducible sequence of random numbers)
-set.seed(072218)
+set.seed(1234)
 
 ### Number of random samples to obtain from the posterior distribution 
 n_resamp <- 1000
@@ -117,7 +125,7 @@ m_calib_post_95cr <- matrixStats::colQuantiles(m_calib_post,
                                                probs = c(0.025, 0.5, 0.975))
 
 ### Compute posterior values for draw
-v_calib_post      <- exp(log_post(m_calib_post))
+v_calib_post <- exp(log_post(m_calib_post))
 
 ### Compute maximum-a-posteriori (MAP) as the mode of the sampled values
 v_calib_post_map  <- m_calib_post[which.max(v_calib_post), ]
@@ -145,33 +153,76 @@ write.csv(df_posterior_summ,
 v_calib_alpha <- scales::rescale(v_calib_post)
 
 ### Plot the 1000 draws from the posterior
-png("figs/03_posterior_distribution_joint.png", 
-    width = 8, height = 6, units = 'in', res = 300)
-  s3d <- scatterplot3d::scatterplot3d(x = m_calib_post[, 1],
-                       y = m_calib_post[, 2],
-                       z = m_calib_post[, 3],
-                       color = scales::alpha("black", v_calib_alpha),
-                       xlim = c(v_lb[1], v_ub[1]), 
-                       ylim = c(v_lb[2], v_ub[2]), 
-                       zlim = c(v_lb[3], v_ub[3]),
-                       xlab = v_param_names[1], 
-                       ylab = v_param_names[2], 
-                       zlab = v_param_names[3])
-  ## Add center of Gaussian components
-  s3d$points3d(l_fit_imis$center, col = "red", pch = 8)
-  ## Add legend
-  legend(s3d$xyz.convert(0.05, 1.0, 5), 
-         col = c("black", "red"), 
-         bg = "white", pch = c(1, 8), yjust = 0, 
-         legend = c("Posterior sample", "Center of Gaussian components"), 
-         cex = 1.1)
-dev.off()
+gg_post_pairs_corr <- ggpairs(data.frame(m_calib_post),
+                              upper = list(continuous = wrap("cor",
+                                                             color = "black",
+                                                             size = 5)),
+                              diag = list(continuous = wrap("barDiag",
+                                                            alpha = 0.8)),
+                              lower = list(continuous = wrap("points", 
+                                                             alpha = 0.3,
+                                                             size = 0.5)),
+                              # columnLabels = c("mu[DieMets]",
+                              #                  "mu[recurCDX2pos]",
+                              #                  "hr[recurCDX2neg]",
+                              #                  "p[Mets]"),
+                              labeller = "label_parsed") +
+  theme_bw(base_size = 18) +
+  theme(axis.title.x = element_blank(),
+        axis.text.x  = element_text(size=6),
+        axis.title.y = element_blank(),
+        axis.text.y  = element_blank(),
+        axis.ticks.y = element_blank())
+gg_post_pairs_corr
+ggsave(filename = "figs/03_posterior-IMIS-correlation-1k.pdf",
+       width = 11, height = 9)
+ggsave(filename = "figs/03_posterior-IMIS-correlation-1k.jpeg",
+       width = 11, height = 9)
+ggsave(filename = "figs/03_posterior-IMIS-correlation-1k.png",
+       width = 11, height = 9)
 
 ### Plot the 1000 draws from the posterior with marginal histograms
-png("figs/03_posterior_distribution_marginal.png", 
-    width = 8, height = 6, units = 'in', res = 300)
-  psych::pairs.panels(m_calib_post)
-dev.off()
+m_samp_prior <- sample.prior(n_resamp)
+df_samp_prior<- reshape2::melt(cbind(PDF = "Prior", 
+                           as.data.frame(m_samp_prior)), 
+                     variable.name = "Parameter")
+df_samp_post_imis <- reshape2::melt(cbind(PDF = "Posterior IMIS",
+                                as.data.frame(m_calib_post)),
+                          variable.name = "Parameter")
+df_samp_prior_post <- dplyr::bind_rows(df_samp_prior, 
+                                       df_samp_post_imis)
+# df_samp_prior_post$Parameter <- factor(df_samp_prior_post$Parameter, 
+#                                        levels = levels(df_samp_prior_post$Parameter),
+#                                        ordered = TRUE, 
+#                                        labels = c(expression(mu[DieMets]),
+#                                                   expression(mu[recurCDX2pos]),
+#                                                   expression(hr[recurCDX2neg]),
+#                                                   expression(p[Mets])
+#                                                    ))
+gg_post_imis <- ggplot(df_samp_prior_post, 
+                       aes(x = value, y = ..density.., fill = PDF)) +
+  facet_wrap(~Parameter, scales = "free", 
+             ncol = 4,
+             labeller = label_parsed) +
+  scale_x_continuous(breaks = dampack::number_ticks(4)) +
+  geom_density(alpha=0.5) +
+  theme_bw(base_size = 16) +
+  theme(legend.position = "bottom",
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+gg_post_imis
+
+ggsave(gg_post_imis,
+       filename = "figs/03_posterior_v_prior-IMIS-1k.pdf",
+       width = 10, height = 6)
+ggsave(gg_post_imis,
+       filename = "figs/03_posterior_v_prior-IMIS-1k.png",
+       width = 10, height = 6)
+ggsave(gg_post_imis,
+       filename = "figs/03_posterior_v_prior-IMIS-1k.jpg",
+       width = 10, height = 6)
 
 #### 03.5 Store posterior and MAP from IMIS calibration ####
 save(m_calib_post,

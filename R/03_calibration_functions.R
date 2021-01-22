@@ -14,6 +14,8 @@ calibration_out <- function(v_params_calib, l_params_all){ # User defined
   # calibrated values
   l_params_all <- update_param_list(l_params_all = l_params_all, params_updated = v_params_calib)
   
+  (l_params_all[names(v_params_calib)])
+  
   ## Run model with updated calibrated parameters by CDX2 status
   # For CDX2-negative patients
   l_out_stm_CDX2neg <- decision_model(l_params_all = l_params_all, 
@@ -36,12 +38,12 @@ calibration_out <- function(v_params_calib, l_params_all){ # User defined
   v_dss_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Local", "Mets", "Dead_OC")])
   
   ####### Return Output ###########################################
-  l_out <- list(v_dfs_CDX2neg = v_dfs_CDX2neg,
-                v_dfs_CDX2pos = v_dfs_CDX2pos,
-                v_os_CDX2neg  = v_os_CDX2neg,
-                v_os_CDX2pos  = v_os_CDX2pos,
-                v_dss_CDX2neg = v_dss_CDX2neg,
-                v_dss_CDX2pos = v_dss_CDX2pos)
+  l_out <- list(v_dfs_CDX2neg = v_dfs_CDX2neg[61],
+                v_dfs_CDX2pos = v_dfs_CDX2pos[61],
+                v_os_CDX2neg  = v_os_CDX2neg[61],
+                v_os_CDX2pos  = v_os_CDX2pos[61],
+                v_dss_CDX2neg = v_dss_CDX2neg[61],
+                v_dss_CDX2pos = v_dss_CDX2pos[61])
   return(l_out)
 }
 
@@ -190,10 +192,19 @@ log_prior <- function(v_params,
 #' @return 
 #' A scalar (or vector) with prior values.
 #' @examples
-#' v_param_names  <- c("p_S1S2", "hr_S1", "hr_S2")
+#' v_param_names  <- c("r_DieMets",
+#'                     "r_RecurCDX2pos",
+#'                     "hr_RecurCDX2neg",
+#'                     "p_Mets")
 #' n_param        <- length(v_param_names)
-#' v_lb <- c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5)  # lower bound
-#' v_ub <- c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15) # upper bound
+#' v_lb <- c(r_DieMets       = 0.037, 
+#'           r_RecurCDX2pos  = 0.001,
+#'           hr_RecurCDX2neg = 1.58, 
+#'           p_Mets          = 0.9))  # lower bound
+#' v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, 
+#'           r_RecurCDX2pos  = 0.03,
+#'           hr_RecurCDX2neg = 4.72, 
+#'           p_Mets          = 0.99) # upper bound
 #' prior(v_params = sample.prior(n_samp = 5))
 #' @export
 prior <- function(v_params) { 
@@ -213,13 +224,22 @@ prior <- function(v_params) {
 #' @importFrom stats dnorm dunif quantile qunif rbeta rgamma sd
 #' @examples 
 #' \dontrun{
-#'   v_param_names  <- c("p_S1S2", "hr_S1", "hr_S2")
-#'   n_param        <- length(v_param_names)
-#'   v_lb <- c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5)  # lower bound
-#'   v_ub <- c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15) # upper bound
-#'   v_target_names <- c("Surv", "Prev", "PropSick")
-#'   n_target       <- length(v_target_names)
-#'   log_lik(v_params = sample.prior(n_samp = 2))
+#' v_param_names  <- c("r_DieMets",
+#'                     "r_RecurCDX2pos",
+#'                     "hr_RecurCDX2neg",
+#'                     "p_Mets")
+#' n_param        <- length(v_param_names)
+#' v_lb <- c(r_DieMets       = 0.037, 
+#'           r_RecurCDX2pos  = 0.001,
+#'           hr_RecurCDX2neg = 1.58, 
+#'           p_Mets          = 0.9))  # lower bound
+#' v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, 
+#'           r_RecurCDX2pos  = 0.03,
+#'           hr_RecurCDX2neg = 4.72, 
+#'           p_Mets          = 0.99) # upper bound
+#' v_target_names <- c("DFS", "OS", "DSS")
+#' n_target       <- length(v_target_names)
+#' log_lik(v_params = sample.prior(n_samp = 2))
 #' }
 #' @export
 log_lik <- function(v_params,
@@ -229,38 +249,41 @@ log_lik <- function(v_params,
   }
   
   n_samp <- nrow(v_params)
-  v_target_names <- c("Surv", "Prev", "PropSick")
+  v_target_names <- c("DFS", "OS", "DSS")
   n_target       <- length(v_target_names)
   v_llik <- matrix(0, nrow = n_samp, ncol = n_target) 
   colnames(v_llik) <- v_target_names
   v_llik_overall <- numeric(n_samp)
   for(j in 1:n_samp) { # j=1
     jj <- tryCatch( { 
-      ###   Run model for parametr set "v_params" ###
+      ###   Run model for parameter set "v_params" ###
       l_model_res <- calibration_out(v_params_calib = v_params[j, ], 
                                      l_params_all = l_params_all)
       
       ###  Calculate log-likelihood of model outputs to targets  ###
-      ## TARGET 1: Survival ("Surv")
+      ## TARGET 1: Disease-free survival ("DFS")
       ## Normal log-likelihood  
-      v_llik[j, "Surv"] <- sum(dnorm(x = SickSicker_targets$Surv$value,
-                                     mean = l_model_res$Surv,
-                                     sd = SickSicker_targets$Surv$se,
+      v_llik[j, "DFS"] <- sum(dnorm(x = df_calibration_targets$S[1:2],
+                                     mean = c(l_model_res$v_dfs_CDX2neg,
+                                              l_model_res$v_dfs_CDX2pos),
+                                     sd = df_calibration_targets$se[1:2],
                                      log = T))
       
-      ## TARGET 2: Prevalence ("Prev")
+      ## TARGET 2: Overall survival ("OS")
       ## Normal log-likelihood
-      v_llik[j, "Prev"] <- sum(dnorm(x = SickSicker_targets$Prev$value,
-                                     mean = l_model_res$Prev,
-                                     sd = SickSicker_targets$Prev$se,
-                                     log = T))
+      v_llik[j, "OS"] <- sum(dnorm(x = df_calibration_targets$S[3:4],
+                                   mean = c(l_model_res$v_os_CDX2neg,
+                                            l_model_res$v_os_CDX2pos),
+                                   sd = df_calibration_targets$se[3:4],
+                                   log = T))
       
-      ## TARGET 3: Proportion Sick+Sicker who are Sick ("PropSick")
+      ## TARGET 3: Disease-specific survival ("DSS")
       ## Normal log-likelihood
-      v_llik[j, "PropSick"] <- sum(dnorm(x = SickSicker_targets$PropSick$value,
-                                         mean = l_model_res$PropSick,
-                                         sd = SickSicker_targets$PropSick$se,
-                                         log = T))
+      v_llik[j, "DSS"] <- sum(dnorm(x = df_calibration_targets$S[5:6],
+                                    mean = c(l_model_res$v_dss_CDX2neg,
+                                             l_model_res$v_dss_CDX2pos),
+                                    sd = df_calibration_targets$se[5:6],
+                                    log = T))
       
       ## OVERALL
       ## can give different targets different weights (user must change this)
@@ -275,6 +298,97 @@ log_lik <- function(v_params,
   return(v_llik_overall)
 }
 
+#' Parallel evaluation of log-likelihood function for a sets of parameters
+#'
+#' \code{log_lik_par} computes a log-likelihood value for one (or multiple) 
+#' parameter set(s) using parallel computation.
+#'
+#' @param v_params Vector (or matrix) of model parameters.
+#' @param l_params_all List with all parameters of the decision model. 
+#' @return 
+#' A scalar (or vector) with log-likelihood values.
+#' @importFrom stats dnorm dunif quantile qunif rbeta rgamma sd
+#' @examples 
+#' \dontrun{
+#' v_param_names  <- c("r_DieMets",
+#'                     "r_RecurCDX2pos",
+#'                     "hr_RecurCDX2neg",
+#'                     "p_Mets")
+#' n_param        <- length(v_param_names)
+#' v_lb <- c(r_DieMets       = 0.037, 
+#'           r_RecurCDX2pos  = 0.001,
+#'           hr_RecurCDX2neg = 1.58, 
+#'           p_Mets          = 0.9))  # lower bound
+#' v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, 
+#'           r_RecurCDX2pos  = 0.03,
+#'           hr_RecurCDX2neg = 4.72, 
+#'           p_Mets          = 0.99) # upper bound
+#' v_target_names <- c("DFS", "OS", "DSS")
+#' n_target       <- length(v_target_names)
+#' log_lik_par(v_params = sample.prior(n_samp = 2))
+#' }
+#' @export
+log_lik_par <- function(v_params, 
+                        l_params_all = l_params_all_calib,
+                        ...) { 
+  if(is.null(dim(v_params))) { # If vector, change to matrix
+    v_params <- t(v_params) 
+  }
+  
+  n_samp <- nrow(v_params)
+  
+  ### Get OS
+  os <- get_os()
+  
+  no_cores <- detectCores() - 2
+  
+  print(paste0("Parallelized Likelihood calculations on ", os, " using ", no_cores, " cores"))
+  
+  n_time_init_likpar <- Sys.time()
+  
+  if(os == "macosx"){
+    # Initialize cluster object
+    cl <- makeForkCluster(no_cores) 
+    registerDoParallel(cl)
+    v_llk <- foreach(i = 1:n_samp, .combine = c) %dopar% {
+      log_lik(v_params[i, ], l_params_all) # i = 1
+    }
+    n_time_end_likpar <- Sys.time()
+  }
+  if(os == "windows"){
+    # Initialize cluster object
+    cl <- makeCluster(no_cores)
+    registerDoParallel(cl)
+    opts <- list(attachExportEnv = TRUE)
+    v_llk <- foreach(i = 1:n_samp, .combine = c,
+                   .export = ls(globalenv()),
+                   .packages=c(),
+                   .options.snow = opts) %dopar% {
+                     log_lik(v_params[i, ], ...)
+                   }
+    n_time_end_likpar <- Sys.time()
+  }
+  if(os == "linux"){
+    # Initialize cluster object
+    cl <- makeCluster(no_cores)
+    registerDoMC(cl)
+    v_llk <- foreach(i = 1:n_samp, .combine = c) %dopar% {
+      log_lik(v_params[i, ], ...)
+    }
+    n_time_end_likpar <- Sys.time()
+  }
+  
+  stopCluster(cl)
+  n_time_total_likpar <- difftime(n_time_end_likpar, n_time_init_likpar, 
+                                  units = "hours")
+  print(paste0("Runtime: ", round(n_time_total_likpar, 2), " hrs."))
+  #-# Try this: # PO
+  rm(cl)        # PO
+  gc()          # PO
+  #-#           # PO
+  return(v_llk)
+}
+
 #' Likelihood
 #'
 #' \code{likelihood} computes a likelihood value for one (or multiple) 
@@ -284,16 +398,25 @@ log_lik <- function(v_params,
 #' @return 
 #' A scalar (or vector) with likelihood values.
 #' @examples
-#' v_param_names  <- c("p_S1S2", "hr_S1", "hr_S2")
+#' v_param_names  <- c("r_DieMets",
+#'                     "r_RecurCDX2pos",
+#'                     "hr_RecurCDX2neg",
+#'                     "p_Mets")
 #' n_param        <- length(v_param_names)
-#' v_lb <- c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5)  # lower bound
-#' v_ub <- c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15) # upper bound
-#' v_target_names <- c("Surv", "Prev", "PropSick")
+#' v_lb <- c(r_DieMets       = 0.037, 
+#'           r_RecurCDX2pos  = 0.001,
+#'           hr_RecurCDX2neg = 1.58, 
+#'           p_Mets          = 0.9))  # lower bound
+#' v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, 
+#'           r_RecurCDX2pos  = 0.03,
+#'           hr_RecurCDX2neg = 4.72, 
+#'           p_Mets          = 0.99) # upper bound
+#' v_target_names <- c("DFS", "OS", "DSS")
 #' n_target       <- length(v_target_names)
 #' likelihood(v_params = sample.prior(n_samp = 2))
 #' @export
 likelihood <- function(v_params){ 
-  v_like <- exp(log_lik(v_params)) 
+  v_like <- exp(log_lik_par(v_params)) 
   return(v_like)
 }
 
@@ -306,16 +429,25 @@ likelihood <- function(v_params){
 #' @return 
 #' A scalar (or vector) with log-posterior values.
 #' @examples 
-#' v_param_names  <- c("p_S1S2", "hr_S1", "hr_S2")
+#' v_param_names  <- c("r_DieMets",
+#'                     "r_RecurCDX2pos",
+#'                     "hr_RecurCDX2neg",
+#'                     "p_Mets")
 #' n_param        <- length(v_param_names)
-#' v_lb <- c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5)  # lower bound
-#' v_ub <- c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15) # upper bound
-#' v_target_names <- c("Surv", "Prev", "PropSick")
+#' v_lb <- c(r_DieMets       = 0.037, 
+#'           r_RecurCDX2pos  = 0.001,
+#'           hr_RecurCDX2neg = 1.58, 
+#'           p_Mets          = 0.9))  # lower bound
+#' v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, 
+#'           r_RecurCDX2pos  = 0.03,
+#'           hr_RecurCDX2neg = 4.72, 
+#'           p_Mets          = 0.99) # upper bound
+#' v_target_names <- c("DFS", "OS", "DSS")
 #' n_target       <- length(v_target_names)
 #' log_post(v_params = sample.prior(n_samp = 5))
 #' @export
 log_post <- function(v_params) { 
-  v_lpost <- log_prior(v_params) + log_lik(v_params)
+  v_lpost <- log_prior(v_params) + log_lik_par(v_params)
   return(v_lpost) 
 }
 
@@ -328,11 +460,20 @@ log_post <- function(v_params) {
 #' A scalar (or vector) with posterior values.
 #' @examples
 #' \dontrun{
-#'  v_param_names  <- c("p_S1S2", "hr_S1", "hr_S2")
-#'  n_param        <- length(v_param_names)
-#'  v_lb <- c(p_S1S2 = 0.01, hr_S1 = 1.0, hr_S2 = 5)  # lower bound
-#'  v_ub <- c(p_S1S2 = 0.50, hr_S1 = 4.5, hr_S2 = 15) # upper bound
-#'  v_target_names <- c("Surv", "Prev", "PropSick")
+#' v_param_names  <- c("r_DieMets",
+#'                     "r_RecurCDX2pos",
+#'                     "hr_RecurCDX2neg",
+#'                     "p_Mets")
+#' n_param        <- length(v_param_names)
+#' v_lb <- c(r_DieMets       = 0.037, 
+#'           r_RecurCDX2pos  = 0.001,
+#'           hr_RecurCDX2neg = 1.58, 
+#'           p_Mets          = 0.9))  # lower bound
+#' v_ub <- c(r_DieMets       = -log(1-(1-0.03))/60, 
+#'           r_RecurCDX2pos  = 0.03,
+#'           hr_RecurCDX2neg = 4.72, 
+#'           p_Mets          = 0.99) # upper bound
+#' v_target_names <- c("DFS", "OS", "DSS")
 #'  n_target       <- length(v_target_names)
 #'  posterior(v_params = sample.prior(n_samp = 5))
 #' }
@@ -340,4 +481,25 @@ log_post <- function(v_params) {
 posterior <- function(v_params) { 
   v_posterior <- exp(log_post(v_params)) 
   return(v_posterior)
+}
+
+#' Get operating system
+#' 
+#' @return 
+#' A string with the operating system.
+#' @export
+get_os <- function(){
+  sysinf <- Sys.info()
+  if (!is.null(sysinf)){
+    os <- sysinf['sysname']
+    if (os == 'Darwin')
+      os <- "MacOSX"
+  } else { ## mystery machine
+    os <- .Platform$OS.type
+    if (grepl("^darwin", R.version$os))
+      os <- "osx"
+    if (grepl("linux-gnu", R.version$os))
+      os <- "linux"
+  }
+  tolower(os)
 }

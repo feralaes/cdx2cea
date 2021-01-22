@@ -192,7 +192,7 @@ load_all_params <- function(l_params_init = NULL,
     # Filter for selected ages
     v_r_mort_by_age <- v_r_mort_by_age %>%
       filter(Age >= n_age_init & Age < n_age_max) %>%
-      select(Total) %>%
+      dplyr::select(Total) %>%
       as.matrix()
     # Compute monthly mortality rates 
     v_r_mort_by_age_month <- rep(v_r_mort_by_age, 

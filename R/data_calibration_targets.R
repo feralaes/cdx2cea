@@ -1,35 +1,17 @@
-#' Calibration targets for the Sick-Sicker model
+#' Calibration targets for the CDX2 STM model
 #'
-#' A list with calibration targets for the Sick-Sicker model
-#' @format A list with three calibration targets:
-#' \describe{
-#'   \item{Surv}{Survival target. A data frame with 3 rows and 8 variables:
-#'     \itemize{\item Target: Target name
-#'              \item Time: Time in years
-#'              \item Num: Number of people alive
-#'              \item Pop: Population at risk
-#'              \item value: Target value
-#'              \item se: Standard error
-#'              \item lb: 95\% CI lower bound
-#'              \item ub: 95\% CI lower bound} }
-#'   \item{Prev}{Prevalence target. A data frame with 3 rows and 8 variables:
-#'     \itemize{\item Target: Target name
-#'              \item Time: Time in years
-#'              \item Num: Number of sick people (either Sick or Sicker) 
-#'              \item Pop: Population at risk
-#'              \item value: Target value
-#'              \item se: Standard error
-#'              \item lb: 95\% CI lower bound
-#'              \item ub: 95\% CI lower bound} }
-#'   \item{PropSicker}{Proportion of Sicker people target. A data frame with 3 rows and 8 variables:
-#'     \itemize{\item Target: Target name
-#'              \item Time: Time in years
-#'              \item Num: Number of sick people in the Sicker state
-#'              \item Pop: Population of sick people (either Sick or Sicker) 
-#'              \item value: Target value
-#'              \item se: Standard error
-#'              \item lb: 95\% CI lower bound
-#'              \item ub: 95\% CI lower bound} }
-#' }
+#' A list with calibration targets for the CDX2 STM
+#' @format A data.frame with three calibration targets split in 2 rows and 9 
+#' variables:
+#' \itemize{\item Source: Source of outcome (i.e., calibration data)
+#'          \item Outcome: Outcome name (i.e., disease-free survival (DFS), 
+#'                overall survival (OS) and disease-specific survival (DSS)
+#'          \item CDX2: CDX2 status (i.e., negative or positive)
+#'          \item Time: Time in months
+#'          \item S: Survival
+#'          \item N: Sample size
+#'          \item se: Standard error
+#'          \item lb: Lower bound
+#'          \item ub: Upper bound}
 #' @md
-"SickSicker_targets"
+"df_calibration_targets"

@@ -118,7 +118,7 @@ decision_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     ## Check that all rows sum to 1
     darthtools::check_sum_of_transition_array(a_P, n_states, n_cycles, err_stop = err_stop, verbose = verbose)
     
-    #### Compute cohort trace matrix and transition array for age-dependent STM ####
+    #### Compute cohort trace matrix and dynamic transition array for age-dependent STM ####
     # Initialize cohort trace matrix
     m_M <- matrix(0, 
                   nrow = (n_cycles + 1), ncol = n_states, 
@@ -126,12 +126,23 @@ decision_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     # Set first row of m.M with the initial state vector
     m_M[1, ] <- v_s_init
     
+    # Initialize dynamic transition array
+    a_A <- array(0,
+                 dim      = c(n_states, n_states, n_cycles + 1),
+                 dimnames = list(v_names_states, v_names_states, 0:n_cycles))
+    # Set first slice of a_A with the initial state vector in its diagonal
+    diag(a_A[, , 1]) <- v_s_init
+    
     # Iterate STM over time
     for(t in 1:n_cycles){
+      ## Fill in cohort trace
       m_M[t + 1, ] <- m_M[t, ] %*% a_P[, , t]
+      ## Fill in transition-dynamics array
+      a_A[, , t + 1] <- m_M[t, ] * a_P[, , t]
     }
     return(list(a_P = a_P,
-                m_M = m_M))
+                m_M = m_M,
+                a_A = a_A))
   }
   )
 }
@@ -155,6 +166,7 @@ plot_trace <- function(l_params_all, m_M) {
   p <- ggplot(df_M_long, aes(x = Cycle, y = value, 
                              color = `Health State`, linetype = `Health State`)) +
     geom_line(size = 1) +
+    scale_y_continuous(limits = c(0, 1), breaks = dampack::number_ticks(6)) +
     xlab("Cycle") +
     ylab("Proportion of the cohort") +
     theme_bw(base_size = 14) +

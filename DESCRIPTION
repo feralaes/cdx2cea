@@ -26,6 +26,8 @@ Imports:
     reshape2,
     logitnorm,
     utils,
+    foreach,
+    doParallel,
     IMIS,
     plotrix,
     rlang
