@@ -40,7 +40,7 @@ n_str <- length(v_names_str)
 l_params_basecase <- update_param_list(l_params_all, v_calib_post_map) 
 
 #### 05b.3 Compute cost-effectiveness outcomes ####
-# l_ce_out <- ce_model(l_params_all = l_params_all)
+l_ce_out <- ce_model(l_params_all = l_params_all, Trt = TRUE)
 
 df_out_ce <- calculate_ce_out(l_params_all = l_params_basecase, 
                               n_wtp = 150000)
