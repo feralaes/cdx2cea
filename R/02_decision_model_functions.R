@@ -1,4 +1,4 @@
-#' Decision Model
+#' Decision model
 #'
 #' \code{decision_model} implements the decision model used.
 #'
@@ -12,19 +12,11 @@
 #' @param verbose Logical variable to indicate print out of messages. Default 
 #' = FALSE
 #' @return 
-#' The transition probability array and the cohort trace matrix.
+#' The transition probability array, the cohort trace matrix and the transition 
+#' dynamics array.
 #' @export
 decision_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
                            err_stop = FALSE, verbose = FALSE){ # User defined
-  ### Definition:
-  ##   Decision model implementation function
-  ### Arguments:  
-  ##   l_params_all: List with all parameters of decision model
-  ##   verbose: Logical variable to indicate print out of messages
-  ### Returns:
-  ##   a_P: Transition probability array
-  ##   m_M: Matrix cohort trace
-  ##
   with(as.list(l_params_all), {
     #### Error checking ####
     if (n_cycles != length(v_r_mort_by_age_month)) {

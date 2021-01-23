@@ -22,7 +22,7 @@ library(dplyr)    # For data manipulation
 library(survival) # For plotting state-transition diagram
 
 #### 02.1.2 Load inputs ####
-l_params_all <- load_all_params() # function in darthpack
+l_params_all <- load_all_params() # function in cdx2cea
 
 #### 02.1.3 Load functions ####
 # no functions required

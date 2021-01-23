@@ -4,7 +4,7 @@
 \alias{log_lik_par}
 \title{Parallel evaluation of log-likelihood function for a sets of parameters}
 \usage{
-log_lik_par(v_params, l_params_all = load_all_params(), ...)
+log_lik_par(v_params, l_params_all = l_params_all_calib, ...)
 }
 \arguments{
 \item{v_params}{Vector (or matrix) of model parameters.}

@@ -21,8 +21,7 @@
 library(dampack) 
 
 #### 05b.1.2 Load inputs ####
-l_params_all <- load_all_params(file.init = "data-raw/01_init_params.csv",
-                                file.mort = "data-raw/01_all_cause_mortality.csv") # function in darthpack
+l_params_all <- load_all_params() # function in cdx2cea
 
 #### 05b.1.3 Load functions ####
 # no required functions
@@ -41,6 +40,8 @@ n_str <- length(v_names_str)
 l_params_basecase <- update_param_list(l_params_all, v_calib_post_map) 
 
 #### 05b.3 Compute cost-effectiveness outcomes ####
+# l_ce_out <- ce_model(l_params_all = l_params_all)
+
 df_out_ce <- calculate_ce_out(l_params_all = l_params_basecase, 
                               n_wtp = 150000)
 df_out_ce

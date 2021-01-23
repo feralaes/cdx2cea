@@ -83,7 +83,7 @@ load_params_init <- function(
   c_CRCStg2_cont <- (c_CRCStg2_cont*inf_pce)/n_cycles_year # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
   c_CRCStg4_cont <- (c_CRCStg4_cont*inf_pce)/n_cycles_year # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
   ic_DeathCRCStg2 <- ic_DeathCRCStg2*inf_pce # 92851, # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-  ic_DeathOCStg2  <- ic_DeathCRCStg2*inf_pce # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD 
+  ic_DeathOCStg2  <- ic_DeathOCStg2*inf_pce # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD 
   
   ### Create list of initial parameters
   l_params_init <- list(

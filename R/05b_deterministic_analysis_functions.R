@@ -1,3 +1,167 @@
+#' Cost-effectiveness model
+#'
+#' \code{ce_model} implements the cost-effectiveness model used.
+#'
+#' @param l_params_all List with all parameters of cost-effectiveness model
+#' @param p_CDX2neg_init Initial proportion of CDX2-negative patients. Default 
+#' is NULL and will take the value of \code{p_CDX2neg} defined in 
+#' \code{load_all_params()}
+#' @param Trt is this the Treat All strategy? (default is FALSE)
+#' @param err_stop Logical variable to stop model run if set up as TRUE. Default 
+#' = FALSE.
+#' @param verbose Logical variable to indicate print out of messages. Default 
+#' = FALSE
+#' @return 
+#' The transition probability array, the cohort trace matrix, the transition 
+#' dynamics array, and the undiscounted and discounted life years (LYs), 
+#' quality-adjusted life years (QALYs) and costs
+#' @export
+ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
+                     err_stop = FALSE, verbose = FALSE){ # User defined
+  with(as.list(l_params_all), {
+    ### Run decision model
+    l_model_out <- decision_model(l_params_all = l_params_all, 
+                                  p_CDX2neg_init = p_CDX2neg_init, 
+                                  Trt = Trt, 
+                                  err_stop = err_stop, verbose = verbose)
+    a_P <- l_model_out$a_P
+    m_M <- l_model_out$m_M
+    a_A <- l_model_out$a_A
+    
+    ### Create discounting vectors
+    v_dwc <- 1 / ((1 + d_e/n_cycles_year) ^ seq(0, n_cycles)) # vector with discount weights for costs
+    v_dwe <- 1 / ((1 + d_c/n_cycles_year) ^ seq(0, n_cycles)) # vector with discount weights for QALYs
+    
+    #### State Rewards ####
+    ### Life Years
+    v_R_ly <- c(CDX2pos = 1/12,
+                CDX2neg = 1/12,
+                Local   = 1/12,
+                Mets    = 1/12,
+                Dead_OC = 0,
+                Dead_C  = 0)
+    
+    ### Utilities
+    ## Utility for Stage 2 Colon Cancer
+    v_u_S2 <- c(rep(u_Stg2Chemo/12, 12), 
+                rep(u_Stg2/12, (n_cycles- 12 + 1))) * Trt + # If on chemotherapy
+      rep(u_Stg2/12, n_cycles + 1) * (1 - Trt)# If not on chemotherapy
+    ## Utility for Mets
+    v_u_Mets <- rep(u_Stg4/12, n_cycles + 1)
+    ## utility when Dead
+    u_D <- 0
+    ## Array of time-dependent state utilities
+    ## Initialize array
+    a_R_u <- array(NaN, dim = c(n_states, n_states, (n_cycles + 1)),
+                 dimnames = list(v_names_states, v_names_states, 0:n_cycles))
+    ## Fill in array
+    # In CDX2 positive (One alternative is to manually assign Utilities to each exiting state)
+    a_R_u["CDX2pos","CDX2pos", ]  <- v_u_S2
+    a_R_u["CDX2neg","CDX2pos", ]  <- v_u_S2
+    a_R_u["Local", "CDX2pos", ]   <- v_u_S2
+    a_R_u["Mets", "CDX2pos", ]    <- v_u_S2
+    a_R_u["Dead_OC", "CDX2pos", ] <- v_u_S2
+    a_R_u["Dead_C", "CDX2pos", ]  <- v_u_S2
+    # In CDX2 negative (Another alternative is to use `rep`)
+    a_R_u[, "CDX2neg", ] <- rep(v_u_S2, each = n_states)
+    # In Local Recurrence
+    a_R_u[, "Local", ] <- rep(v_u_S2, each = n_states)
+    # In Mets Recurrence
+    a_R_u[, "Mets", ] <- rep(v_u_Mets, each = n_states)
+    # In Dead OC
+    a_R_u[, "Dead_OC", ] <- rep(u_D, each = n_states)
+    # In Dead C
+    a_R_u[, "Dead_C", ] <- rep(u_D, each = n_states)
+    
+    ### Costs
+    ## Initial and continuing Costs in Stage II (no evidence of disease, NED)
+    v_c_S2 <- c(rep(c_CRCStg2_init, 12), rep(c_CRCStg2_cont, ((n_cycles + 1) - 12)))
+    ## Costs of Mets 
+    c_Mets <- c_CRCStg4_cont
+    ## Cost when Dead
+    c_D <- 0     
+    ### Array of age-dependent state utilities
+    ## Initialize array
+    a_R_c <- array(NaN, dim = c(n_states, n_states, (n_cycles + 1)),
+                 dimnames = list(v_names_states, v_names_states, 0:n_cycles))
+    ## Fill in array
+    # In CDX2 positive (One alternative is to manually assign Utilities to each exiting state)
+    a_R_c["CDX2pos","CDX2pos", ]  <- v_c_S2
+    a_R_c["CDX2neg","CDX2pos", ]  <- v_c_S2
+    a_R_c["Local", "CDX2pos", ]   <- v_c_S2
+    a_R_c["Mets", "CDX2pos", ]    <- v_c_S2
+    a_R_c["Dead_OC", "CDX2pos", ] <- v_c_S2
+    a_R_c["Dead_C", "CDX2pos", ]  <- v_c_S2
+    # In CDX2 negative (Another alternative is to use `rep`)
+    a_R_c[, "CDX2neg", ] <- rep(v_c_S2,  each = n_states) # Or: rep(v_c_S2, each = n.s), if v_c_S2 is time dependent
+    # In Local Recurrence
+    a_R_c[, "Local", ] <- rep(v_c_S2,  each = n_states) # Or: rep(v_c_S2, each = n.s), if v_c_S2 is time dependent
+    # In Mets Recurrence
+    a_R_c[, "Mets", ] <- c_Mets
+    # In Dead OC
+    a_R_c[, "Dead_OC", ] <- c_D
+    # In Dead C
+    a_R_c[, "Dead_C", ] <- c_D
+    
+    #### Transition rewards ####
+    ## Add increment in cost due to transition from CDX2 or Local to Dead_OC
+    a_R_c["CDX2pos", "Dead_OC", ] <- a_R_c["CDX2pos", "Dead_OC", ] + ic_DeathOCStg2
+    a_R_c["CDX2neg", "Dead_OC", ] <- a_R_c["CDX2neg", "Dead_OC", ] + ic_DeathOCStg2
+    a_R_c["Local", "Dead_OC", ]   <- a_R_c["Local", "Dead_OC", ]   + ic_DeathOCStg2
+    a_R_c["Mets", "Dead_OC", ]    <- a_R_c["Mets", "Dead_OC", ]    + ic_DeathOCStg2
+    ## Add increment in cost due to transition from CDX2 or Local to Dead_OC
+    a_R_c["CDX2pos", "Dead_C", ] <- a_R_c["CDX2pos", "Dead_C", ] + ic_DeathCRCStg2
+    a_R_c["CDX2neg", "Dead_C", ] <- a_R_c["CDX2neg", "Dead_C", ] + ic_DeathCRCStg2
+    a_R_c["Local", "Dead_C", ]   <- a_R_c["Local", "Dead_C", ]   + ic_DeathCRCStg2
+    a_R_c["Mets", "Dead_C", ]    <- a_R_c["Mets", "Dead_C", ]    + ic_DeathCRCStg2
+    
+    #### Expected QALYs and Costs for all transitions per cycle ####
+    a_Y_c <- a_A * a_R_c
+    a_Y_u <- a_A * a_R_u 
+    
+    #### Expected LYS, QALYs and Costs per cycle ####
+    ## Vector of LYs, QALYs and Costs
+    v_ly   <- m_M %*% v_R_ly
+    v_qaly <- apply(a_Y_u, 3, sum) # sum the proportion of the cohort across transitions 
+    v_cost <- apply(a_Y_c, 3, sum) # sum the proportion of the cohort across transitions
+    
+    #### Undiscounted total expected LYs, QALYs and Costs ####
+    ## LYs
+    tot_ly_und   <- t(v_ly) %*% (v_wcc)
+    ## QALYs
+    tot_qaly_und <- t(v_qaly) %*% (v_wcc)
+    ## Costs + Chemo
+    tot_cost_und <- (t(v_cost) %*% (v_wcc)) + 
+      ((c_Chemo + c_ChemoAdmin) * Trt) # Add Chemo cost WITHOUT WCC and discounting
+    
+    #### Discounted total expected LYs, QALYs and Costs ####
+    ## LYs
+    tot_ly   <- t(v_ly) %*% (v_dwe * v_wcc)
+    ## QALYs
+    tot_qaly <- t(v_qaly) %*% (v_dwe * v_wcc)
+    ## Costs + Chemo
+    tot_cost <- t(v_cost) %*% (v_dwc * v_wcc) + 
+      ((c_Chemo + c_ChemoAdmin) * Trt) # Add Chemo cost WITHOUT WCC and discounting
+    
+    ### Store the results from the simulation in a list
+    l_ce_out <- list(a_P = a_P,
+                     m_M = m_M,
+                     a_A = a_A,
+                     # Undiscounted outcomes
+                     tot_ly_und   = tot_ly_und,
+                     tot_qaly_und = tot_qaly_und,
+                     tot_cost_und = tot_cost_und,
+                     # Discounted outcomes
+                     tot_ly   = tot_ly,
+                     tot_qaly = tot_qaly,
+                     tot_cost = tot_cost
+                     )
+    ### Return the results
+    return(l_ce_out)  
+  }
+  )
+}
+
 #' Calculate cost-effectiveness outcomes
 #'
 #' \code{calculate_ce_out} calculates costs and effects for a given vector of 
@@ -12,19 +176,39 @@ calculate_ce_out <- function(l_params_all = load_all_params(),
                              n_wtp = 100000){ # User defined
   with(as.list(l_params_all), {
     ## Create discounting vectors
-    v_dwc <- 1 / ((1 + d_e) ^ (0:(n_t))) # vector with discount weights for costs
-    v_dwe <- 1 / ((1 + d_c) ^ (0:(n_t))) # vector with discount weights for QALYs
+    v_dwc <- 1 / ((1 + d_e) ^ (0:(n_cycles))) # vector with discount weights for costs
+    v_dwe <- 1 / ((1 + d_c) ^ (0:(n_cycles))) # vector with discount weights for QALYs
     
     ## Run STM model at a parameter set for each intervention
-    l_model_out_no_trt <- decision_model(l_params_all = l_params_all)
+    l_model_out_no_trt <- decision_model(l_params_all = l_params_all, )
     l_model_out_trt    <- decision_model(l_params_all = l_params_all)
     
     ## Cohort trace by treatment
     m_M_no_trt <- l_model_out_no_trt$m_M # No treatment
     m_M_trt    <- l_model_out_trt$m_M    # Treatment
     
+    ## vector with life years
+    v_ly <- c(CDX2pos = 1/12,
+              CDX2neg = 1/12,
+              Local   = 1/12,
+              Mets    = 1/12,
+              Dead_OC = 0,
+              Dead_C  = 0)
+    
     ## Vectors with costs and utilities by treatment
-    v_u_no_trt <- c(u_H, u_S1, u_S2, u_D)
+    ## Utility of Stage 2 Colon Cancer
+    v_u_S2_Trt <- c(rep(u_Stg2Chemo/12, 12), rep(u_Stg2/12, (n_cycles- 12 + 1))) # If treatment
+    v_u_S2     <- rep(u_Stg2/12, n_cycles + 1) # If no treatment
+    ## Utility of CRC Stage 4 by age
+    v_u_S4 <- rep(u_Stg4/12, n_cycle + 1)
+    ## utility when Dead
+    u.D   <- 0
+    v_u_no_trt <- c(CDX2pos = ,
+                    CDX2neg = ,
+                    Local   = ,
+                    Mets    = ,
+                    Dead_OC = ,
+                    Dead_C  = )
     v_u_trt    <- c(u_H, u_Trt, u_S2, u_D)
     
     v_c_no_trt <- c(c_H, c_S1, c_S2, c_D)
