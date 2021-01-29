@@ -1,13 +1,12 @@
 ################################################################################ 
-# This script runs the cohort implementation of the Sick-Sicker                #
-# state-transition model (STM)                                                 #
+# This script runs cohort STM used to evaluated the cost-effectiveness of      #
+# testing for the absence of CDX2 biomarker followed by adjuvant chemotherapy  #
+# for stage II colon cancer patients.                                          #
 #                                                                              # 
 # Authors:                                                                     #
-#     - Fernando Alarid-Escudero, PhD, <fernando.alarid@cide.edu>              # 
-#     - Eline Krijkamp, MS                                                     #
-#     - Petros Pechlivanoglou, PhD                                             #
-#     - Hawre Jalal, MD, PhD                                                   #
-#     - Eva A. Enns, PhD                                                       # 
+#     - Fernando Alarid-Escudero, PhD, <fernando.alarid@cide.edu>              #
+#     - Deb Schrag, MD, MPH                                                    #
+#     - Karen M. Kuntz, ScD                                                    #
 ################################################################################ 
 # The structure of this code is according to the DARTH framework               #
 # https://github.com/DARTH-git/Decision-Modeling-Framework                     #
