@@ -198,7 +198,6 @@ df_owsa_det <- run_owsa_det(params_range = df_owsa_input,
                             strategies = v_names_str
                             )
 df_owsa_icer$parameter <- ordered(df_owsa_icer$parameter, 
-                                  # unique(df_owsa_icer$parameter),
                                   labels = c("Cost of test ($)",
                                              "Increased recurrence in CDX2-negative patients",
                                              "Effectiveness of FOLFOX in CDX2−negative patients as a HR",
