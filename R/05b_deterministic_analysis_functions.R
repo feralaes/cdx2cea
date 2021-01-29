@@ -17,7 +17,7 @@
 #' quality-adjusted life years (QALYs) and costs
 #' @export
 ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
-                     err_stop = FALSE, verbose = FALSE){ # User defined
+                     err_stop = TRUE, verbose = TRUE){ # User defined
   with(as.list(l_params_all), {
     ### Run decision model
     l_model_out <- decision_model(l_params_all = l_params_all, 
@@ -29,8 +29,8 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     a_A <- l_model_out$a_A
     
     ### Create discounting vectors
-    v_dwc <- 1 / ((1 + d_e/n_cycles_year) ^ seq(0, n_cycles)) # vector with discount weights for costs
-    v_dwe <- 1 / ((1 + d_c/n_cycles_year) ^ seq(0, n_cycles)) # vector with discount weights for QALYs
+    v_dwc <- 1 / ((1 + d_c/n_cycles_year) ^ seq(0, n_cycles)) # vector with discount weights for costs
+    v_dwe <- 1 / ((1 + d_e/n_cycles_year) ^ seq(0, n_cycles)) # vector with discount weights for QALYs
     
     #### State Rewards ####
     ### Life Years
@@ -172,73 +172,111 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
 #' @return 
 #' A data frame with discounted costs, effectiveness and NMB for each strategy.
 #' @export
-calculate_ce_out <- function(l_params_all = load_all_params(), 
+calculate_ce_out <- function(l_params_all, 
                              n_wtp = 100000){ # User defined
   with(as.list(l_params_all), {
-    ## Create discounting vectors
-    v_dwc <- 1 / ((1 + d_e) ^ (0:(n_cycles))) # vector with discount weights for costs
-    v_dwe <- 1 / ((1 + d_c) ^ (0:(n_cycles))) # vector with discount weights for QALYs
+    #### Costs and QALYs for No Treatment ####
+    l_out_notrt <- ce_model(l_params_all = l_params_all, 
+                            p_CDX2neg_init = p_CDX2neg, 
+                            Trt = FALSE)
+    ## Store output
+    cost_notrt <- l_out_notrt$tot_cost
+    qaly_notrt <- l_out_notrt$tot_qaly
+    ly_notrt   <- l_out_notrt$tot_ly
+    m_M_notrt  <- l_out_notrt$m_M
     
-    ## Run STM model at a parameter set for each intervention
-    l_model_out_no_trt <- decision_model(l_params_all = l_params_all, )
-    l_model_out_trt    <- decision_model(l_params_all = l_params_all)
+    #### Costs and QALYs for Treat All ####
+    l_out_trtall <- ce_model(l_params_all = l_params_all, 
+                            p_CDX2neg_init = p_CDX2neg, 
+                            Trt = TRUE)
+    ## Store output
+    cost_trtall <- l_out_trtall$tot_cost
+    qaly_trtall <- l_out_trtall$tot_qaly
+    ly_trtall   <- l_out_trtall$tot_ly
+    m_M_trtall  <- l_out_notrt$m_M
     
-    ## Cohort trace by treatment
-    m_M_no_trt <- l_model_out_no_trt$m_M # No treatment
-    m_M_trt    <- l_model_out_trt$m_M    # Treatment
+    #### Costs and QALYs for Test and Treat ####
+    ### Test characteristics
+    sens_test <- 1
+    spec_test <- 1
     
-    ## vector with life years
-    v_ly <- c(CDX2pos = 1/12,
-              CDX2neg = 1/12,
-              Local   = 1/12,
-              Mets    = 1/12,
-              Dead_OC = 0,
-              Dead_C  = 0)
+    ### Test outcomes
+    ## Probability of testing positive
+    p_test_pos <- p_CDX2neg * sens_test + (1 - p_CDX2neg) * (1 - spec_test) 
+    ## Probability of testing negative
+    p_test_neg <- 1 - p_test_pos
+    ## Probability of Disease Positive GIVEN Testing Positive
+    p_DisPos_TestPos <- p_CDX2neg*sens_test/p_test_pos
+    ## Probability of Disease Negative GIVEN Testing Positive
+    p_DisNeg_TestPos <- 1 - p_DisPos_TestPos
+    ## Probability of Disease Positive GIVEN Testing Positive
+    p_DisPos_TestNeg <- p_CDX2neg*(1 - sens_test)/(1 - p_test_pos)
+    ## Probability of Disease Negative GIVEN Testing Positive
+    p_DisNeg_TestNeg <- 1 - p_DisPos_TestNeg
     
-    ## Vectors with costs and utilities by treatment
-    ## Utility of Stage 2 Colon Cancer
-    v_u_S2_Trt <- c(rep(u_Stg2Chemo/12, 12), rep(u_Stg2/12, (n_cycles- 12 + 1))) # If treatment
-    v_u_S2     <- rep(u_Stg2/12, n_cycles + 1) # If no treatment
-    ## Utility of CRC Stage 4 by age
-    v_u_S4 <- rep(u_Stg4/12, n_cycle + 1)
-    ## utility when Dead
-    u.D   <- 0
-    v_u_no_trt <- c(CDX2pos = ,
-                    CDX2neg = ,
-                    Local   = ,
-                    Mets    = ,
-                    Dead_OC = ,
-                    Dead_C  = )
-    v_u_trt    <- c(u_H, u_Trt, u_S2, u_D)
+    #### Run model for by CDX2 status and treatment status
+    ### Run model with treatment
+    l_cdx2neg_trt <- ce_model(l_params_all = l_params_all, 
+                              p_CDX2neg_init = 1, Trt = TRUE)
+    ### Run model without treatment
+    l_cdx2neg_notrt <- ce_model(l_params_all = l_params_all, 
+                                p_CDX2neg_init = 1, Trt = FALSE)
+    ### Run model with treatment
+    l_cdx2pos_trt <- ce_model(l_params_all = l_params_all, 
+                              p_CDX2neg_init = 0, Trt = TRUE)
+    ### Run model without treatment
+    l_cdx2pos_notrt <- ce_model(l_params_all = l_params_all, 
+                                p_CDX2neg_init = 0, Trt = FALSE)
+    ## Extract Costs
+    cost_cdx2neg_trt   <- l_cdx2neg_trt$tot_cost
+    cost_cdx2neg_notrt <- l_cdx2neg_notrt$tot_cost
+    cost_cdx2pos_trt   <- l_cdx2pos_trt$tot_cost
+    cost_cdx2pos_notrt <- l_cdx2pos_notrt$tot_cost
+    ## Extract QALYs
+    qaly_cdx2neg_trt   <- l_cdx2neg_trt$tot_qaly
+    qaly_cdx2neg_notrt <- l_cdx2neg_notrt$tot_qaly
+    qaly_cdx2pos_trt   <- l_cdx2pos_trt$tot_qaly
+    qaly_cdx2pos_notrt <- l_cdx2pos_notrt$tot_qaly
+    ## Extract LYs
+    ly_cdx2neg_trt   <- l_cdx2neg_trt$tot_ly
+    ly_cdx2neg_notrt <- l_cdx2neg_notrt$tot_ly
+    ly_cdx2pos_trt   <- l_cdx2pos_trt$tot_ly
+    ly_cdx2pos_notrt <- l_cdx2pos_notrt$tot_ly
+    ## Extract cohort trace
+    m_M_cdx2neg_trt   <- l_cdx2neg_trt$m_M
+    m_M_cdx2neg_notrt <- l_cdx2neg_notrt$m_M
+    m_M_cdx2pos_trt   <- l_cdx2pos_trt$m_M
+    m_M_cdx2pos_notrt <- l_cdx2pos_notrt$m_M
+    ### Costs
+    cost_test_n_treat <- (cost_cdx2neg_trt * p_DisPos_TestPos +
+                         cost_cdx2pos_trt* p_DisNeg_TestPos) * p_test_pos +
+      (cost_cdx2neg_notrt * p_DisPos_TestNeg +
+         cost_cdx2pos_notrt * p_DisNeg_TestNeg) * p_test_neg +
+      c_Test
+    ### QALYs
+    qaly_test_n_treat <- (qaly_cdx2neg_trt * p_DisPos_TestPos +
+                      qaly_cdx2pos_trt * p_DisNeg_TestPos) * p_test_pos +
+      (qaly_cdx2neg_notrt * p_DisPos_TestNeg +
+         qaly_cdx2pos_notrt * p_DisNeg_TestNeg) * p_test_neg
+    ### LYs
+    ly_test_n_treat <- (ly_cdx2neg_trt * p_DisPos_TestPos +
+                         ly_cdx2pos_trt * p_DisNeg_TestPos) * p_test_pos +
+      (ly_cdx2neg_notrt * p_DisPos_TestNeg +
+         ly_cdx2pos_notrt * p_DisNeg_TestNeg) * p_test_neg
     
-    v_c_no_trt <- c(c_H, c_S1, c_S2, c_D)
-    v_c_trt    <- c(c_H, c_S1 + c_Trt, c_S2 + c_Trt, c_D)
-    
-    ## Mean Costs and QALYs for Treatment and NO Treatment
-    v_tu_no_trt <- m_M_no_trt %*% v_u_no_trt
-    v_tu_trt    <- m_M_trt %*% v_u_trt
-    
-    v_tc_no_trt <- m_M_no_trt %*% v_c_no_trt
-    v_tc_trt    <- m_M_trt %*% v_c_trt
-    
-    ## Total discounted mean Costs and QALYs
-    tu_d_no_trt <- t(v_tu_no_trt) %*% v_dwe 
-    tu_d_trt    <- t(v_tu_trt) %*% v_dwe
-    
-    tc_d_no_trt <- t(v_tc_no_trt) %*% v_dwc
-    tc_d_trt    <- t(v_tc_trt)    %*% v_dwc
-    
-    ## Vector with total discounted mean Costs and QALYs
-    v_tc_d <- c(tc_d_no_trt, tc_d_trt)
-    v_tu_d <- c(tu_d_no_trt, tu_d_trt)
+    #### Vector with total discounted Costs and QALYs per strategy nd ICER ####
+    v_tot_cost <- c(cost_notrt, cost_test_n_treat)
+    v_tot_qaly <- c(qaly_notrt, qaly_test_n_treat)
+    v_icer     <- c(NA, diff(v_tot_cost)/diff(v_tot_qaly))
     
     ## Vector with discounted net monetary benefits (NMB)
-    v_nmb_d <- v_tu_d * n_wtp - v_tc_d
+    v_nmb_d <- (v_tot_qaly * n_wtp) - v_tot_cost
     
-    ## Dataframe with discounted costs, effectiveness and NMB
+    #### Data.frame with discounted costs, effectiveness and NMB #### 
     df_ce <- data.frame(Strategy = v_names_str,
-                        Cost     = v_tc_d,
-                        Effect   = v_tu_d,
+                        Cost     = v_tot_cost,
+                        Effect   = v_tot_qaly,
+                        ICER     = v_icer,
                         NMB      = v_nmb_d)
     
     return(df_ce)

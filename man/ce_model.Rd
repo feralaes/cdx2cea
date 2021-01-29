@@ -8,8 +8,8 @@ ce_model(
   l_params_all,
   p_CDX2neg_init = NULL,
   Trt = FALSE,
-  err_stop = FALSE,
-  verbose = FALSE
+  err_stop = TRUE,
+  verbose = TRUE
 )
 }
 \arguments{
