@@ -266,7 +266,8 @@ levels(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k$strategy) <- c("(1) No CDX2 testin
                                                               "(2) CDX2 testing and FOLFOX if CDX2-negative")
 colnames(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k)[1:2] <- c("Proportion of CDX2-neative patients",
                                                             "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
-gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k <- plot(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k) +
+gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k <- plot(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k,
+                                               col = c("bw")) +
   theme(legend.position = "bottom")
 gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k 
 ggsave(plot = gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k,
@@ -292,7 +293,8 @@ levels(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k$strategy) <- c("(1) No CDX2 testi
                                                               "(2) CDX2 testing and FOLFOX if CDX2-negative")
 colnames(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k)[1:2] <- c("Proportion of CDX2-neative patients",
                                                             "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
-gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k <- plot(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k) +
+gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k <- plot(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k,
+                                                col = c("bw")) +
   theme(legend.position = "bottom")
 gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k 
 ggsave(plot = gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k,
@@ -319,7 +321,8 @@ levels(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k$strategy) <- c("(1) No CD
                                                                       "(2) CDX2 testing and FOLFOX if CDX2-negative")
 colnames(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k)[1:2] <- c("Increased recurrence in CDX2-negative patients",
                                                                     "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
-gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- plot(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k) +
+gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- plot(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
+                                                        col = c("bw")) +
   theme(legend.position = "bottom")
 gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k 
 ggsave(plot = gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
@@ -345,7 +348,8 @@ levels(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k$strategy) <- c("(1) No C
                                                                        "(2) CDX2 testing and FOLFOX if CDX2-negative")
 colnames(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)[1:2] <- c("Increased recurrence in CDX2-negative patients",
                                                                      "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
-gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- plot(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k) +
+gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- plot(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
+                                                         col = c("bw")) +
   theme(legend.position = "bottom")
 gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k 
 ggsave(plot = gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
