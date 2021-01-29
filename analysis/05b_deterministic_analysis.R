@@ -187,45 +187,16 @@ plot(df_cea_det)
 ggsave("figs/05b_cea_frontier.png", width = 8, height = 6)
 
 #### 05b.6 One-way sensitivity analysis (OWSA) ####
-# df_owsa_input <- data.frame(pars = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx", 
-#                                      "c_Test", "u_Stg4", "hr_RecurCDX2neg"),
-#                             min = c(0.015, 0.620, 94,  0.2, 1.69),
-#                             max = c(0.150, 0.970, 179, 0.7, 4.38))
-# l_owsa_det <- run_owsa_det(params_range = df_owsa_input,
-#                            params_basecase = l_params_basecase,
-#                            FUN = calculate_ce_out, # Function to compute outputs
-#                            outcomes = "ICER",      # Output to do the OWSA on
-#                            strategies = v_names_str
-#                            )
-# l_owsa_det$parameter <- ordered(l_owsa_det$parameter, 
-#                                 labels = c("Cost of test ($)",
-#                                            "Effectiveness of FOLFOX in CDX2−negative patients as a HR",
-#                                            "Proportion of CDX2−negative patients",
-#                                            "Utility of metastatic recurrence"))
-# 
-# gg_owsa <- plot(test, 
-#                 txtsize = 16,
-#                 n_x_ticks = 5,
-#                 facet_scales = "free") +
-#   ylab("$/QALY") +
-#   theme(legend.position = "")
-# gg_owsa
-
-df_owsa_icer <- owsa_det(parms = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx", 
-                                   "c_Test", "u_Stg4", "hr_RecurCDX2neg"), # parameter names
-                     ranges = list("p_CDX2neg" = c(0.015, 0.150),
-                                   "hr_Recurr_CDXneg_Rx" = c(0.620, 0.970),
-                                   "c_Test" = c(94, 179),
-                                   "u_Stg4" = c(0.2, 0.7),
-                                   "hr_RecurCDX2neg" = c(1.69, 4.38)
-                                   ),
-                     nsamps = 100, # number of values  
-                     FUN = calculate_ce_out, # Function to compute outputs 
-                     params_basecase = l_params_basecase, # List with base-case parameters
-                     outcome = "ICER",      # Output to do the OWSA on
-                     strategies = v_names_str, # Names of strategies
-                     n_wtp = 100000        # Extra argument to pass to FUN
-                     )
+df_owsa_input <- data.frame(pars = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx",
+                                     "c_Test", "u_Stg4", "hr_RecurCDX2neg"),
+                            min = c(0.015, 0.620, 94,  0.2, 1.69),
+                            max = c(0.150, 0.970, 179, 0.7, 4.38))
+df_owsa_det <- run_owsa_det(params_range = df_owsa_input,
+                            params_basecase = l_params_basecase,
+                            FUN = calculate_ce_out, # Function to compute outputs
+                            outcomes = "ICER",      # Output to do the OWSA on
+                            strategies = v_names_str
+                            )
 df_owsa_icer$parameter <- ordered(df_owsa_icer$parameter, 
                                   # unique(df_owsa_icer$parameter),
                                   labels = c("Cost of test ($)",
