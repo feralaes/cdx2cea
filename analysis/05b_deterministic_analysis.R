@@ -1,13 +1,12 @@
 ################################################################################ 
-# This script runs the cost-effectiveness analysis of a hypothetical treatment #
-# for the simulated cohort of the Sick-Sicker state-transition model (STM)     #
-#                                                                              #                                                                          # 
+# This script runs the deterministic cost-effectiveness analysis of testing    #
+# Stage II colon cancer patients for the absence of CDX2 biomarker followed by #
+# adjuvant chemotherapy.                                                       #
+#                                                                              # 
 # Authors:                                                                     #
-#     - Fernando Alarid-Escudero, PhD, <fernando.alarid@cide.edu>              # 
-#     - Eline Krijkamp, MS                                                     #
-#     - Petros Pechlivanoglou, PhD                                             #
-#     - Hawre Jalal, MD, PhD                                                   #
-#     - Eva A. Enns, PhD                                                       # 
+#     - Fernando Alarid-Escudero, PhD, <fernando.alarid@cide.edu>              #
+#     - Deb Schrag, MD, MPH                                                    #
+#     - Karen M. Kuntz, ScD                                                    #
 ################################################################################
 # The structure of this code is according to the DARTH framework               #
 # https://github.com/DARTH-git/Decision-Modeling-Framework                     #
@@ -21,6 +20,9 @@
 library(dampack) 
 library(dplyr)
 library(reshape2)
+library(ggplot2)
+library(dplyr)
+library(patchwork)
 
 #### 05b.1.2 Load inputs ####
 l_params_all <- load_all_params() # function in cdx2cea
@@ -74,13 +76,13 @@ df_ly_rec_cdx2neg <- data.frame(`Health State` = ordered(c("Without recurrence",
                                             sum(m_M_cdx2neg_trt[, 4]))/12,
                             check.names = FALSE
 )
-df_ly_rec_cdx2neg_lng <- melt(df_ly_rec_cdx2neg, 
-                              id.vars = "Health State", 
-                              variable.name = "Strategy", 
-                              value.name = "Years")
+df_ly_rec_cdx2neg_lng <- reshape2::melt(df_ly_rec_cdx2neg, 
+                                        id.vars = "Health State", 
+                                        variable.name = "Strategy", 
+                                        value.name = "Years")
 df_charts_ly_rec_cdx2neg <- df_ly_rec_cdx2neg_lng %>% 
-  group_by(Strategy) %>%
-  mutate(pos = cumsum(Years) - (0.5 * Years))
+  dplyr::group_by(.data$Strategy) %>%
+  dplyr::mutate(pos = cumsum(.data$Years) - (0.5 * .data$Years))
 df_charts_ly_rec_cdx2neg
 
 #### 05b.2.2 CDX2-positive patients ####
@@ -109,13 +111,13 @@ df_ly_rec_cdx2pos <- data.frame(`Health State` = ordered(c("Without recurrence",
                                                 sum(m_M_cdx2pos_trt[, 4]))/12,
                                 check.names = FALSE
 )
-df_ly_rec_cdx2pos_lng <- melt(df_ly_rec_cdx2pos, 
-                              id.vars = "Health State", 
-                              variable.name = "Strategy", 
-                              value.name = "Years")
+df_ly_rec_cdx2pos_lng <- reshape2::melt(df_ly_rec_cdx2pos, 
+                                        id.vars = "Health State", 
+                                        variable.name = "Strategy", 
+                                        value.name = "Years")
 df_charts_ly_rec_cdx2pos <- df_ly_rec_cdx2pos_lng %>% 
-  group_by(Strategy) %>%
-  mutate(pos = cumsum(Years) - (0.5 * Years))
+  dplyr::group_by(.data$Strategy) %>%
+  dplyr::mutate(pos = cumsum(.data$Years) - (0.5 * .data$Years))
 df_charts_ly_rec_cdx2pos
 
 #### 05b.2.3 For both types of patients ####
@@ -134,7 +136,7 @@ df_charts_ly_rec_all <- rbind(
                        scales::percent(round(1-l_params_basecase$p_CDX2neg, 3), accuracy = 0.1), ")"), 
         data.frame(df_charts_ly_rec_cdx2pos, check.names = F)))
 
-ggplot(df_ly_rec_all, 
+g_ly <- ggplot(df_ly_rec_all, 
        aes(x = Strategy, y = Years, fill = `Health State`)) +
   facet_wrap(~ Group, ncol = 1) +
   geom_bar(stat="identity", position = "stack") +
@@ -142,8 +144,8 @@ ggplot(df_ly_rec_all,
             aes(x = Strategy, y = pos, 
                 label = format(round(Years, 2), nsmall = 2), group = `Health State`),
             size=5) +
-  scale_fill_manual(values=c("#E69F00", "#56B4E9")) +
-  # scale_fill_grey(start=0.8, end=0.5) +
+  # scale_fill_manual(values=c("#E69F00", "#56B4E9")) +
+  scale_fill_grey(start=0.8, end=0.5) +
   xlab("") + 
   scale_y_continuous("Life expectancy (years)", 
                      breaks = dampack::number_ticks(8)) +
@@ -152,10 +154,11 @@ ggplot(df_ly_rec_all,
   theme_bw(base_size = 17) + 
   theme(legend.position = "bottom") +
   NULL
-ggsave(filename = "figs/05b_time-states-all-patients.pdf", 
-       width = 10, height = 7)
-ggsave(filename = "figs/05b_time-states-all-patients.png", 
-       width = 10, height = 7)
+ggsave(plot = g_ly, filename = "figs/05b_time-states-all-patients.pdf", width = 10, height = 7)
+ggsave(plot = g_ly, filename = "figs/05b_time-states-all-patients.png", width = 10, height = 7)
+ggsave(plot = g_ly, filename = "figs/manuscript/fig02_time-states-all-patients.pdf", width = 10, height = 7)
+ggsave(plot = g_ly, filename = "figs/manuscript/fig02_time-states-all-patients.png", width = 10, height = 7)
+ggsave(plot = g_ly, filename = "figs/manuscript/fig02_time-states-all-patients.tiff", width = 10, height = 7)
 
 #### 05b.3 Cost-effectiveness analysis parameters ####
 ### Strategy names
@@ -173,7 +176,9 @@ df_out_ce
 df_cea_det <- dampack::calculate_icers(cost       = df_out_ce$Cost, 
                                        effect     = df_out_ce$Effect, 
                                        strategies = v_names_str)
-df_cea_det
+df_cea_det$Strategy <- c("No CDX2 testing and no FOLFOX", 
+                         "CDX2 testing and FOLFOX if CDX2-negative")
+
 ### Save CEA table with ICERs
 ## As .RData
 save(df_cea_det,
@@ -187,59 +192,87 @@ plot(df_cea_det)
 ggsave("figs/05b_cea_frontier.png", width = 8, height = 6)
 
 #### 05b.6 One-way sensitivity analysis (OWSA) ####
+### Define OWSA design
 df_owsa_input <- data.frame(pars = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx",
                                      "c_Test", "u_Stg4", "hr_RecurCDX2neg"),
                             min = c(0.015, 0.620, 94,  0.2, 1.69),
                             max = c(0.150, 0.970, 179, 0.7, 4.38))
-df_owsa_det <- run_owsa_det(params_range = df_owsa_input,
+### Run OWSA
+df_owsa_icer <- run_owsa_det(params_range = df_owsa_input,
                             params_basecase = l_params_basecase,
                             FUN = calculate_ce_out, # Function to compute outputs
                             outcomes = "ICER",      # Output to do the OWSA on
                             strategies = v_names_str
                             )
+### Rename parameters for plotting
 df_owsa_icer$parameter <- ordered(df_owsa_icer$parameter, 
                                   labels = c("Cost of test ($)",
                                              "Increased recurrence in CDX2-negative patients",
                                              "Effectiveness of FOLFOX in CDX2−negative patients as a HR",
                                              "Proportion of CDX2−negative patients",
                                              "Utility of metastatic recurrence"))
+### Plot OWSA
 gg_owsa <- plot(df_owsa_icer, 
-                txtsize = 16, n_x_ticks = 5, 
+                txtsize = 16, 
+                n_x_ticks = 5, n_y_ticks = 5,
                 facet_ncol = 2,
                 facet_scales = "free") +
   ylab("$/QALY") +
-  theme(legend.position = "")
+  theme(legend.position = "",
+        strip.background = element_rect(fill = "white",
+                                        color = "white"),
+        strip.text = element_text(hjust = 0, face = "bold"))
 gg_owsa
+### Save OWSA figure
 ggsave(plot = gg_owsa, 
        filename = "figs/05b_owsa_icer.png", 
        width = 10, height = 8)
 ggsave(plot = gg_owsa, 
        filename = "figs/05b_owsa_icer.pdf", 
        width = 10, height = 8)
+ggsave(plot = gg_owsa, 
+       filename = "figs/manuscript/fig03_owsa_icer.png", 
+       width = 10, height = 8)
+ggsave(plot = gg_owsa, 
+       filename = "figs/manuscript/fig03_owsa_icer.pdf", 
+       width = 10, height = 8)
+ggsave(plot = gg_owsa, 
+       filename = "figs/manuscript/fig03_owsa_icer.tiff", 
+       width = 10, height = 8)
 
 #### 05b.7 Two-way sensitivity analysis (TWSA) ####
 
 #### 05b.7.1 Proportion of CDX2-negative vs Effectiveness of FOLFOX in CDX2-negative patients (HR) ####
+### Define TWSA designs
+df_twsa_input_pCDX2_vs_hrCDX2negtrt <- data.frame(pars = c("p_CDX2neg", 
+                                                           "hr_Recurr_CDXneg_Rx"),
+                            min = c(0.015, 0.670),
+                            max = c(0.150, 0.940))
+
 ### $50K/QALY
-df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k <- twsa_det(parm1 = "p_CDX2neg",  # parameter 1 name
-                     parm2 = "hr_Recurr_CDXneg_Rx", # parameter 2 name
-                     ranges = list("p_CDX2neg" = c(0.015, 0.150),
-                                   "hr_Recurr_CDXneg_Rx" = c(0.620, 0.970)),
-                     nsamps = 40, # number of values  
-                     FUN = calculate_ce_out, # Function to compute outputs 
-                     params_basecase = l_params_basecase, # Vector with base-case parameters
-                     outcome = "NMB",      # Output to do the OWSA on
-                     strategies = v_names_str, # Names of strategies
-                     n_wtp = 50000        # Extra argument to pass to FUN
+## Run TWSA
+df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k <- run_twsa_det(params_range = df_twsa_input_pCDX2_vs_hrCDX2negtrt,
+                            params_basecase = l_params_basecase,
+                            FUN = calculate_ce_out, # Function to compute outputs
+                            # nsamp = 10, 
+                            outcomes = "NMB",      # Output to do the OWSA on
+                            strategies = v_names_str, # Names of strategies
+                            n_wtp = 50000        # Extra argument to pass to FUN
 )
-levels(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k$strategy) <- c("(1) No CDX2 testing and no FOLFOX",
-                                                              "(2) CDX2 testing and FOLFOX if CDX2-negative")
-colnames(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k)[1:2] <- c("Proportion of CDX2-neative patients",
-                                                            "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
+### Rename strategies for plotting
+df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k$strategy <- factor(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k$strategy, 
+                                                          levels = unique(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k$strategy),
+                                                          c("(1) No CDX2 testing and no FOLFOX",
+                                                            "(2) CDX2 testing and FOLFOX if CDX2-negative"))
+### Rename parameters for plotting
+colnames(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k)[1:2] <- c("Proportion of CDX2-negative patients",
+                                                           "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
+### Plot TWSA
 gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k <- plot(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k,
                                                col = c("bw")) +
   theme(legend.position = "bottom")
 gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k 
+### Save TWSA figures
 ggsave(plot = gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k,
        filename = "figs/05b_twsa_p_CDX2neg_hr_RecurrCDXnegRx_nmb_50k.png", 
        width = 8, height = 6)
@@ -248,25 +281,27 @@ ggsave(plot = gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k,
        width = 8, height = 6)
 
 ### $100K/QALY
-df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k <- twsa_det(parm1 = "p_CDX2neg",  # parameter 1 name
-                                                    parm2 = "hr_Recurr_CDXneg_Rx", # parameter 2 name
-                                                    ranges = list("p_CDX2neg" = c(0.015, 0.150),
-                                                                  "hr_Recurr_CDXneg_Rx" = c(0.620, 0.970)),
-                                                    nsamps = 40, # number of values  
-                                                    FUN = calculate_ce_out, # Function to compute outputs 
-                                                    params_basecase = l_params_basecase, # Vector with base-case parameters
-                                                    outcome = "NMB",      # Output to do the OWSA on
-                                                    strategies = v_names_str, # Names of strategies
-                                                    n_wtp = 100000        # Extra argument to pass to FUN
+df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k <- run_twsa_det(params_range = df_twsa_input_pCDX2_vs_hrCDX2negtrt,
+                                                       params_basecase = l_params_basecase,
+                                                       FUN = calculate_ce_out, # Function to compute outputs
+                                                       outcomes = "NMB",      # Output to do the OWSA on
+                                                       strategies = v_names_str, # Names of strategies
+                                                       n_wtp = 100000        # Extra argument to pass to FUN
 )
-levels(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k$strategy) <- c("(1) No CDX2 testing and no FOLFOX",
-                                                              "(2) CDX2 testing and FOLFOX if CDX2-negative")
-colnames(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k)[1:2] <- c("Proportion of CDX2-neative patients",
+### Rename strategies for plotting
+df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k$strategy <- factor(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k$strategy, 
+                                                          levels = unique(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k$strategy),
+                                                          c("(1) No CDX2 testing and no FOLFOX",
+                                                            "(2) CDX2 testing and FOLFOX if CDX2-negative"))
+### Rename parameters for plotting
+colnames(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k)[1:2] <- c("Proportion of CDX2-negative patients",
                                                             "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
+### Plot TWSA
 gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k <- plot(df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k,
                                                 col = c("bw")) +
   theme(legend.position = "bottom")
 gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k 
+### Save TWSA figures
 ggsave(plot = gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k,
        filename = "figs/05b_twsa_p_CDX2neg_hr_RecurrCDXnegRx_nmb_100k.png", 
        width = 8, height = 6)
@@ -275,26 +310,35 @@ ggsave(plot = gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k,
        width = 8, height = 6)
 
 #### 05b.7.2 Increased recurrence in CDX2-negative patients vs Effectiveness of FOLFOX in CDX2-negative patients (HR) ####
+### Define TWSA designs
+df_twsa_input_hrRecurCDX2neg_vs_hrCDX2negtrt <- data.frame(pars = c("hr_RecurCDX2neg",
+                                                                    "hr_Recurr_CDXneg_Rx"),
+                                                  min = c(1.69, 0.670),
+                                                  max = c(4.38, 0.940))
+
 ### $50K/QALY
-df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- twsa_det(parm1 = "hr_RecurCDX2neg",  # parameter 1 name
-                                                   parm2 = "hr_Recurr_CDXneg_Rx", # parameter 2 name
-                                                   ranges = list("hr_RecurCDX2neg" = c(1.69, 4.38),
-                                                                 "hr_Recurr_CDXneg_Rx" = c(0.620, 0.970)),
-                                                   nsamps = 40, # number of values  
-                                                   FUN = calculate_ce_out, # Function to compute outputs 
-                                                   params_basecase = l_params_basecase, # Vector with base-case parameters
-                                                   outcome = "NMB",      # Output to do the OWSA on
-                                                   strategies = v_names_str, # Names of strategies
-                                                   n_wtp = 50000        # Extra argument to pass to FUN
+## Run TWSA
+df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- run_twsa_det(params_range = df_twsa_input_hrRecurCDX2neg_vs_hrCDX2negtrt,
+                                                       params_basecase = l_params_basecase,
+                                                       FUN = calculate_ce_out, # Function to compute outputs
+                                                       outcomes = "NMB",      # Output to do the OWSA on
+                                                       strategies = v_names_str, # Names of strategies
+                                                       n_wtp = 50000        # Extra argument to pass to FUN
 )
-levels(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k$strategy) <- c("(1) No CDX2 testing and no FOLFOX",
-                                                                      "(2) CDX2 testing and FOLFOX if CDX2-negative")
+### Rename strategies for plotting
+df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k$strategy <- factor(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k$strategy, 
+                                                                   levels = unique(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k$strategy),
+                                                                   c("(1) No CDX2 testing and no FOLFOX",
+                                                                     "(2) CDX2 testing and FOLFOX if CDX2-negative"))
+### Rename parameters for plotting
 colnames(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k)[1:2] <- c("Increased recurrence in CDX2-negative patients",
                                                                     "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
+### Plot TWSA
 gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- plot(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
                                                         col = c("bw")) +
   theme(legend.position = "bottom")
 gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k 
+### Save TWSA figures
 ggsave(plot = gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
        filename = "figs/05b_twsa_hr_Recurr_CDXneg_Rx_RecurrCDXnegRx_nmb_50k.png", 
        width = 8, height = 6)
@@ -303,28 +347,132 @@ ggsave(plot = gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
        width = 8, height = 6)
 
 ### $100K/QALY
-df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- twsa_det(parm1 = "hr_RecurCDX2neg",  # parameter 1 name
-                                                            parm2 = "hr_Recurr_CDXneg_Rx", # parameter 2 name
-                                                            ranges = list("hr_RecurCDX2neg" = c(1.69, 4.38),
-                                                                          "hr_Recurr_CDXneg_Rx" = c(0.620, 0.970)),
-                                                            nsamps = 40, # number of values  
-                                                            FUN = calculate_ce_out, # Function to compute outputs 
-                                                            params_basecase = l_params_basecase, # Vector with base-case parameters
-                                                            outcome = "NMB",      # Output to do the OWSA on
-                                                            strategies = v_names_str, # Names of strategies
-                                                            n_wtp = 100000        # Extra argument to pass to FUN
+## Run TWSA
+df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- run_twsa_det(params_range = df_twsa_input_hrRecurCDX2neg_vs_hrCDX2negtrt,
+                                                                params_basecase = l_params_basecase,
+                                                                FUN = calculate_ce_out, # Function to compute outputs
+                                                                outcomes = "NMB",      # Output to do the OWSA on
+                                                                strategies = v_names_str, # Names of strategies
+                                                                n_wtp = 100000        # Extra argument to pass to FUN
 )
-levels(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k$strategy) <- c("(1) No CDX2 testing and no FOLFOX",
-                                                                       "(2) CDX2 testing and FOLFOX if CDX2-negative")
+### Rename strategies for plotting
+df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k$strategy <- factor(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k$strategy, 
+                                                                   levels = unique(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k$strategy),
+                                                                   c("(1) No CDX2 testing and no FOLFOX",
+                                                                     "(2) CDX2 testing and FOLFOX if CDX2-negative"))
+### Rename parameters for plotting
 colnames(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)[1:2] <- c("Increased recurrence in CDX2-negative patients",
-                                                                     "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
+                                                                    "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
+### Plot TWSA
 gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- plot(df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
                                                          col = c("bw")) +
   theme(legend.position = "bottom")
 gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k 
+### Save TWSA figure
 ggsave(plot = gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
        filename = "figs/05b_twsa_hr_Recurr_CDXneg_Rx_RecurrCDXnegRx_nmb_100k.png", 
        width = 8, height = 6)
 ggsave(plot = gg_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
        filename = "figs/05b_twsa_hr_Recurr_CDXneg_Rx_RecurrCDXnegRx_nmb_100k.pdf", 
        width = 8, height = 6)
+
+#### 05b.7.3 Combine both TWSAs ####
+### Proportion of CDX2-negative vs Effectiveness of FOLFOX in CDX2-negative patients (HR)
+df_twsa_pCDX2_vs_hrCDX2negtrt <- dplyr::bind_rows(data.frame(WTP = "$50,000/QALY", 
+                                                      df_twsa_icer_pCDX2_vs_hrCDX2negtrt_50k, 
+                                                      check.names = FALSE),
+                                           data.frame(WTP = "$100,000/QALY", 
+                                                      df_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k,
+                                                      check.names = FALSE))
+df_twsa_pCDX2_vs_hrCDX2negtrt$WTP <- ordered(df_twsa_pCDX2_vs_hrCDX2negtrt$WTP, 
+                                             c("$50,000/QALY", "$100,000/QALY"))
+# parameter names
+params <- names(df_twsa_pCDX2_vs_hrCDX2negtrt)[c(2, 3)]
+param1 <- params[1]
+param2 <- params[2]
+obj_fn <- which.max
+opt_df <- df_twsa_pCDX2_vs_hrCDX2negtrt %>%
+  group_by(WTP, .data[[param1]], .data[[param2]]) %>%
+  slice(obj_fn(.data$outcome_val))
+
+gg_twsa_pCDX2_vs_hrCDX2negtrt <- ggplot(opt_df, aes_(x = as.name(param1), y = as.name(param2))) +
+  geom_tile(aes_(fill = as.name("strategy"))) +
+  facet_wrap(~ WTP) + 
+  theme_bw()+ 
+  xlab(param1) +
+  ylab(param2) +
+  theme(strip.background = element_rect(fill = "white",
+                                        color = "white"),
+        strip.text = element_text(hjust = 0, face = "bold", 
+                                  size = 14))
+gg_twsa_pCDX2_vs_hrCDX2negtrt <- add_common_aes(gg_twsa_pCDX2_vs_hrCDX2negtrt, 16, col = "bw", 
+               col_aes = "fill",
+               scale_name = "Strategy",
+               continuous = c("x", "y"),
+               n_x_ticks = 6,
+               n_y_ticks = 6,
+               xexpand = c(0, 0),
+               yexpand = c(0, 0)) +
+  theme(legend.position = "",
+        strip.background = element_rect(fill = "white",
+                                        color = "white"),
+        strip.text = element_text(hjust = 0, face = "bold", 
+                                  size = 14))
+gg_twsa_pCDX2_vs_hrCDX2negtrt
+
+### Increased recurrence in CDX2-negative patients vs Effectiveness of FOLFOX in CDX2-negative patients (HR)
+df_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt <- dplyr::bind_rows(data.frame(WTP = "$50,000/QALY", 
+                                                      df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_50k, 
+                                                      check.names = FALSE),
+                                           data.frame(WTP = "$100,000/QALY", 
+                                                      df_twsa_icer_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
+                                                      check.names = FALSE))
+df_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt$WTP <- ordered(df_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt$WTP, 
+                                             c("$50,000/QALY", "$100,000/QALY"))
+# parameter names
+params <- names(df_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt)[c(2, 3)]
+param1 <- params[1]
+param2 <- params[2]
+obj_fn <- which.max
+opt_df <- df_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt %>%
+  group_by(WTP, .data[[param1]], .data[[param2]]) %>%
+  slice(obj_fn(.data$outcome_val))
+
+gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt <- ggplot(opt_df, aes_(x = as.name(param1), y = as.name(param2))) +
+  geom_tile(aes_(fill = as.name("strategy"))) +
+  facet_wrap(~ WTP) + 
+  theme_bw()+ 
+  xlab(param1) +
+  ylab(param2) +
+  theme(strip.background = element_rect(fill = "white",
+                                        color = "white"),
+        strip.text = element_text(hjust = 0, face = "bold", 
+                                  size = 14))
+gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt <- add_common_aes(gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt, 16, col = "bw", 
+                                                col_aes = "fill",
+                                                scale_name = "Strategy",
+                                                continuous = c("x", "y"),
+                                                n_x_ticks = 6,
+                                                n_y_ticks = 6,
+                                                xexpand = c(0, 0),
+                                                yexpand = c(0, 0)) +
+  theme(legend.position = "bottom",
+        strip.background = element_rect(fill = "white",
+                                        color = "white"),
+        strip.text = element_text(hjust = 0, face = "bold", 
+                                  size = 14))
+gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt
+
+
+patched <- gg_twsa_pCDX2_vs_hrCDX2negtrt/gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt
+gg_twsa <- patched + plot_annotation(tag_levels = 'A')
+gg_twsa
+ggsave(plot = gg_twsa,
+       filename = "figs/manuscript/fig04_TWSA.pdf", 
+       width = 12, height = 14)
+ggsave(plot = gg_twsa,
+       filename = "figs/manuscript/fig04_TWSA.png", 
+       width = 12, height = 14)
+ggsave(plot = gg_twsa,
+       filename = "figs/manuscript/fig04_TWSA.tiff", 
+       width = 12, height = 14)

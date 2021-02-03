@@ -1,14 +1,13 @@
 ################################################################################ 
-# This script calibrates the Sick-Sicker state-transition model (STM) to       #
-# epidemiological targets using a Bayesian approach with the Incremental       #
-# Mixture Importance Samping (IMIS) algorithm                                 #
+# This script calibrates the cohort STM of Stage II colon cancer patients      #
+# stratified by CDX2 biomarker status to survival curves from Dalerba et al.   #
+# (2016) using a Bayesian approach with the Incremental Mixture Importance     #
+# Sampling (IMIS) algorithm                                                    #
 #                                                                              # 
 # Authors:                                                                     #
-#     - Fernando Alarid-Escudero, PhD, <fernando.alarid@cide.edu>              # 
-#     - Eline Krijkamp, MS                                                     #
-#     - Petros Pechlivanoglou, PhD                                             #
-#     - Hawre Jalal, MD, PhD                                                   #
-#     - Eva A. Enns, PhD                                                       # 
+#     - Fernando Alarid-Escudero, PhD, <fernando.alarid@cide.edu>              #
+#     - Deb Schrag, MD, MPH                                                    #
+#     - Karen M. Kuntz, ScD                                                    #
 ################################################################################ 
 # The structure of this code is according to the DARTH framework               #
 # https://github.com/DARTH-git/darthpack                                       #

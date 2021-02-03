@@ -4,40 +4,293 @@
 #' model parameters from their distributions. The sample of the calibrated
 #' parameters is a draw from their posterior distribution obtained with the
 #' IMIS algorithm.
-#' @param n_sim Number of PSA samples.
+#' @param l_params_all List with all parameters of cost-effectiveness model.
 #' @param seed Seed for reproducibility of Monte Carlo sampling.
 #' @return 
-#' A data frame with \code{n_sim} rows and 15 columns of parameters for PSA. 
-#' Each row is a parameter set sampled from distributions that characterize 
-#' their uncertainty
+#' A data frame with 18 columns of parameters for PSA. Each row is a parameter 
+#' set sampled from distributions that characterize their uncertainty
 #' @examples 
-#' generate_psa_params()
+#' generate_psa_params(l_params_all = load_all_params())
 #' @export
-generate_psa_params <- function(n_sim = 1000, seed = 20190220){ # User defined
+generate_psa_params <- function(l_params_all, seed = 20210202){ # User defined
+  with(as.list(l_params_all), {
   ## Load calibrated parameters
   n_sim <- nrow(m_calib_post)
   set_seed <- seed
+  ## Obtain parameter bounds
+  l_bounds <- generate_params_bounds(l_params_all)
+  
   df_psa_params <- data.frame(
     ### Calibrated parameters
     m_calib_post,
     
-    ### Transition probabilities (per cycle)
-    p_HS1   = rbeta(n_sim, 30, 170),        # probability to become sick when healthy
-    p_S1H   = rbeta(n_sim, 60, 60) ,        # probability to become healthy when sick
+    ### External parameters
+    ## Proportion of CDX2-negative patients obtained from Step 3 of Figure 1 in page 213
+    p_CDX2neg = rbeta(n_sim, (23+25), (389+232)), # (23+25)/669
+    ## Hazard ratio for disease recurrence among patients with CDX2-negative 
+    # under chemo versus CDX2-negative patients without chemotherapy. From:
+    # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
+    hr_Recurr_CDXneg_Rx = exp(rnorm(n_sim, log(0.79), sd = (log(0.94)-log(0.670))/(2*1.96))),
+    # Hazard ratio for disease recurrence among patients with CDX2-positive 
+    # under chemo versus CDX2-positive patients without chemotherapy. 
+    hr_Recurr_CDXpos_Rx = exp(rnorm(n_sim, log(0.99), sd = (log(0.999)-log(0.95))/(2*1.96))),
+    # hr_Recurr_CDXpos_Rx = logitnorm::invlogit(rnorm(n_sim, logitnorm::logit(0.999), 
+    #                                                 sd = (logitnorm::logit(0.999)-logitnorm::logit(0.95))/(2*1.96))),
     
     ### State rewards
     ## Costs
-    c_H   = rgamma(n_sim, shape = 100, scale = 20)    , # cost of remaining one cycle in state H
-    c_S1  = rgamma(n_sim, shape = 177.8, scale = 22.5), # cost of remaining one cycle in state S1
-    c_S2  = rgamma(n_sim, shape = 225, scale = 66.7)  , # cost of remaining one cycle in state S2
-    c_Trt = rgamma(n_sim, shape = 73.5, scale = 163.3), # cost of treatment (per cycle)
-    c_D   = 0                                         , # cost of being in the death state
+    # Cost of chemotherapy
+    c_Chemo = rnorm(n_sim, 1391, sd = l_bounds$v_se$c_Chemo), 
+    # Cost of chemotherapy administration
+    c_ChemoAdmin = rnorm(n_sim, 315, sd = l_bounds$v_se$c_ChemoAdmin),
+    # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2020 USD using price index from PCE
+    c_CRCStg2_init = rnorm(n_sim, c_CRCStg2_init, sd = 339*inf_pce/n_cycles_year), 
+    # Continuing costs in CRC Stage II inflated from 2004 USD to 2020 USD using price index from PCE
+    c_CRCStg2_cont = rnorm(n_sim, c_CRCStg2_cont, sd = 79*inf_pce/n_cycles_year),
+    # Continuing costs in CRC Stage IV inflated from 2004 USD to 2020 USD using price index from PCE
+    c_CRCStg4_cont = rnorm(n_sim, c_CRCStg4_cont, sd = 437*inf_pce/n_cycles_year),
+    # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2020 USD using price index from PCE
+    ic_DeathCRCStg2 = rnorm(n_sim, ic_DeathCRCStg2, sd = 705*inf_pce/n_cycles_year),
+    # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2020 USD using price index from PCE
+    ic_DeathOCStg2  = rnorm(n_sim, ic_DeathOCStg2, sd = 755*inf_pce/n_cycles_year),
+    # Cost of IHC staining
+    c_Test = runif(n_sim,
+                   min = l_bounds$v_lb$c_Test, 
+                   max = l_bounds$v_ub$c_Test),
     ## Utilities
-    u_H   = truncnorm::rtruncnorm(n_sim, mean =    1, sd = 0.01, b = 1), # utility when healthy
-    u_S1  = truncnorm::rtruncnorm(n_sim, mean = 0.75, sd = 0.02, b = 1), # utility when sick
-    u_S2  = truncnorm::rtruncnorm(n_sim, mean = 0.50, sd = 0.03, b = 1), # utility when sicker
-    u_D   = 0                                               , # utility when dead
-    u_Trt = truncnorm::rtruncnorm(n_sim, mean = 0.95, sd = 0.02, b = 1)  # utility when being treated
+    # Stage II without chemotherapy
+    u_Stg2 = rnorm(n_sim, mean = u_Stg2, sd = l_bounds$v_se$u_Stg2),
+    # Stage II with chemotherapy
+    u_Stg2Chemo = rnorm(n_sim, mean = u_Stg2Chemo, sd = l_bounds$v_se$u_Stg2Chemo),
+    u_Stg4 = rnorm(n_sim, mean = u_Stg4, sd = l_bounds$v_se$u_Stg4)
   )
   return(df_psa_params)
+  }
+  )
+
+}
+
+#' Generate lower and upper bound of the CEA parameters
+#'
+#' \code{generate_params_bounds} generates the lower and upper bounds of the
+#' model parameters.
+#' @param l_params_all List with all parameters of cost-effectiveness model.
+#' @param seed Seed for reproducibility of Monte Carlo sampling.
+#' @return 
+#' A list with the lower and upper bounds of the model parameters.
+#' @examples 
+#' generate_params_bounds()
+#' @export
+generate_params_bounds <- function(l_params_all){
+  with(as.list(l_params_all),{
+  lb_factor <- 0.8
+  ub_factor <- 1.2
+  
+  #--- Lower bounds ---#
+  v_lb <- data.frame(
+    ## Proportion of CDX2-negative patients 
+    p_CDX2neg = 0.010, 
+    # Proportion of recurrence being metastatic (CALIBRATED)
+    p_Mets  = quantile(m_calib_post[, "p_Mets"], probs = 0.025), 
+    # Cancer mortality rate (CALIBRATED)
+    r_DieMets = quantile(m_calib_post[, "r_DieMets"], probs = 0.025),
+    # Rate of recurrence in CDX2 positive patients (CALIBRATED)
+    r_RecurCDX2pos = quantile(m_calib_post[, "r_RecurCDX2pos"], probs = 0.025), 
+    # Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
+    hr_RecurCDX2neg = quantile(m_calib_post[, "hr_RecurCDX2neg"], probs = 0.025),
+    ## Hazard ratio for disease recurrence among patients with CDX2-negative 
+    # under chemo versus CDX2-negative patients without chemotherapy. From:
+    # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
+    hr_Recurr_CDXneg_Rx = 0.670,
+    # Hazard ratio for disease recurrence among patients with CDX2-positive 
+    # under chemo versus CDX2-positive patients without chemotherapy. From: [TO BE ADDED]
+    hr_Recurr_CDXpos_Rx = 0.95,
+    
+    ### State rewards
+    ## Costs
+    # Cost of chemotherapy
+    c_Chemo = c_Chemo*lb_factor,
+    # Cost of chemotherapy administration
+    c_ChemoAdmin = c_ChemoAdmin*lb_factor, 
+    # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
+    c_CRCStg2_init = c_CRCStg2_init - 1.96*339*inf_pce/n_cycles_year,
+    # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+    c_CRCStg2_cont =  c_CRCStg2_cont - 1.96*79*inf_pce/n_cycles_year, 
+    # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
+    c_CRCStg4_cont = c_CRCStg4_cont - 1.96*437*inf_pce/n_cycles_year,
+    # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+    ic_DeathCRCStg2 = ic_DeathCRCStg2 - 1.96*705*inf_pce,
+    # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+    ic_DeathOCStg2  = ic_DeathOCStg2 - 1.96*755*inf_pce,
+    # Cost of IHC staining
+    c_Test = 94,
+    
+    ## Utilities
+    u_Stg2 = 0.69,      # Ness 1999, Outcome state "A" from table 3
+    u_Stg2Chemo = 0.62, # Ness 1999, Outcome state "BC" from table 4
+    u_Stg4 = 0.20       # Ness 1999, Outcome state "FG" from table 4
+  ) 
+  #--- Upper bounds ---#
+  v_ub <- data.frame(
+    ## Proportion of CDX2-negative patients 
+    p_CDX2neg = 0.150, 
+    # Proportion of recurrence being metastatic (CALIBRATED)
+    p_Mets  = quantile(m_calib_post[, "p_Mets"], probs = 0.975), 
+    # Cancer mortality rate (CALIBRATED)
+    r_DieMets = quantile(m_calib_post[, "r_DieMets"], probs = 0.975),
+    # Rate of recurrence in CDX2 positive patients (CALIBRATED)
+    r_RecurCDX2pos = quantile(m_calib_post[, "r_RecurCDX2pos"], probs = 0.975), 
+    # Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
+    hr_RecurCDX2neg = quantile(m_calib_post[, "hr_RecurCDX2neg"], probs = 0.975),
+    ## Hazard ratio for disease recurrence among patients with CDX2-negative 
+    # under chemo versus CDX2-negative patients without chemotherapy. From:
+    # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
+    hr_Recurr_CDXneg_Rx = 0.940,
+    # Hazard ratio for disease recurrence among patients with CDX2-positive 
+    # under chemo versus CDX2-positive patients without chemotherapy. From: [TO BE ADDED]
+    hr_Recurr_CDXpos_Rx = 1.000,
+    
+    ### State rewards
+    ## Costs
+    # Cost of chemotherapy
+    c_Chemo = c_Chemo*ub_factor,
+    # Cost of chemotherapy administration
+    c_ChemoAdmin = c_ChemoAdmin*ub_factor, 
+    # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
+    c_CRCStg2_init = c_CRCStg2_init + 1.96*339*inf_pce/n_cycles_year,
+    # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+    c_CRCStg2_cont = c_CRCStg2_cont + 1.96*79*inf_pce/n_cycles_year, 
+    # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
+    c_CRCStg4_cont = c_CRCStg4_cont + 1.96*437*inf_pce/n_cycles_year,
+    # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+    ic_DeathCRCStg2 = ic_DeathCRCStg2 + 1.96*705*inf_pce,
+    # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+    ic_DeathOCStg2  = ic_DeathOCStg2 + 1.96*755*inf_pce,
+    # Cost of IHC staining
+    c_Test = 179, # Cost of genetic test for CDX2neg
+    
+    ## Utilities
+    u_Stg2 = 0.78,      # Ness 1999, Outcome state "A" from table 3
+    u_Stg2Chemo = 0.72, # Ness 1999, Outcome state "BC" from table 4
+    u_Stg4 = 0.31       # Ness 1999, Outcome state "FG" from table 3
+  ) 
+  #--- Standard errors based on bounds ---#
+  v_se <- (v_ub - v_lb)/(2*1.96)
+  
+  #--- Return output ---#
+  return(out = list(v_lb = v_lb,
+                    v_ub = v_ub,
+                    v_se = v_se))
+  }
+  )
+}
+
+#' Generate lower and upper bound of the CEA parameters
+#'
+#' \code{run_probsa} runs a probabilistic sensitivity analysis (ProbSA) and 
+#' calculates cost and effectiveness outcomes.
+#' @param df_psa_input Data frame with ProbSA input dataset .
+#' @param n_str Number of strategies
+#' @param parallel Run ProbSA in parallel
+#' @return 
+#' A list containing ProbSA cost and effectiveness outcomes for each strategy
+#' @examples 
+#' df_psa_input <- generate_psa_params(load_all_params())
+#' run_probsa(df_psa_input, parallel = FALSE)
+#' @export
+run_probsa <- function(df_psa_input, n_str = 2, parallel = FALSE){
+  ## Get number of simulations
+  n_sim <- nrow(df_psa_input)
+  if (parallel){
+    ## Get OS
+    os <- get_os()
+    no_cores <- parallel::detectCores() - 1
+    
+    print(paste0("Parallelized PSA on ", os, " using ", n_cores, "cores"))
+    
+    n_time_init_psa <- Sys.time()
+    
+    ## Run parallelized PSA based on OS
+    if(os == "macosx"){
+      # Initialize cluster object
+      cl <- parallel::makeForkCluster(no_cores)
+      # Register clusters
+      doParallel::registerDoParallel(cl)
+      # Run parallelized PSA
+      df_ce <- foreach::foreach(i = 1:n_sim, .combine = rbind) %dopar% {
+        l_out_temp <- calculate_ce_out(df_psa_input[i, ])
+        df_ce <- c(l_out_temp$Cost, l_out_temp$Effect)
+      }
+      # Extract costs and effects from the PSA dataset
+      df_c[i, ] <- df_ce[, 1:n_str]
+      df_e[i, ] <- df_ce[, (n_str+1):(2*n_str)]
+      # Register end time of parallelized PSA
+      n_time_end_psa <- Sys.time()
+    }
+    if(os == "windows"){
+      # Initialize cluster object
+      cl <- parallel::makeCluster(no_cores)
+      # Register clusters
+      doParallel::registerDoParallel(cl)
+      opts <- list(attachExportEnv = TRUE)
+      # Run parallelized PSA
+      df_ce <- foeach::foreach(i = 1:n_samp, .combine = rbind,
+                               .export = ls(globalenv()),
+                               .packages=c("dampack"),
+                               .options.snow = opts) %dopar% {
+                                 l_out_temp <- calculate_ce_out(df_psa_input[i, ])
+                                 df_ce <- c(l_out_temp$Cost, l_out_temp$Effect)
+                               }
+      # Extract costs and effects from the PSA dataset
+      df_c[i, ] <- df_ce[, 1:n_str]
+      df_e[i, ] <- df_ce[, (n_str+1):(2*n_str)]
+      # Register end time of parallelized PSA
+      n_time_end_psa <- Sys.time()
+    }
+    if(os == "linux"){
+      # Initialize cluster object
+      cl <- parallel::makeCluster(no_cores)
+      # Register clusters
+      doParallel::registerDoMC(cl)
+      # Run parallelized PSA
+      df_ce <- foreach::foreach(i = 1:n_sim, .combine = rbind) %dopar% {
+        l_out_temp <- calculate_ce_out(df_psa_input[i, ])
+        df_ce <- c(l_out_temp$Cost, l_out_temp$Effect)
+      }
+      # Extract costs and effects from the PSA dataset
+      df_c[i, ] <- df_ce[, 1:n_str]
+      df_e[i, ] <- df_ce[, (n_str+1):(2*n_str)]
+      # Register end time of parallelized PSA
+      n_time_end_psa <- Sys.time()
+    }
+    # Stope clusters
+    stopCluster(cl)
+    n_time_total_psa <- n_time_end_psa - n_time_init_psa
+    print(paste0("PSA with ", scales::comma(n_sim), 
+                 " simulations run in parallel on ", no_cores," cores in ",
+                 round(n_time_total_psa, 2), " ",
+                 units(n_time_total_psa)))
+    l_out_probsa <- list(Costs = df_c,
+                         Effects = df_e)
+  } else{
+    n_time_init_psa_series <- Sys.time()
+    for(i in 1:n_sim){ # i <- 1
+      l_psa_input <- update_param_list(l_params_all, df_psa_input[i,])
+      df_out_temp <- calculate_ce_out(l_psa_input)
+      df_c[i, ] <- df_out_temp$Cost
+      df_e[i, ] <- df_out_temp$Effect
+      # Display simulation progress
+      if(i/(n_sim/100) == round(i/(n_sim/100),0)) {
+        cat('\r', paste(i/n_sim * 100, "% done", sep = " "))
+      }
+    }
+    n_time_end_psa_series <- Sys.time()
+    n_time_total_psa_series <- n_time_end_psa_series - n_time_init_psa_series
+    print(paste0("PSA with ", scales::comma(n_sim), " simulations run in series in ", 
+                 round(n_time_total_psa_series, 2), " ", 
+                 units(n_time_total_psa_series)))
+    l_out_probsa <- list(Costs = df_c,
+                         Effects = df_e)
+  }
+  return(l_out_probsa)
 }

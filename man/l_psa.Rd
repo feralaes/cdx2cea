@@ -14,25 +14,24 @@ A list with 11 rows and 5 variables:
 \item{effectiveness}{A data frame with \code{n_sim} rows and \code{n_strategies} columns with the effectiveness per strategy for all PSA samples.}
 \item{parameters}{Survival target. A data frame of input parameters with
 \code{n_sim} rows and 15 columns:
-\itemize{\item c_H: Annual cost for healthy individuals
-\item c_S1: Annual cost for sick individuals in S1
-\item c_S2: Annual cost for sick individuals in S2
-\item c_D: Annual cost for dead individuals
-\item c_Trt: Additional costs of sick individuals treated in S1 or S2
-\item u_H: Utility for healthy individuals
-\item u_S1: Utility for sick individuals in S1
-\item u_S2: Utility for sick individuals in S1
-\item u_D: Utility for dead individuals
-\item u_Trt: Utility for treated individuals in S1
-\item p_HS1: Annual transition probability of disease onset (H to S1)
-\item p_S1H: Annual transition probability of recovery (S1 to H)
-\item p_S1S2: Annual transition probability of disease progression (S1 to S2)
-\item hr_S1: Hazard rate ratio of death in S1 vs H
-\item hr_S2: Hazard rate ratio of death in S2 vs H
-\item n_age_init: Initial age of the population
-\item n_t: Time horizon in years
-\item d_c: Annual discount rate for costs
-\item d_e: Annual discount rate for effectiveness}}
+\itemize{\item r_DieMets: Cancer mortality rate (CALIBRATED)
+\item r_RecurCDX2pos: Rate of recurrence in CDX2 positive patients (CALIBRATED)
+\item hr_RecurCDX2neg: Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
+\item p_Mets: Proportion of recurrence being metastatic (CALIBRATED)
+\item p_CDX2neg: Proportion of CDX2-negative patients
+\item hr_Recurr_CDXneg_Rx: Hazard ratio for disease recurrence among patients with CDX2-negative under chemo versus CDX2-negative patients without chemotherapy.
+\item hr_Recurr_CDXpos_Rx: Hazard ratio for disease recurrence among patients with CDX2-positive under chemo versus CDX2-positive patients without chemotherapy.
+\item c_Chemo: Cost of chemotherapy
+\item c_ChemoAdmin: Cost of chemotherapy administration
+\item c_CRCStg2_init: Initial costs in CRC Stage II (minus chemo and chemo admin)
+\item c_CRCStg2_cont: Continuing costs in CRC Stage II
+\item c_CRCStg4_cont: Continuing costs in CRC Stage IV
+\item ic_DeathCRCStg2: Increase in cost when dying from cancer while in Stage II
+\item ic_DeathOCStg2: Increase in cost when dying from Other Causes (OC) while in Stage II
+\item c_Test: Cost of IHC staining
+\item u_Stg2: Utility of Stage II without chemo
+\item u_Stg2Chemo: Utility of Stage II with chemo
+\item u_Stg4: Utility of Stage IV as Mets}}
 \item{parnames}{A vector of strings with parameter names.}
 \item{currency}{A string with the currency.}
 }

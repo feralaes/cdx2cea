@@ -12,12 +12,12 @@ load_params_init(
   d_e = 0.03,
   index_pce = 0.018,
   p_CDX2neg = 0.0717488789237668,
+  p_Mets = 0.980840626,
   r_DieMets = 0.03870286,
   r_RecurCDX2pos = 0.003328773,
   hr_RecurCDX2neg = 3.601069078,
   hr_Recurr_CDXneg_Rx = 0.79,
   hr_Recurr_CDXpos_Rx = 1,
-  p_Mets = 0.980840626,
   c_Chemo = 1391,
   c_ChemoAdmin = 315,
   c_CRCStg2_init = (32039 - (1391 + 315)),
@@ -46,6 +46,8 @@ load_params_init(
 
 \item{p_CDX2neg}{Proportion of CDX2-negative patients}
 
+\item{p_Mets}{Proportion of recurrence being metastatic}
+
 \item{r_DieMets}{Cancer mortality rate}
 
 \item{r_RecurCDX2pos}{Rate of recurrence in CDX2 positive patients}
@@ -60,8 +62,6 @@ chemotherapy.}
 \item{hr_Recurr_CDXpos_Rx}{Hazard ratio for disease recurrence among patients
 with CDX2-positive under chemotherapy versus CDX2-positive patients without
 chemotherapy.}
-
-\item{p_Mets}{Proportion of recurrence being metastatic}
 
 \item{c_Chemo}{Cost of chemotherapy}
 

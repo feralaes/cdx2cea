@@ -4,7 +4,7 @@
 \alias{calculate_ce_out}
 \title{Calculate cost-effectiveness outcomes}
 \usage{
-calculate_ce_out(l_params_all = load_all_params(), n_wtp = 1e+05)
+calculate_ce_out(l_params_all, n_wtp = 1e+05)
 }
 \arguments{
 \item{l_params_all}{List with all parameters of decision model}

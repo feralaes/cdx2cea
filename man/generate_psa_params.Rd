@@ -4,17 +4,16 @@
 \alias{generate_psa_params}
 \title{Generate PSA dataset of CEA parameters}
 \usage{
-generate_psa_params(n_sim = 1000, seed = 20190220)
+generate_psa_params(l_params_all, seed = 20210202)
 }
 \arguments{
-\item{n_sim}{Number of PSA samples.}
+\item{l_params_all}{List with all parameters of cost-effectiveness model.}
 
 \item{seed}{Seed for reproducibility of Monte Carlo sampling.}
 }
 \value{
-A data frame with \code{n_sim} rows and 15 columns of parameters for PSA.
-Each row is a parameter set sampled from distributions that characterize
-their uncertainty
+A data frame with 18 columns of parameters for PSA. Each row is a parameter
+set sampled from distributions that characterize their uncertainty
 }
 \description{
 \code{generate_psa_params} generates PSA input dataset by sampling decision
@@ -23,5 +22,5 @@ parameters is a draw from their posterior distribution obtained with the
 IMIS algorithm.
 }
 \examples{
-generate_psa_params()
+generate_psa_params(l_params_all = load_all_params())
 }

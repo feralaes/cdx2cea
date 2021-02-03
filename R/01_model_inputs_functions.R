@@ -50,9 +50,14 @@ load_params_init <- function(
   index_pce = 0.018,
   # Proportion of CDX2-negative patients obtained from Step 3 of Figure 1 in page 213
   p_CDX2neg = 0.07174887892376682, # (23+25)/669
-  r_DieMets = 0.03870286, # Cancer mortality rate (CALIBRATED)
-  r_RecurCDX2pos = 0.003328773, # Rate of recurrence in CDX2 positive patients (CALIBRATED)
-  hr_RecurCDX2neg = 3.601069078, # Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
+  # Proportion of recurrence being metastatic (CALIBRATED)
+  p_Mets  = 0.980840626,
+  # Cancer mortality rate (CALIBRATED)
+  r_DieMets = 0.03870286,
+  # Rate of recurrence in CDX2 positive patients (CALIBRATED)
+  r_RecurCDX2pos = 0.003328773,
+  # Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
+  hr_RecurCDX2neg = 3.601069078,
   # Hazard ratio for disease recurrence among patients with CDX2-negative 
   # under chemo versus CDX2-negative patients without chemotherapy. From:
   # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
@@ -60,16 +65,25 @@ load_params_init <- function(
   # Hazard ratio for disease recurrence among patients with CDX2-positive 
   # under chemo versus CDX2-positive patients without chemotherapy. From: [TO BE ADDED]
   hr_Recurr_CDXpos_Rx = 1.00, 
-  p_Mets  = 0.980840626, # Proportion of recurrence being metastatic (CALIBRATED)
-  c_Chemo = 1391, # cost of chemotherapy
-  c_ChemoAdmin = 315, # cost of chemotherapy administration
-  c_CRCStg2_init = (32039 - (1391+315)), # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
-  c_CRCStg2_cont = 1722, # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-  c_CRCStg4_cont = 7629, # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
-  ic_DeathCRCStg2 = 41500, # 92851, # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-  ic_DeathOCStg2  = 8969,  # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-  c_Test = 112,            # Cost of IHC staining
-  ### Utilities
+  ### State rewards
+  ## Costs
+  # Cost of chemotherapy
+  c_Chemo = 1391,
+  # Cost of chemotherapy administration
+  c_ChemoAdmin = 315, 
+  # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
+  c_CRCStg2_init = (32039 - (1391+315)),
+  # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+  c_CRCStg2_cont = 1722,
+  # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
+  c_CRCStg4_cont = 7629,
+  # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+  ic_DeathCRCStg2 = 41500,
+  # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+  ic_DeathOCStg2  = 8969,
+  # Cost of IHC staining
+  c_Test = 112,
+  ## Utilities
   u_Stg2 = 0.74,      # Ness 1999, Outcome state "A" from table 3
   u_Stg2Chemo = 0.67, # Ness 1999, Outcome state "BC" from table 4
   u_Stg4 = 0.25       # Ness 1999, Outcome state "FG" from table 3

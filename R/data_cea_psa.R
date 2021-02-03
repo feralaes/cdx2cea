@@ -11,7 +11,7 @@
 #'   \item{Inc_Effect}{Incremental QALYs}
 #'   \item{ICER}{Incremental cost-effectivenes ratio (ICER)}
 #'   \item{Status}{Domination status. ND, not dominated (i.e., on the 
-#'   cost-effectivenes efficiency frontier); D, strongly dominated; d,
+#'   cost-effectiveness efficiency frontier); D, strongly dominated; d,
 #'   dominated by extension}
 #' }
 #' @docType data

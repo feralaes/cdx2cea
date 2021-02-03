@@ -25,7 +25,7 @@ calibration_out <- function(v_params_calib, l_params_all){ # User defined
                                       p_CDX2neg_init = 0)
   
   ####### Epidemiological Output ###########################################
-  #### Disease-Free Survival (DSF) ####
+  #### Disease-Free Survival (DFS) ####
   v_dfs_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Dead_OC")])
   v_dfs_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Dead_OC")])
   
