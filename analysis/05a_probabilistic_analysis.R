@@ -39,18 +39,6 @@ n_sim <- 1000
 ### Generate PSA input dataset
 df_psa_input <- generate_psa_params(l_params_all = l_params_all)
 
-### Initialize matrices for PSA output 
-## Matrix of costs
-df_c <- as.data.frame(matrix(0, 
-                             nrow = n_sim,
-                             ncol = n_str))
-colnames(df_c) <- v_names_str
-## Matrix of effectiveness
-df_e <- as.data.frame(matrix(0, 
-                             nrow = n_sim,
-                             ncol = n_str))
-colnames(df_e) <- v_names_str
-
 #### 05a.4 Conduct probabilistic sensitivity analysis ####
 ### Run decision model on each parameter set of PSA input dataset to produce
 ### PSA outputs for cost and effects
@@ -78,10 +66,10 @@ df_c <- l_out_psa$Costs
 df_e <- l_out_psa$Effects
 
 ### Create PSA object for dampack
-l_psa <- make_psa_obj(cost = df_c, 
-                      effectiveness = df_e, 
-                      parameters = df_psa_input, 
-                      strategies = v_names_str)
+l_psa <- dampack::make_psa_obj(cost = df_c, 
+                               effectiveness = df_e, 
+                               parameters = df_psa_input, 
+                               strategies = v_names_str)
 # Format object for plotting
 l_psa$strategies              <- c("No CDX2 testing and no FOLFOX", "CDX2 testing and FOLFOX if CDX2-negative")
 colnames(l_psa$effectiveness) <- c("No CDX2 testing and no FOLFOX", "CDX2 testing and FOLFOX if CDX2-negative")
@@ -107,9 +95,9 @@ ggsave("figs/05a_cea_plane_scatter.png", width = 8, height = 6)
 ### Compute expected costs and effects for each strategy from the PSA
 df_out_ce_psa <- summary(l_psa)
 ### Calculate incremental cost-effectiveness ratios (ICERs)
-df_cea_psa <- calculate_icers(cost = df_out_ce_psa$meanCost, 
-                              effect = df_out_ce_psa$meanEffect,
-                              strategies = df_out_ce_psa$Strategy)
+df_cea_psa <- dampack::calculate_icers(cost = df_out_ce_psa$meanCost, 
+                                       effect = df_out_ce_psa$meanEffect,
+                                       strategies = df_out_ce_psa$Strategy)
 df_cea_psa
 ### Save CEA table with ICERs
 ## As .RData
@@ -162,26 +150,3 @@ ggsave(plot = gg_elc, "figs/05a_elc.png", width = 8, height = 6)
 ggsave(plot = gg_elc, "figs/manuscript/fig05b_elc.png", width = 8, height = 6)
 ggsave(plot = gg_elc, "figs/manuscript/fig05b_elc.pdf", width = 8, height = 6)
 ggsave(plot = gg_elc, "figs/manuscript/fig05b_elc.tiff", width = 8, height = 6)
-
-#### 05a.7 Create linear regression metamodeling sensitivity analysis graphs ####
-#### 05a.7.1 One-way sensitivity analysis (OWSA) ####
-owsa_lrm_nmb <- owsa(l_psa, params = c("c_Test", "p_HS1", "u_S1", "u_Trt"),
-                     outcome = "nmb", wtp = 150000)
-plot(owsa_lrm_nmb, txtsize = 16, n_x_ticks = 5, 
-     facet_scales = "free") +
-  theme(legend.position = "bottom")
-ggsave("figs/05a_owsa_lrm_nmb.png", width = 10, height = 6)  
-
-#### 05a.7.2 Optimal strategy with OWSA ####
-owsa_opt_strat(owsa = owsa_lrm_nmb)
-ggsave("figs/05a_optimal_owsa_lrm_nmb.png", width = 8, height = 6)
-
-#### 05a.7.3 Tornado plot ####
-owsa_tornado(owsa = owsa_lrm_nmb)
-ggsave("figs/05a_tornado_lrm_Treatment_nmb.png", width = 8, height = 6)
-
-#### 05a.7.4 Two-way sensitivity analysis (TWSA) ####
-twsa_lrm_nmb <- twsa(l_psa, param1 = "u_S1", param2 = "u_Trt",
-                     outcome = "nmb", wtp = 150000)
-plot(twsa_lrm_nmb)
-ggsave("figs/05a_twsa_lrm_uS1_uTrt_nmb.png", width = 8, height = 6)  

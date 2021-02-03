@@ -206,7 +206,7 @@ run_probsa <- function(df_psa_input, n_str = 2, parallel = FALSE){
     os <- get_os()
     no_cores <- parallel::detectCores() - 1
     
-    print(paste0("Parallelized PSA on ", os, " using ", n_cores, "cores"))
+    print(paste0("Parallelized PSA on ", os, " using ", no_cores, " cores"))
     
     n_time_init_psa <- Sys.time()
     
@@ -218,12 +218,13 @@ run_probsa <- function(df_psa_input, n_str = 2, parallel = FALSE){
       doParallel::registerDoParallel(cl)
       # Run parallelized PSA
       df_ce <- foreach::foreach(i = 1:n_sim, .combine = rbind) %dopar% {
-        l_out_temp <- calculate_ce_out(df_psa_input[i, ])
+        l_psa_input <- update_param_list(l_params_all, df_psa_input[i, ])
+        l_out_temp <- calculate_ce_out(l_psa_input)
         df_ce <- c(l_out_temp$Cost, l_out_temp$Effect)
       }
       # Extract costs and effects from the PSA dataset
-      df_c[i, ] <- df_ce[, 1:n_str]
-      df_e[i, ] <- df_ce[, (n_str+1):(2*n_str)]
+      df_c <- data.frame(df_ce[, 1:n_str])
+      df_e <- data.frame(df_ce[, (n_str+1):(2*n_str)])
       # Register end time of parallelized PSA
       n_time_end_psa <- Sys.time()
     }
@@ -238,12 +239,14 @@ run_probsa <- function(df_psa_input, n_str = 2, parallel = FALSE){
                                .export = ls(globalenv()),
                                .packages=c("dampack"),
                                .options.snow = opts) %dopar% {
-                                 l_out_temp <- calculate_ce_out(df_psa_input[i, ])
+                                 l_psa_input <- update_param_list(l_params_all,
+                                                                  df_psa_input[i, ])
+                                 l_out_temp <- calculate_ce_out(l_psa_input)
                                  df_ce <- c(l_out_temp$Cost, l_out_temp$Effect)
                                }
       # Extract costs and effects from the PSA dataset
-      df_c[i, ] <- df_ce[, 1:n_str]
-      df_e[i, ] <- df_ce[, (n_str+1):(2*n_str)]
+      df_c <- data.frame(df_ce[, 1:n_str])
+      df_e <- data.frame(df_ce[, (n_str+1):(2*n_str)])
       # Register end time of parallelized PSA
       n_time_end_psa <- Sys.time()
     }
@@ -258,8 +261,8 @@ run_probsa <- function(df_psa_input, n_str = 2, parallel = FALSE){
         df_ce <- c(l_out_temp$Cost, l_out_temp$Effect)
       }
       # Extract costs and effects from the PSA dataset
-      df_c[i, ] <- df_ce[, 1:n_str]
-      df_e[i, ] <- df_ce[, (n_str+1):(2*n_str)]
+      df_c <- data.frame(df_ce[, 1:n_str])
+      df_e <- data.frame(df_ce[, (n_str+1):(2*n_str)])
       # Register end time of parallelized PSA
       n_time_end_psa <- Sys.time()
     }
@@ -274,6 +277,17 @@ run_probsa <- function(df_psa_input, n_str = 2, parallel = FALSE){
                          Effects = df_e)
   } else{
     n_time_init_psa_series <- Sys.time()
+    ### Initialize matrices for PSA output 
+    ## Matrix of costs
+    df_c <- as.data.frame(matrix(0, 
+                                 nrow = n_sim,
+                                 ncol = n_str))
+    colnames(df_c) <- v_names_str
+    ## Matrix of effectiveness
+    df_e <- as.data.frame(matrix(0, 
+                                 nrow = n_sim,
+                                 ncol = n_str))
+    colnames(df_e) <- v_names_str
     for(i in 1:n_sim){ # i <- 1
       l_psa_input <- update_param_list(l_params_all, df_psa_input[i,])
       df_out_temp <- calculate_ce_out(l_psa_input)
