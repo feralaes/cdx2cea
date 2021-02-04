@@ -8,18 +8,18 @@
 A \code{data.frame} with three rows, one per calibrated parameter
 and 6 columns:
 \describe{
-\item{Parameter}{Parameter name.}
-\item{Mean}{Posterior mean.}
-\item{2.5\\%}{Lower bound of credible interval.}
-\item{50\\%}{Posterior median.}
-\item{97.5\\%}{Upper bound of credible interval.}
-\item{MAP}{Maximum-a-posteriori (MAP) estimate.}
+\item{Parameter}{Parameter name}
+\item{Mean}{Posterior mean}
+\item{2.5\%}{Lower bound of credible interval}
+\item{50\%}{Posterior median}
+\item{97.5\%}{Upper bound of credible interval}
+\item{MAP}{Maximum-a-posteriori (MAP) estimate}
 }
 }
 \usage{
 df_posterior_summ
 }
 \description{
-A \code{data.frame} with the summary statistics of the calibrated parameters.
+A dataset with the summary statistics of the calibrated parameters.
 }
 \keyword{datasets}

@@ -11,6 +11,7 @@
 #' set sampled from distributions that characterize their uncertainty
 #' @examples 
 #' generate_psa_params(l_params_all = load_all_params())
+#' @import doParallel
 #' @export
 generate_psa_params <- function(l_params_all, seed = 20210202){ # User defined
   with(as.list(l_params_all), {

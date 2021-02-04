@@ -18,7 +18,7 @@ Description: A collection of functions that implements the Decision Analysis in 
   Under revision.
 License: file LICENSE
 Depends:
-    R (>= 3.5.0)
+    R (>= 4.0.3)
 Imports:
     dplyr,
     lhs,
@@ -30,7 +30,9 @@ Imports:
     doParallel,
     IMIS,
     plotrix,
-    rlang
+    rlang,
+    magrittr,
+    bookdown
 Suggests: 
     knitr,
     rmarkdown,

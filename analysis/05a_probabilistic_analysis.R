@@ -1,5 +1,5 @@
 ################################################################################ 
-# This script conducts the probabilistic sensitivity analysis (robPSA) of the  #
+# This script conducts the probabilistic sensitivity analysis (ProbSA) of the  #
 # cost-effectiveness of testing Stage II colon cancer patients for the absence #
 # of CDX2 biomarker followed by adjuvant chemotherapy                          #
 #                                                                              # 
