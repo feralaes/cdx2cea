@@ -12,7 +12,7 @@
 # https://github.com/DARTH-git/darthpack                                       #
 ################################################################################
 
-# rm(list = ls()) # to clean the workspace
+rm(list = ls()) # to clean the workspace
 
 #### 05b.1 Load packages and functions ####
 #### 05b.1.1 Load packages ####
@@ -38,17 +38,6 @@ data("v_calib_post_map")
 ## Update base-case parameters with calibrated values at MAP
 l_params_basecase <- update_param_list(l_params_all, v_calib_post_map)
 
-
-# v_calib_params_test <- c(r_DieMets = 0.03870286,
-#                          r_RecurCDX2pos = 0.003328773,
-#                          hr_RecurCDX2neg = 3.601069,
-#                          p_Mets = 0.9808406)
-# l_params_test <- update_param_list(l_params_all, v_calib_params_test)
-# l_params_basecase <- l_params_test
-# list2env(l_params_test, envir = .GlobalEnv)
-# p_CDX2neg_init <- 0.07174888
-
-
 #### 05b.2 Time spent in each state ####
 #### 05b.2.1 CDX2-negative patients ####
 ### Run model with treatment
@@ -70,10 +59,10 @@ ly_gain_cdx2neg <- (ly_cdx2neg_trt - ly_cdx2neg_notrt)/ly_cdx2neg_notrt ### RESU
 ### Time spent without and with recurrence
 df_ly_rec_cdx2neg <- data.frame(`Health State` = ordered(c("Without recurrence", "With recurrence"),
                                                          c("With recurrence", "Without recurrence")),
-                            `No FOLFOX` = c(sum(m_M_cdx2neg_notrt[, 1:2]), 
-                                            sum(m_M_cdx2neg_notrt[, 4]))/12,
-                            `FOLFOX`    = c(sum(m_M_cdx2neg_trt[, 1:2]), 
-                                            sum(m_M_cdx2neg_trt[, 4]))/12,
+                            `No FOLFOX` = c(sum(m_M_cdx2neg_notrt[, c("CDX2pos", "CDX2neg")]), 
+                                            sum(m_M_cdx2neg_notrt[, "Mets"]))/12,
+                            `FOLFOX`    = c(sum(m_M_cdx2neg_trt[, c("CDX2pos", "CDX2neg")]), 
+                                            sum(m_M_cdx2neg_trt[, "Mets"]))/12,
                             check.names = FALSE
 )
 df_ly_rec_cdx2neg_lng <- reshape2::melt(df_ly_rec_cdx2neg, 
@@ -105,10 +94,10 @@ ly_gain_cdx2pos <- (ly_cdx2pos_trt - ly_cdx2pos_notrt)/ly_cdx2pos_notrt ### RESU
 ### Time spent without and with recurrence
 df_ly_rec_cdx2pos <- data.frame(`Health State` = ordered(c("Without recurrence", "With recurrence"),
                                                          c("With recurrence", "Without recurrence")),
-                                `No FOLFOX` = c(sum(m_M_cdx2pos_notrt[, 1:2]), 
-                                                sum(m_M_cdx2pos_notrt[, 4]))/12,
-                                `FOLFOX`    = c(sum(m_M_cdx2pos_trt[, 1:2]), 
-                                                sum(m_M_cdx2pos_trt[, 4]))/12,
+                                `No FOLFOX` = c(sum(m_M_cdx2pos_notrt[, c("CDX2pos", "CDX2neg")]), 
+                                                sum(m_M_cdx2pos_notrt[, "Mets"]))/12,
+                                `FOLFOX`    = c(sum(m_M_cdx2pos_trt[, c("CDX2pos", "CDX2neg")]), 
+                                                sum(m_M_cdx2pos_trt[, "Mets"]))/12,
                                 check.names = FALSE
 )
 df_ly_rec_cdx2pos_lng <- reshape2::melt(df_ly_rec_cdx2pos, 
@@ -181,6 +170,7 @@ df_cea_det <- dampack::calculate_icers(cost       = df_out_ce$Cost,
                                        strategies = v_names_str)
 df_cea_det$Strategy <- c("No CDX2 testing and no FOLFOX", 
                          "CDX2 testing and FOLFOX if CDX2-negative")
+df_cea_det
 
 ### Save CEA table with ICERs
 ## As .RData
@@ -262,8 +252,8 @@ ggsave(plot = gg_owsa,
 ### Define TWSA designs
 df_twsa_input_pCDX2_vs_hrCDX2negtrt <- data.frame(pars = c("p_CDX2neg", 
                                                            "hr_Recurr_CDXneg_Rx"),
-                            min = c(0.015, 0.670),
-                            max = c(0.150, 0.940))
+                            min = c(0.015, 0.630),
+                            max = c(0.150, 1.000))
 
 ### $50K/QALY
 ## Run TWSA
@@ -329,8 +319,8 @@ ggsave(plot = gg_twsa_icer_pCDX2_vs_hrCDX2negtrt_100k,
 ### Define TWSA designs
 df_twsa_input_hrRecurCDX2neg_vs_hrCDX2negtrt <- data.frame(pars = c("hr_RecurCDX2neg",
                                                                     "hr_Recurr_CDXneg_Rx"),
-                                                  min = c(1.69, 0.670),
-                                                  max = c(4.38, 0.940))
+                                                  min = c(1.69, 0.630),
+                                                  max = c(4.38, 1.000))
 
 ### $50K/QALY
 ## Run TWSA
@@ -484,11 +474,11 @@ patched <- gg_twsa_pCDX2_vs_hrCDX2negtrt/gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt
 gg_twsa <- patched + plot_annotation(tag_levels = 'A')
 gg_twsa
 ggsave(plot = gg_twsa,
-       filename = "figs/manuscript/fig04_TWSA.pdf", 
+       filename = "figs/manuscript/Figure 4 - TWSA.pdf", 
        width = 12, height = 14)
 ggsave(plot = gg_twsa,
-       filename = "figs/manuscript/fig04_TWSA.png", 
+       filename = "figs/manuscript/Figure 4 - TWSA.png", 
        width = 12, height = 14)
 ggsave(plot = gg_twsa,
-       filename = "figs/manuscript/fig04_TWSA.tiff", 
+       filename = "figs/manuscript/Figure 4 - TWSA.tiff", 
        width = 12, height = 14)

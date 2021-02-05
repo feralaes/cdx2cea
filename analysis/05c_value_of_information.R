@@ -40,7 +40,7 @@ pop_evi <- sum(101000*0.33*(1/(1+0.03)^(1:10))) # Annual cases * proportion that
 evpi_pop <- calc_evpi(wtp = v_wtp, psa = l_psa, pop = pop_evi)
 gg_evpi_pop <- plot(evpi_pop, effect_units = "QALY", txtsize = 16, n_x_ticks = 8) + 
   scale_y_continuous(name = "EVPI (Million $)",
-                     breaks = number_ticks(6), 
+                     breaks = number_ticks(9), 
                      labels = function(x){formatC((x)/1000000, digits = 0, format = "f")}) +
   xlab("Cost-effectiveness threshold (Thousand $/QALY)")
 gg_evpi_pop
@@ -49,6 +49,8 @@ ggsave(plot = gg_evpi_pop, "figs/05c_evpi_pop.pdf", width = 8, height = 6)
 ggsave(plot = gg_evpi_pop, "figs/manuscript/fig05b_evpi_pop.png", width = 8, height = 6)
 ggsave(plot = gg_evpi_pop, "figs/manuscript/fig05b_evpi_pop.pdf", width = 8, height = 6)
 ggsave(plot = gg_evpi_pop, "figs/manuscript/fig05b_evpi_pop.tiff", width = 8, height = 6)
+
+evpi_pop %>% filter(WTP %in% c(50000, 100000, 150000))
 
 #### 05c.4 Expected value of partial perfect information (EVPPI) ####
 

@@ -59,11 +59,11 @@ print(paste0("PSA with ", scales::comma(n_sim), " simulations run in series in "
              round(n_time_total_psa_series, 2), " ", 
              units(n_time_total_psa_series)))
 
-l_out_psa <- run_probsa(df_psa_input = df_psa_input, 
-                        n_str = n_str, 
-                        parallel = TRUE)
-df_c <- l_out_psa$Costs
-df_e <- l_out_psa$Effects
+l_out_probsa <- run_probsa(df_psa_input = df_psa_input, 
+                           n_str = n_str, 
+                           parallel = TRUE)
+df_c <- l_out_probsa$Costs
+df_e <- l_out_probsa$Effects
 
 ### Create PSA object for dampack
 l_psa <- dampack::make_psa_obj(cost = df_c, 

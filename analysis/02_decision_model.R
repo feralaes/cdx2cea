@@ -28,7 +28,8 @@ l_params_all <- load_all_params() # function in cdx2cea
 
 #### 02.2 Run STM ####
 ### Create list of model output
-l_out_stm <- decision_model(l_params_all = l_params_all)
+l_out_stm <- decision_model(l_params_all = l_params_all, 
+                            err_stop = TRUE, verbose = TRUE)
 
 ### Plot Markov cohort trace
 gg_trace <- plot_trace(l_params_all, m_M = l_out_stm$m_M)
@@ -46,5 +47,5 @@ ggsave(gg_trace,
 ### Plot state-transition diagram
 png("figs/02_model_diagram.png")
   connect <- (l_out_stm$a_P[,,1] > 0)
-  survival::statefig(layout = c(3, 2, 1), connect = connect)
+  survival::statefig(layout = c(2, 2, 1), connect = connect)
 dev.off()

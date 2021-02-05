@@ -29,7 +29,7 @@ decision_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     ### Initial state vector
     v_s_init <- c(CDX2pos = 1 - p_CDX2neg_init,
                   CDX2neg = p_CDX2neg_init,
-                  Local   = 0,
+                  # Local   = 0, # REMOVE LOCAL
                   Mets    = 0, 
                   Dead_OC = 0,
                   Dead_C  = 0)
@@ -62,44 +62,46 @@ decision_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
                  dimnames = list(v_names_states, v_names_states, 0:(n_cycles-1)))
     ### Fill in array
     ## From CDX2 positive
-    a_P["CDX2pos", "CDX2pos", ] <- (1 - v_p_DieAge) * (1 - p_RecurCDX2pos)
+    a_P["CDX2pos", "CDX2pos", ] <- (1 - v_p_DieAge) * (1 - p_RecurCDX2pos) + 
+      (1 - v_p_DieAge) * p_RecurCDX2pos * (1- p_Mets)
     a_P["CDX2pos", "CDX2neg", ] <- 0
-    a_P["CDX2pos", "Local", ]   <- (1 - v_p_DieAge) * p_RecurCDX2pos * (1 - p_Mets)
+    # a_P["CDX2pos", "Local", ]   <- (1 - v_p_DieAge) * p_RecurCDX2pos * (1 - p_Mets) # REMOVE LOCAL
     a_P["CDX2pos", "Mets", ]    <- (1 - v_p_DieAge) * p_RecurCDX2pos * p_Mets
     a_P["CDX2pos", "Dead_OC", ] <- v_p_DieAge
     a_P["CDX2pos", "Dead_C", ]  <- 0
     ## From CDX2 negative
     a_P["CDX2neg", "CDX2pos", ] <- 0
-    a_P["CDX2neg", "CDX2neg", ] <- (1 - v_p_DieAge) * (1 - p_RecurCDX2neg)
-    a_P["CDX2neg", "Local", ]   <- (1 - v_p_DieAge) * p_RecurCDX2neg * (1 - p_Mets)
+    a_P["CDX2neg", "CDX2neg", ] <- (1 - v_p_DieAge) * (1 - p_RecurCDX2neg) + 
+      (1 - v_p_DieAge) * p_RecurCDX2neg * ( 1- p_Mets)
+    # a_P["CDX2neg", "Local", ]   <- (1 - v_p_DieAge) * p_RecurCDX2neg * (1 - p_Mets) # REMOVE LOCAL
     a_P["CDX2neg", "Mets", ]    <- (1 - v_p_DieAge) * p_RecurCDX2neg * p_Mets
     a_P["CDX2neg", "Dead_OC", ] <- v_p_DieAge
     a_P["CDX2neg", "Dead_C", ]  <- 0
-    ## From Local Recurrence
-    a_P["Local", "CDX2pos", ] <- 0
-    a_P["Local", "CDX2neg", ] <- 0
-    a_P["Local", "Local", ]   <- (1 - v_p_DieAge) * (1 - p_Mets)
-    a_P["Local", "Mets", ]    <- (1 - v_p_DieAge) * p_Mets
-    a_P["Local", "Dead_OC", ] <- v_p_DieAge
-    a_P["Local", "Dead_C", ]  <- 0
+    # ## From Local Recurrence
+    # a_P["Local", "CDX2pos", ] <- 0                               # REMOVE LOCAL
+    # a_P["Local", "CDX2neg", ] <- 0                               # REMOVE LOCAL
+    # a_P["Local", "Local", ]   <- (1 - v_p_DieAge) * (1 - p_Mets) # REMOVE LOCAL
+    # a_P["Local", "Mets", ]    <- (1 - v_p_DieAge) * p_Mets       # REMOVE LOCAL
+    # a_P["Local", "Dead_OC", ] <- v_p_DieAge                      # REMOVE LOCAL
+    # a_P["Local", "Dead_C", ]  <- 0                               # REMOVE LOCAL
     ## From Mets Recurrence
     a_P["Mets", "CDX2pos", ] <- 0
     a_P["Mets", "CDX2neg", ] <- 0
-    a_P["Mets", "Local", ]   <- 0
+    # a_P["Mets", "Local", ]   <- 0 # REMOVE LOCAL
     a_P["Mets", "Mets", ]    <- (1 - v_p_DieMets)
     a_P["Mets", "Dead_OC", ] <- v_p_DieMets * v_r_mort_by_age_month/(v_r_mort_by_age_month + r_DieMets)
     a_P["Mets", "Dead_C", ]  <- v_p_DieMets * r_DieMets/(v_r_mort_by_age_month + r_DieMets)
     ## From Dead_OC
     a_P["Dead_OC", "CDX2pos", ] <- 0
     a_P["Dead_OC", "CDX2neg", ] <- 0
-    a_P["Dead_OC", "Local", ]   <- 0
+    # a_P["Dead_OC", "Local", ]   <- 0 # REMOVE LOCAL
     a_P["Dead_OC", "Mets", ]    <- 0
     a_P["Dead_OC", "Dead_OC", ] <- 1
     a_P["Dead_OC", "Dead_C", ]  <- 0
     ## From Dead_C
     a_P["Dead_C", "CDX2pos", ] <- 0
     a_P["Dead_C", "CDX2neg", ] <- 0
-    a_P["Dead_C", "Local", ]   <- 0
+    # a_P["Dead_C", "Local", ]   <- 0 # REMOVE LOCAL
     a_P["Dead_C", "Mets", ]    <- 0
     a_P["Dead_C", "Dead_OC", ] <- 0
     a_P["Dead_C", "Dead_C", ]  <- 1

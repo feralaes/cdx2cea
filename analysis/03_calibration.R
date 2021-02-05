@@ -84,6 +84,11 @@ n_resamp <- 1000
 ### Names and number of input parameters to be calibrated
 v_param_names  <- names(v_params_calib)
 n_param        <- length(v_param_names)
+## Labels for plotting
+v_param_names_labels <- c("Monthly rate of metastatic\ndisease mortality",
+                          "Montly rate of recurrence\nin CDX2-positive patients",
+                          "Hazard ratio for developing\nrecurrence in CDX2-negative patients",
+                          "Proportion of recurrences \nthat are metastatic")
 
 ### Vector with range on input search space
 # Lower bound
@@ -113,8 +118,8 @@ l_fit_imis <- IMIS::IMIS(B        =  1000,      # incremental sample size at eac
                          D        =  0)
 ### Obtain posterior
 m_calib_post    <- l_fit_imis$resample
-v_p_DieMets_3yr <- 1-exp(-m_calib_post[,"r_DieMets"]*36)
-v_p_RecurCDX2pos_3yr <- 1-exp(-m_calib_post[,"r_RecurCDX2pos"]*36)
+v_p_DieMets_3yr <- 1-exp(-m_calib_post[, "r_DieMets"]*36)
+v_p_RecurCDX2pos_3yr <- 1-exp(-m_calib_post[, "r_RecurCDX2pos"]*36)
 
 #### 03.4 Exploring posterior distribution ####
 #### 03.4.1 Summary statistics of posterior distribution ####
@@ -126,21 +131,27 @@ p_RecurCDX2pos_3yr_mean <- mean(v_p_RecurCDX2pos_3yr)
 ### Compute posterior median and 95% credible interval
 m_calib_post_95cr <- matrixStats::colQuantiles(m_calib_post, 
                                                probs = c(0.025, 0.5, 0.975))
-quantile(v_p_DieMets_3yr, probs = c(0.025, 0.5, 0.975))
-quantile(v_p_RecurCDX2pos_3yr, probs = c(0.025, 0.5, 0.975))
+p_DieMets_3yr_post_95cr <- quantile(v_p_DieMets_3yr, probs = c(0.025, 0.5, 0.975))
+p_RecurCDX2pos_3yr_post_95cr <- quantile(v_p_RecurCDX2pos_3yr, probs = c(0.025, 0.5, 0.975))
 
 ### Compute posterior values for draw
 v_calib_post <- exp(log_post(m_calib_post))
 
 ### Compute maximum-a-posteriori (MAP) as the mode of the sampled values
 v_calib_post_map  <- m_calib_post[which.max(v_calib_post), ]
+p_DieMets_3yr_map <- 1-exp(-v_calib_post_map["r_DieMets"]*36)
+p_RecurCDX2pos_3yr_map <- 1-exp(-v_calib_post_map["r_RecurCDX2pos"]*36)
 
 # Summary statistics
 df_posterior_summ <- data.frame(
-  Parameter = v_param_names,
-  Mean      = v_calib_post_mean,
-  m_calib_post_95cr,
-  MAP       = v_calib_post_map,
+  Parameter = c(v_param_names_labels, 
+                "3-year cumulative metastatic mortality risk", 
+                "3-year cumulative recurrence risk"),
+  Mean      = c(v_calib_post_mean, p_DieMets_3yr_mean, p_RecurCDX2pos_3yr_mean),
+  rbind(m_calib_post_95cr, 
+        p_DieMets_3yr_post_95cr,
+        p_RecurCDX2pos_3yr_post_95cr),
+  MAP = c(v_calib_post_map, p_DieMets_3yr_map, p_RecurCDX2pos_3yr_map),
   check.names = FALSE)
 df_posterior_summ
 
@@ -156,9 +167,11 @@ write.csv(df_posterior_summ,
 #### 03.4.2 Visualization of posterior distribution ####
 ### Rescale posterior to plot density of plots
 v_calib_alpha <- scales::rescale(v_calib_post)
+df_calib_post <- data.frame(m_calib_post)
+colnames(df_calib_post) <-v_param_names_labels
 
 ### Plot the 1000 draws from the posterior
-gg_post_pairs_corr <- ggpairs(data.frame(m_calib_post),
+gg_post_pairs_corr <- GGally::ggpairs(data.frame(m_calib_post),
                               upper = list(continuous = wrap("cor",
                                                              color = "black",
                                                              size = 5)),
@@ -166,25 +179,30 @@ gg_post_pairs_corr <- ggpairs(data.frame(m_calib_post),
                                                             alpha = 0.8)),
                               lower = list(continuous = wrap("points", 
                                                              alpha = 0.3,
-                                                             size = 0.5)),
+                                                             size = 0.7)),
+                              columnLabels = v_param_names_labels
                               # columnLabels = c("mu[DieMets]",
                               #                  "mu[recurCDX2pos]",
                               #                  "hr[recurCDX2neg]",
                               #                  "p[Mets]"),
-                              labeller = "label_parsed") +
+                              # labeller = "label_parsed"
+                              ) +
   theme_bw(base_size = 18) +
   theme(axis.title.x = element_blank(),
-        axis.text.x  = element_text(size=6),
+        axis.text.x  = element_text(size = 14),
         axis.title.y = element_blank(),
         axis.text.y  = element_blank(),
-        axis.ticks.y = element_blank())
+        axis.ticks.y = element_blank(),
+        strip.background = element_rect(fill = "white",
+                                        color = "white"),
+        strip.text = element_text(hjust = 0))
 gg_post_pairs_corr
 ggsave(filename = "figs/03_posterior-IMIS-correlation-1k.pdf",
-       width = 11, height = 9)
+       width = 12, height = 12)
 ggsave(filename = "figs/03_posterior-IMIS-correlation-1k.jpeg",
-       width = 11, height = 9)
+       width = 12, height = 12)
 ggsave(filename = "figs/03_posterior-IMIS-correlation-1k.png",
-       width = 11, height = 9)
+       width = 12, height = 12)
 
 ### Plot the 1000 draws from the posterior with marginal histograms
 m_samp_prior <- sample.prior(n_resamp)
@@ -231,5 +249,6 @@ ggsave(gg_post_imis,
 
 #### 03.5 Store posterior and MAP from IMIS calibration ####
 save(m_calib_post,
+     v_calib_post_mean,
      v_calib_post_map,
      file = "output/03_imis_output.RData")

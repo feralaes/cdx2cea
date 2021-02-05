@@ -17,7 +17,7 @@ v_target_n <- c(6,  # DFS CDX2neg, pg.  pg. 219
 
 df_calibration_targets <- data.frame(Source = "Calibration target",
                                      Outcome = rep(c("DFS", "OS", "DSS"), each = 2),
-                                     CDX2 = rep(c("Negative", "Positive"), 3), 
+                                     CDX2 = rep(c("CDX2-Negative", "CDX2-Positive"), 3), 
                                      Time = 60,
                                      S = v_targets,
                                      N = v_target_n)

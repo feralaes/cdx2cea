@@ -200,7 +200,7 @@ load_all_params <- function(l_params_init = NULL,
                          1:n_cycles_year, 
                          sep = ".")
     # Vector with the 6 health states of the model
-    v_names_states <- c("CDX2pos", "CDX2neg", "Local", 
+    v_names_states <- c("CDX2pos", "CDX2neg", #"Local", 
                         "Mets", "Dead_OC", "Dead_C")
     n_states <- length(v_names_states) # number of health states
     

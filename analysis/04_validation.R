@@ -1,18 +1,15 @@
 ################################################################################ 
-# This script conducts an internal validation of the Sick-Sicker               # 
-# state-transition model (STM) by comparing the model-predicted outputs        #
-# evaluated at the calibrated parameters vs the calibration targets. This      #
-# script could be modified by adding an external validation exercise.          #
+# This script conducts an internal validation of the cohort STM of Stage II    #
+# colon cancer patients stratified by CDX2 biomarker status to survival curves #
+# from Dalerba et al. (2016)                                                   #
 #                                                                              # 
 # Authors:                                                                     #
-#     - Fernando Alarid-Escudero, PhD, <fernando.alarid@cide.edu>              # 
-#     - Eline Krijkamp, MS                                                     #
-#     - Petros Pechlivanoglou, PhD                                             #
-#     - Hawre Jalal, MD, PhD                                                   #
-#     - Eva A. Enns, PhD                                                       # 
+#     - Fernando Alarid-Escudero, PhD, <fernando.alarid@cide.edu>              #
+#     - Deb Schrag, MD, MPH                                                    #
+#     - Karen M. Kuntz, ScD                                                    #
 ################################################################################ 
-# The structure of this code is according to the DARTH framework               #
-# https://github.com/DARTH-git/Decision-Modeling-Framework                     #
+# The structure of this code follows DARTH's coding framework                  #
+# https://github.com/DARTH-git/darthpack                                       #
 ################################################################################ 
 
 rm(list = ls()) # to clean the workspace
@@ -49,12 +46,12 @@ m_dss_neg <- matrix(NA, nrow = n_samp, ncol = 61)
 m_dss_pos <- matrix(NA, nrow = n_samp, ncol = 61)
 
 ### Create data frames with model predicted outputs
-df_dfs_neg <- data.frame(Outcome = "DFS", CDX2 = "Negative", m_dfs_neg)
-df_dfs_pos <- data.frame(Outcome = "DFS", CDX2 = "Positive", m_dfs_pos)
-df_os_neg  <- data.frame(Outcome = "OS",  CDX2 = "Negative", m_os_neg)
-df_os_pos  <- data.frame(Outcome = "OS",  CDX2 = "Positive", m_os_pos)
-df_dss_neg <- data.frame(Outcome = "DSS", CDX2 = "Negative", m_dss_neg)
-df_dss_pos <- data.frame(Outcome = "DSS", CDX2 = "Positive", m_dss_pos)
+df_dfs_neg <- data.frame(Outcome = "DFS", CDX2 = "CDX2-Negative", m_dfs_neg)
+df_dfs_pos <- data.frame(Outcome = "DFS", CDX2 = "CDX2-Positive", m_dfs_pos)
+df_os_neg  <- data.frame(Outcome = "OS",  CDX2 = "CDX2-Negative", m_os_neg)
+df_os_pos  <- data.frame(Outcome = "OS",  CDX2 = "CDX2-Positive", m_os_pos)
+df_dss_neg <- data.frame(Outcome = "DSS", CDX2 = "CDX2-Negative", m_dss_neg)
+df_dss_pos <- data.frame(Outcome = "DSS", CDX2 = "CDX2-Positive", m_dss_pos)
 
 ### Evaluate model at each posterior sample and store results
 for(i in 1:n_samp){ # i = 1
@@ -98,7 +95,6 @@ df_out_valid_5yr_sum$Time <- df_out_valid_5yr_sum$Time-1
 ### Combine model-predicted outputs with targets
 df_model_n_targets <- dplyr::bind_rows(df_out_valid_5yr_sum,
                                        df_calibration_targets)
-levels(df_model_n_targets$CDX2) <- c("CDX2-negative","CDX2-positive")
 
 #### 04.4 Internal validation: Model-predicted outputs vs. targets ####
 gg_valid <- ggplot(df_model_n_targets,
@@ -119,7 +115,10 @@ gg_valid <- ggplot(df_model_n_targets,
   ylab("5-year survival") +
   theme_bw(base_size = 16) +
   theme(legend.position = "bottom",
-        legend.title = element_blank())
+        legend.title = element_blank(),
+        strip.background = element_rect(fill = "white",
+                                        color = "white"),
+        strip.text = element_text(size = 14, face = "bold"))
 gg_valid
 ggsave(gg_valid,
        filename = "figs/04_validation_posterior_vs_targets.pdf",

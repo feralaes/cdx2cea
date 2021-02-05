@@ -105,7 +105,7 @@ run_probsa <- function(df_psa_input, n_str = 2, parallel = FALSE){
       # Register clusters
       doParallel::registerDoParallel(cl)
       # Run parallelized PSA
-      df_ce <- foreach::foreach(i = 1:n_sim, .combine = rbind) %dopar% {
+      df_ce <- foreach::foreach(i = 1:n_sim, .combine = rbind) %dopar% { # i <- 1
         l_psa_input <- update_param_list(l_params_all, df_psa_input[i, ])
         l_out_temp <- calculate_ce_out(l_psa_input)
         df_ce <- c(l_out_temp$Cost, l_out_temp$Effect)
