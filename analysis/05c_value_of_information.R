@@ -8,8 +8,8 @@
 #     - Deb Schrag, MD, MPH                                                    #
 #     - Karen M. Kuntz, ScD                                                    #
 ################################################################################
-# The structure of this code is according to the DARTH framework               #
-# https://github.com/DARTH-git/Decision-Modeling-Framework                     #
+# The structure of this code follows DARTH's coding framework                  #
+# https://github.com/DARTH-git/darthpack                                       #
 ################################################################################
 rm(list = ls()) # to clean the workspace
 

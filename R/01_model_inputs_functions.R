@@ -58,17 +58,21 @@ load_params_init <- function(
   r_RecurCDX2pos = 0.003328773,
   # Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
   hr_RecurCDX2neg = 3.601069078,
-  # Hazard ratio for disease recurrence among patients with CDX2-negative 
+  # # Hazard ratio for disease recurrence among patients with CDX2-negative 
+  # # under chemo versus CDX2-negative patients without chemotherapy. From:
+  # # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
+  # hr_Recurr_CDXneg_Rx = 0.79, 
+  ## Hazard ratio for disease recurrence among patients with CDX2-negative
   # under chemo versus CDX2-negative patients without chemotherapy. From:
-  # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
-  hr_Recurr_CDXneg_Rx = 0.79, 
+  # QUASAR. Lancet 2007 Figure 3, Stage II RR [99% CI]: 0.82 [0.63, 1.08]
+  hr_Recurr_CDXneg_Rx = 0.82,
   # Hazard ratio for disease recurrence among patients with CDX2-positive 
   # under chemo versus CDX2-positive patients without chemotherapy. From: [TO BE ADDED]
   hr_Recurr_CDXpos_Rx = 1.00, 
   ### State rewards
   ## Costs
   # Cost of chemotherapy
-  c_Chemo = 1391,
+  c_Chemo =  1576,
   # Cost of chemotherapy administration
   c_ChemoAdmin = 315, 
   # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
@@ -90,15 +94,17 @@ load_params_init <- function(
 ){
   # Number of cycles
   n_cycles <- (n_age_max - n_age_init)*n_cycles_year # Time horizon, number of monthly cycles
-  # Inflation factor based on PCE from 2004 USD to 2018 USD [UPDATE]
-  inf_pce <- (1 + index_pce)^14
+  # Inflation factor based on PCE from 2004 USD to 2020 USD
+  inf_pce <- (1 + index_pce)^16
   # Inflate costs
+  c_Chemo        <- c_Chemo*(1 + index_pce)^2 # Cost of chemotherapy
+  c_ChemoAdmin   <- c_ChemoAdmin*(1 + index_pce)^2  # Cost of chemotherapy administration
   c_CRCStg2_init <- (c_CRCStg2_init*inf_pce)/n_cycles_year # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
   c_CRCStg2_cont <- (c_CRCStg2_cont*inf_pce)/n_cycles_year # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
   c_CRCStg4_cont <- (c_CRCStg4_cont*inf_pce)/n_cycles_year # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
   ic_DeathCRCStg2 <- ic_DeathCRCStg2*inf_pce # 92851, # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
   ic_DeathOCStg2  <- ic_DeathOCStg2*inf_pce # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD 
-  
+  c_Test          <- c_Test*(1 + index_pce)^2 # Cost of IHC staining
   ### Create list of initial parameters
   l_params_init <- list(
     # Initial and final ages

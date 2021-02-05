@@ -31,7 +31,8 @@ generate_psa_params <- function(l_params_all, seed = 20210202){ # User defined
     ## Hazard ratio for disease recurrence among patients with CDX2-negative 
     # under chemo versus CDX2-negative patients without chemotherapy. From:
     # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
-    hr_Recurr_CDXneg_Rx = exp(rnorm(n_sim, log(0.79), sd = (log(0.94)-log(0.670))/(2*1.96))),
+    # hr_Recurr_CDXneg_Rx = exp(rnorm(n_sim, log(0.79), sd = (log(0.94)-log(0.670))/(2*1.96))), OLD VALUE
+    hr_Recurr_CDXneg_Rx = exp(rnorm(n_sim, log(0.82), sd = (log(1.08)-log(0.63))/(2*2.576))), # 2.576 is the Z value for a 1% significance level
     # Hazard ratio for disease recurrence among patients with CDX2-positive 
     # under chemo versus CDX2-positive patients without chemotherapy. 
     hr_Recurr_CDXpos_Rx = exp(rnorm(n_sim, log(0.99), sd = (log(0.999)-log(0.95))/(2*1.96))),
@@ -71,122 +72,8 @@ generate_psa_params <- function(l_params_all, seed = 20210202){ # User defined
 
 }
 
-#' Generate lower and upper bound of the CEA parameters
-#'
-#' \code{generate_params_bounds} generates the lower and upper bounds of the
-#' model parameters.
-#' @param l_params_all List with all parameters of cost-effectiveness model.
-#' @param seed Seed for reproducibility of Monte Carlo sampling.
-#' @return 
-#' A list with the lower and upper bounds of the model parameters.
-#' @examples 
-#' generate_params_bounds()
-#' @export
-generate_params_bounds <- function(l_params_all){
-  with(as.list(l_params_all),{
-  lb_factor <- 0.8
-  ub_factor <- 1.2
-  
-  #--- Lower bounds ---#
-  v_lb <- data.frame(
-    ## Proportion of CDX2-negative patients 
-    p_CDX2neg = 0.010, 
-    # Proportion of recurrence being metastatic (CALIBRATED)
-    p_Mets  = quantile(m_calib_post[, "p_Mets"], probs = 0.025), 
-    # Cancer mortality rate (CALIBRATED)
-    r_DieMets = quantile(m_calib_post[, "r_DieMets"], probs = 0.025),
-    # Rate of recurrence in CDX2 positive patients (CALIBRATED)
-    r_RecurCDX2pos = quantile(m_calib_post[, "r_RecurCDX2pos"], probs = 0.025), 
-    # Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
-    hr_RecurCDX2neg = quantile(m_calib_post[, "hr_RecurCDX2neg"], probs = 0.025),
-    ## Hazard ratio for disease recurrence among patients with CDX2-negative 
-    # under chemo versus CDX2-negative patients without chemotherapy. From:
-    # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
-    hr_Recurr_CDXneg_Rx = 0.670,
-    # Hazard ratio for disease recurrence among patients with CDX2-positive 
-    # under chemo versus CDX2-positive patients without chemotherapy. From: [TO BE ADDED]
-    hr_Recurr_CDXpos_Rx = 0.95,
-    
-    ### State rewards
-    ## Costs
-    # Cost of chemotherapy
-    c_Chemo = c_Chemo*lb_factor,
-    # Cost of chemotherapy administration
-    c_ChemoAdmin = c_ChemoAdmin*lb_factor, 
-    # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
-    c_CRCStg2_init = c_CRCStg2_init - 1.96*339*inf_pce/n_cycles_year,
-    # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-    c_CRCStg2_cont =  c_CRCStg2_cont - 1.96*79*inf_pce/n_cycles_year, 
-    # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
-    c_CRCStg4_cont = c_CRCStg4_cont - 1.96*437*inf_pce/n_cycles_year,
-    # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-    ic_DeathCRCStg2 = ic_DeathCRCStg2 - 1.96*705*inf_pce,
-    # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-    ic_DeathOCStg2  = ic_DeathOCStg2 - 1.96*755*inf_pce,
-    # Cost of IHC staining
-    c_Test = 94,
-    
-    ## Utilities
-    u_Stg2 = 0.69,      # Ness 1999, Outcome state "A" from table 3
-    u_Stg2Chemo = 0.62, # Ness 1999, Outcome state "BC" from table 4
-    u_Stg4 = 0.20       # Ness 1999, Outcome state "FG" from table 4
-  ) 
-  #--- Upper bounds ---#
-  v_ub <- data.frame(
-    ## Proportion of CDX2-negative patients 
-    p_CDX2neg = 0.150, 
-    # Proportion of recurrence being metastatic (CALIBRATED)
-    p_Mets  = quantile(m_calib_post[, "p_Mets"], probs = 0.975), 
-    # Cancer mortality rate (CALIBRATED)
-    r_DieMets = quantile(m_calib_post[, "r_DieMets"], probs = 0.975),
-    # Rate of recurrence in CDX2 positive patients (CALIBRATED)
-    r_RecurCDX2pos = quantile(m_calib_post[, "r_RecurCDX2pos"], probs = 0.975), 
-    # Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
-    hr_RecurCDX2neg = quantile(m_calib_post[, "hr_RecurCDX2neg"], probs = 0.975),
-    ## Hazard ratio for disease recurrence among patients with CDX2-negative 
-    # under chemo versus CDX2-negative patients without chemotherapy. From:
-    # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
-    hr_Recurr_CDXneg_Rx = 0.940,
-    # Hazard ratio for disease recurrence among patients with CDX2-positive 
-    # under chemo versus CDX2-positive patients without chemotherapy. From: [TO BE ADDED]
-    hr_Recurr_CDXpos_Rx = 1.000,
-    
-    ### State rewards
-    ## Costs
-    # Cost of chemotherapy
-    c_Chemo = c_Chemo*ub_factor,
-    # Cost of chemotherapy administration
-    c_ChemoAdmin = c_ChemoAdmin*ub_factor, 
-    # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
-    c_CRCStg2_init = c_CRCStg2_init + 1.96*339*inf_pce/n_cycles_year,
-    # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-    c_CRCStg2_cont = c_CRCStg2_cont + 1.96*79*inf_pce/n_cycles_year, 
-    # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
-    c_CRCStg4_cont = c_CRCStg4_cont + 1.96*437*inf_pce/n_cycles_year,
-    # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-    ic_DeathCRCStg2 = ic_DeathCRCStg2 + 1.96*705*inf_pce,
-    # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
-    ic_DeathOCStg2  = ic_DeathOCStg2 + 1.96*755*inf_pce,
-    # Cost of IHC staining
-    c_Test = 179, # Cost of genetic test for CDX2neg
-    
-    ## Utilities
-    u_Stg2 = 0.78,      # Ness 1999, Outcome state "A" from table 3
-    u_Stg2Chemo = 0.72, # Ness 1999, Outcome state "BC" from table 4
-    u_Stg4 = 0.31       # Ness 1999, Outcome state "FG" from table 3
-  ) 
-  #--- Standard errors based on bounds ---#
-  v_se <- (v_ub - v_lb)/(2*1.96)
-  
-  #--- Return output ---#
-  return(out = list(v_lb = v_lb,
-                    v_ub = v_ub,
-                    v_se = v_se))
-  }
-  )
-}
-
-#' Generate lower and upper bound of the CEA parameters
+#' Run a probabilistic sensitivity analysis (ProbSA) of the cost-effectiveness
+#' model
 #'
 #' \code{run_probsa} runs a probabilistic sensitivity analysis (ProbSA) and 
 #' calculates cost and effectiveness outcomes.

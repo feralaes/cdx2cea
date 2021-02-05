@@ -8,8 +8,8 @@
 #     - Deb Schrag, MD, MPH                                                    #
 #     - Karen M. Kuntz, ScD                                                    #
 ################################################################################
-# The structure of this code is according to the DARTH framework               #
-# https://github.com/DARTH-git/Decision-Modeling-Framework                     #
+# The structure of this code follows DARTH's coding framework                  #
+# https://github.com/DARTH-git/darthpack                                       #
 ################################################################################
 
 # rm(list = ls()) # to clean the workspace
@@ -36,17 +36,17 @@ data("v_calib_post_map")
 
 ### Parameters for base-case
 ## Update base-case parameters with calibrated values at MAP
-# l_params_basecase <- update_param_list(l_params_all, v_calib_post_map)
+l_params_basecase <- update_param_list(l_params_all, v_calib_post_map)
 
 
-v_calib_params_test <- c(r_DieMets = 0.03870286,
-                         r_RecurCDX2pos = 0.003328773,
-                         hr_RecurCDX2neg = 3.601069,
-                         p_Mets = 0.9808406)
-l_params_test <- update_param_list(l_params_all, v_calib_params_test)
-p_CDX2neg_init <- 0.07174888
-list2env(l_params_test, envir = .GlobalEnv)
-l_params_basecase <- l_params_test
+# v_calib_params_test <- c(r_DieMets = 0.03870286,
+#                          r_RecurCDX2pos = 0.003328773,
+#                          hr_RecurCDX2neg = 3.601069,
+#                          p_Mets = 0.9808406)
+# l_params_test <- update_param_list(l_params_all, v_calib_params_test)
+# l_params_basecase <- l_params_test
+# list2env(l_params_test, envir = .GlobalEnv)
+# p_CDX2neg_init <- 0.07174888
 
 
 #### 05b.2 Time spent in each state ####
@@ -121,44 +121,47 @@ df_charts_ly_rec_cdx2pos <- df_ly_rec_cdx2pos_lng %>%
 df_charts_ly_rec_cdx2pos
 
 #### 05b.2.3 For both types of patients ####
+v_p_CDX2_names <- c(paste0("CDX2-negative patients (", 
+                           scales::percent(round(l_params_basecase$p_CDX2neg, 3), accuracy = 0.1), ")"),
+                    paste0("CDX2-positive patients (", 
+                           scales::percent(round(1-l_params_basecase$p_CDX2neg, 3), accuracy = 0.1), ")")) 
 df_ly_rec_all <- rbind(
-  cbind(Group = paste0("CDX2-negative patients (", 
-                       scales::percent(round(l_params_basecase$p_CDX2neg, 3), accuracy = 0.1), ")"), 
+  cbind(Group = v_p_CDX2_names[1], 
         df_ly_rec_cdx2neg_lng),
-  cbind(Group = paste0("CDX2-positive patients (", 
-                       scales::percent(round(1-l_params_basecase$p_CDX2neg, 3), accuracy = 0.1), ")"), 
-        df_ly_rec_cdx2pos_lng))
+  cbind(Group = v_p_CDX2_names[2], 
+        df_ly_rec_cdx2pos_lng)) %>%
+  filter(!(Group == v_p_CDX2_names[2] & Strategy == "FOLFOX"))
 df_charts_ly_rec_all <- rbind(
-  cbind(Group = paste0("CDX2-negative patients (", 
-                       scales::percent(round(l_params_basecase$p_CDX2neg, 3), accuracy = 0.1), ")"), 
+  cbind(Group = v_p_CDX2_names[1], 
         data.frame(df_charts_ly_rec_cdx2neg, check.names = F)),
-  cbind(Group = paste0("CDX2-positive patients (", 
-                       scales::percent(round(1-l_params_basecase$p_CDX2neg, 3), accuracy = 0.1), ")"), 
-        data.frame(df_charts_ly_rec_cdx2pos, check.names = F)))
+  cbind(Group = v_p_CDX2_names[2], 
+        data.frame(df_charts_ly_rec_cdx2pos, check.names = F))) %>%
+  filter(!(Group == v_p_CDX2_names[2] & Strategy == "FOLFOX"))
 
-g_ly <- ggplot(df_ly_rec_all, 
+gg_ly <- ggplot(df_ly_rec_all, 
        aes(x = Strategy, y = Years, fill = `Health State`)) +
-  facet_wrap(~ Group, ncol = 1) +
+  facet_wrap(~ Group, ncol = 1, scales = "free_y") +
   geom_bar(stat="identity", position = "stack") +
   geom_text(data = df_charts_ly_rec_all, 
             aes(x = Strategy, y = pos, 
                 label = format(round(Years, 2), nsmall = 2), group = `Health State`),
             size=5) +
   # scale_fill_manual(values=c("#E69F00", "#56B4E9")) +
-  scale_fill_grey(start=0.8, end=0.5) +
+  scale_fill_grey(start = 0.8, end = 0.5) +
   xlab("") + 
   scale_y_continuous("Life expectancy (years)", 
                      breaks = dampack::number_ticks(8)) +
   coord_flip() +
-  guides(fill = guide_legend(title = "", reverse=T)) +
+  guides(fill = guide_legend(title = "", reverse = T)) +
   theme_bw(base_size = 17) + 
   theme(legend.position = "bottom") +
   NULL
-ggsave(plot = g_ly, filename = "figs/05b_time-states-all-patients.pdf", width = 10, height = 7)
-ggsave(plot = g_ly, filename = "figs/05b_time-states-all-patients.png", width = 10, height = 7)
-ggsave(plot = g_ly, filename = "figs/manuscript/fig02_time-states-all-patients.pdf", width = 10, height = 7)
-ggsave(plot = g_ly, filename = "figs/manuscript/fig02_time-states-all-patients.png", width = 10, height = 7)
-ggsave(plot = g_ly, filename = "figs/manuscript/fig02_time-states-all-patients.tiff", width = 10, height = 7)
+gg_ly
+ggsave(plot = gg_ly, filename = "figs/05b_time-states-all-patients.pdf", width = 10, height = 7)
+ggsave(plot = gg_ly, filename = "figs/05b_time-states-all-patients.png", width = 10, height = 7)
+ggsave(plot = gg_ly, filename = "figs/manuscript/Figure 2 - time-states-all-patients.pdf", width = 10, height = 7)
+ggsave(plot = gg_ly, filename = "figs/manuscript/Figure 2 - time-states-all-patients.png", width = 10, height = 7)
+ggsave(plot = gg_ly, filename = "figs/manuscript/Figure 2 - time-states-all-patients.tiff", width = 10, height = 7)
 
 #### 05b.3 Cost-effectiveness analysis parameters ####
 ### Strategy names
@@ -192,11 +195,20 @@ plot(df_cea_det)
 ggsave("figs/05b_cea_frontier.png", width = 8, height = 6)
 
 #### 05b.6 One-way sensitivity analysis (OWSA) ####
+l_bounds <- generate_params_bounds(l_params_all = l_params_basecase)
 ### Define OWSA design
 df_owsa_input <- data.frame(pars = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx",
                                      "c_Test", "u_Stg4", "hr_RecurCDX2neg"),
-                            min = c(0.015, 0.620, 94,  0.2, 1.69),
-                            max = c(0.150, 0.970, 179, 0.7, 4.38))
+                            min = c(l_bounds$v_lb$p_CDX2neg, 
+                                    l_bounds$v_lb$hr_Recurr_CDXneg_Rx, 
+                                    l_bounds$v_lb$c_Test,
+                                    l_bounds$v_lb$u_Stg4,
+                                    1.69),
+                            max = c(l_bounds$v_ub$p_CDX2neg, 
+                                    0.970, 
+                                    l_bounds$v_ub$c_Test,
+                                    0.7,
+                                    l_bounds$v_ub$hr_RecurCDX2neg))
 ### Run OWSA
 df_owsa_icer <- run_owsa_det(params_range = df_owsa_input,
                             params_basecase = l_params_basecase,
@@ -207,9 +219,9 @@ df_owsa_icer <- run_owsa_det(params_range = df_owsa_input,
 ### Rename parameters for plotting
 df_owsa_icer$parameter <- ordered(df_owsa_icer$parameter, 
                                   labels = c("Cost of test ($)",
-                                             "Increased recurrence in CDX2-negative patients",
-                                             "Effectiveness of FOLFOX in CDX2−negative patients as a HR",
-                                             "Proportion of CDX2−negative patients",
+                                             "Increased recurrence in CDX2-negative patients\nas a HR",
+                                             "Effectiveness of FOLFOX in CDX2-negative\npatients as a HR",
+                                             "Proportion of CDX2-negative patients",
                                              "Utility of metastatic recurrence"))
 ### Plot OWSA
 gg_owsa <- plot(df_owsa_icer, 
@@ -217,11 +229,15 @@ gg_owsa <- plot(df_owsa_icer,
                 n_x_ticks = 5, n_y_ticks = 5,
                 facet_ncol = 2,
                 facet_scales = "free") +
-  ylab("$/QALY") +
+  scale_y_continuous("$/QALY",
+                     breaks = equal_breaks(n=5, s=0.05), 
+                     label = function(x){scales::comma(x)}, 
+                     expand = c(0.05, 0)) + 
   theme(legend.position = "",
         strip.background = element_rect(fill = "white",
                                         color = "white"),
-        strip.text = element_text(hjust = 0, face = "bold"))
+        strip.text = element_text(hjust = 0, face = "bold", 
+                                  size = 12))
 gg_owsa
 ### Save OWSA figure
 ggsave(plot = gg_owsa, 
@@ -231,13 +247,13 @@ ggsave(plot = gg_owsa,
        filename = "figs/05b_owsa_icer.pdf", 
        width = 10, height = 8)
 ggsave(plot = gg_owsa, 
-       filename = "figs/manuscript/fig03_owsa_icer.png", 
+       filename = "figs/manuscript/Figure 3 - OWSA.png", 
        width = 10, height = 8)
 ggsave(plot = gg_owsa, 
-       filename = "figs/manuscript/fig03_owsa_icer.pdf", 
+       filename = "figs/manuscript/Figure 3 - OWSA.pdf", 
        width = 10, height = 8)
 ggsave(plot = gg_owsa, 
-       filename = "figs/manuscript/fig03_owsa_icer.tiff", 
+       filename = "figs/manuscript/Figure 3 - OWSA.tiff", 
        width = 10, height = 8)
 
 #### 05b.7 Two-way sensitivity analysis (TWSA) ####

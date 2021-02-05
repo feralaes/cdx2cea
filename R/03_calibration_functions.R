@@ -19,13 +19,14 @@ calibration_out <- function(v_params_calib, l_params_all){ # User defined
   ## Run model with updated calibrated parameters by CDX2 status
   # For CDX2-negative patients
   l_out_stm_CDX2neg <- decision_model(l_params_all = l_params_all, 
-                                      p_CDX2neg_init = 1)
+                                      p_CDX2neg_init = 1, Trt = FALSE)
   # For CDX2-positive patients
   l_out_stm_CDX2pos <- decision_model(l_params_all = l_params_all, 
-                                      p_CDX2neg_init = 0)
+                                      p_CDX2neg_init = 0, Trt = FALSE)
   
   ####### Epidemiological Output ###########################################
   #### Disease-Free Survival (DFS) ####
+  # Definition based on: https://www.cancer.gov/publications/dictionaries/cancer-terms/def/disease-free-survival
   v_dfs_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Dead_OC")])
   v_dfs_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Dead_OC")])
   
@@ -34,6 +35,7 @@ calibration_out <- function(v_params_calib, l_params_all){ # User defined
   v_os_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Local", "Mets")])
   
   #### Disease-Specific Survival (DSS) ####
+  # Definition based on: https://www.cancer.gov/publications/dictionaries/cancer-terms/def/disease-specific-survival-rate
   v_dss_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Local", "Mets", "Dead_OC")])
   v_dss_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Local", "Mets", "Dead_OC")])
   
@@ -340,7 +342,7 @@ log_lik_par <- function(v_params,
   ### Get OS
   os <- get_os()
   
-  no_cores <- detectCores() - 2
+  no_cores <- detectCores() - 1
   
   print(paste0("Parallelized Likelihood calculations on ", os, " using ", no_cores, " cores"))
   

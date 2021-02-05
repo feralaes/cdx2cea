@@ -284,213 +284,148 @@ calculate_ce_out <- function(l_params_all,
   )
 }
 
-#' One-way sensitivity analysis (OWSA)
+#' Generate lower and upper bound of the CEA parameters
+#'
+#' \code{generate_params_bounds} generates the lower and upper bounds of the
+#' model parameters.
+#' @param l_params_all List with all parameters of cost-effectiveness model.
+#' @param seed Seed for reproducibility of Monte Carlo sampling.
+#' @return 
+#' A list with the lower and upper bounds of the model parameters.
+#' @examples 
+#' generate_params_bounds()
+#' @export
+generate_params_bounds <- function(l_params_all){
+  with(as.list(l_params_all),{
+    lb_factor <- 0.8
+    ub_factor <- 1.2
+    
+    #--- Lower bounds ---#
+    v_lb <- data.frame(
+      ## Proportion of CDX2-negative patients 
+      p_CDX2neg = 0.015, 
+      # Proportion of recurrence being metastatic (CALIBRATED)
+      p_Mets  = quantile(m_calib_post[, "p_Mets"], probs = 0.025), 
+      # Cancer mortality rate (CALIBRATED)
+      r_DieMets = quantile(m_calib_post[, "r_DieMets"], probs = 0.025),
+      # Rate of recurrence in CDX2 positive patients (CALIBRATED)
+      r_RecurCDX2pos = quantile(m_calib_post[, "r_RecurCDX2pos"], probs = 0.025), 
+      # Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
+      hr_RecurCDX2neg = quantile(m_calib_post[, "hr_RecurCDX2neg"], probs = 0.025),
+      # ## Hazard ratio for disease recurrence among patients with CDX2-negative 
+      # # under chemo versus CDX2-negative patients without chemotherapy. From:
+      # # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
+      # hr_Recurr_CDXneg_Rx = 0.670,
+      ## Hazard ratio for disease recurrence among patients with CDX2-negative
+      # under chemo versus CDX2-negative patients without chemotherapy. From:
+      # QUASAR. Lancet 2007 Figure 3, Stage II RR [99% CI]: 0.82 [0.63, 1.08]
+      hr_Recurr_CDXneg_Rx = 0.63,
+      # Hazard ratio for disease recurrence among patients with CDX2-positive 
+      # under chemo versus CDX2-positive patients without chemotherapy. From: [TO BE ADDED]
+      hr_Recurr_CDXpos_Rx = 0.95,
+      
+      ### State rewards
+      ## Costs
+      # Cost of chemotherapy
+      c_Chemo = c_Chemo*lb_factor,
+      # Cost of chemotherapy administration
+      c_ChemoAdmin = c_ChemoAdmin*lb_factor, 
+      # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
+      c_CRCStg2_init = c_CRCStg2_init - 1.96*339*inf_pce/n_cycles_year,
+      # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+      c_CRCStg2_cont =  c_CRCStg2_cont - 1.96*79*inf_pce/n_cycles_year, 
+      # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
+      c_CRCStg4_cont = c_CRCStg4_cont - 1.96*437*inf_pce/n_cycles_year,
+      # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+      ic_DeathCRCStg2 = ic_DeathCRCStg2 - 1.96*705*inf_pce,
+      # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+      ic_DeathOCStg2  = ic_DeathOCStg2 - 1.96*755*inf_pce,
+      # Cost of IHC staining
+      c_Test = 94,
+      
+      ## Utilities
+      u_Stg2 = 0.69,      # Ness 1999, Outcome state "A" from table 3
+      u_Stg2Chemo = 0.62, # Ness 1999, Outcome state "BC" from table 4
+      u_Stg4 = 0.20       # Ness 1999, Outcome state "FG" from table 4
+    ) 
+    #--- Upper bounds ---#
+    v_ub <- data.frame(
+      ## Proportion of CDX2-negative patients 
+      p_CDX2neg = 0.150, 
+      # Proportion of recurrence being metastatic (CALIBRATED)
+      p_Mets  = quantile(m_calib_post[, "p_Mets"], probs = 0.975), 
+      # Cancer mortality rate (CALIBRATED)
+      r_DieMets = quantile(m_calib_post[, "r_DieMets"], probs = 0.975),
+      # Rate of recurrence in CDX2 positive patients (CALIBRATED)
+      r_RecurCDX2pos = quantile(m_calib_post[, "r_RecurCDX2pos"], probs = 0.975), 
+      # Hazard ratio of recurrence in CDX2 negative vs positive patients (CALIBRATED)
+      hr_RecurCDX2neg = quantile(m_calib_post[, "hr_RecurCDX2neg"], probs = 0.975),
+      # ## Hazard ratio for disease recurrence among patients with CDX2-negative 
+      # # under chemo versus CDX2-negative patients without chemotherapy. From:
+      # # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]
+      # hr_Recurr_CDXneg_Rx = 0.940,
+      ## Hazard ratio for disease recurrence among patients with CDX2-negative
+      # under chemo versus CDX2-negative patients without chemotherapy. From:
+      # QUASAR. Lancet 2007 Figure 3, Stage II RR [99% CI]: 0.82 [0.63, 1.08]
+      hr_Recurr_CDXneg_Rx = 1.080,
+      # Hazard ratio for disease recurrence among patients with CDX2-positive 
+      # under chemo versus CDX2-positive patients without chemotherapy. From: [TO BE ADDED]
+      hr_Recurr_CDXpos_Rx = 1.000,
+      
+      ### State rewards
+      ## Costs
+      # Cost of chemotherapy
+      c_Chemo = c_Chemo*ub_factor,
+      # Cost of chemotherapy administration
+      c_ChemoAdmin = c_ChemoAdmin*ub_factor, 
+      # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
+      c_CRCStg2_init = c_CRCStg2_init + 1.96*339*inf_pce/n_cycles_year,
+      # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+      c_CRCStg2_cont = c_CRCStg2_cont + 1.96*79*inf_pce/n_cycles_year, 
+      # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
+      c_CRCStg4_cont = c_CRCStg4_cont + 1.96*437*inf_pce/n_cycles_year,
+      # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+      ic_DeathCRCStg2 = ic_DeathCRCStg2 + 1.96*705*inf_pce,
+      # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+      ic_DeathOCStg2  = ic_DeathOCStg2 + 1.96*755*inf_pce,
+      # Cost of IHC staining
+      c_Test = 179, # Cost of genetic test for CDX2neg
+      
+      ## Utilities
+      u_Stg2 = 0.78,      # Ness 1999, Outcome state "A" from table 3
+      u_Stg2Chemo = 0.72, # Ness 1999, Outcome state "BC" from table 4
+      u_Stg4 = 0.31       # Ness 1999, Outcome state "FG" from table 3
+    ) 
+    #--- Standard errors based on bounds ---#
+    v_se <- (v_ub - v_lb)/(2*1.96)
+    
+    #--- Return output ---#
+    return(out = list(v_lb = v_lb,
+                      v_ub = v_ub,
+                      v_se = v_se))
+  }
+  )
+}
+
+#' Equal number of breaks
 #'
 #' This function runs a deterministic one-way sensitivity analysis (OWSA) on a
-#' given function that produces outcomes.
+#' given function that produces outcomes. Obtained from: 
+#' https://stackoverflow.com/a/28459434
 #' @param parms Vector with strings with the name of the parameters of interest
 #' @param ranges A named list of the form c("parm" = c(0, 1), ...) that gives 
 #' the ranges for the parameters of interest. The number of samples from this 
 #' range is determined by \code{nsamp}
 #' @param nsamps number of parameter values. If NULL, 100 parameter values are 
 #' used
-#' @param params_basecase List with parameters for the base case
-#' @param FUN Function that takes \code{params_basecase} and \code{...} and 
-#' produces \code{outcome} of interest
-#' @param outcome String with the outcome of interest produced by \code{nsamp}
-#' @param strategies vector of strategy names. The default (NULL) will use 
-#' strategy names in FUN
-#' @param ... Further arguments to FUN (not used)
-#' @keywords owsa
-#' @return A dataframe with the results of the sensitivity analysis. Can be 
-#' visualized with \code{plot.owsa}, \code{owsa_opt_strat} and 
-#' \code{owsa_tornado} from \code{dampack}
-#' @section Details:
-#' FUN must return a dataframe where the first column are the strategy names
-#' and the rest of the columns must be outcomes.
+#' @param n_breaks Number of breaks
+#' @param scale_factor Scaling factor
+#' @param ... Further arguments to function (not used)
+#' @return A function that generates equal number of breaks across facets
 #' @export
-owsa_det <- function(parms, ranges, nsamps = 100, params_basecase, FUN, outcome, 
-                     strategies = NULL, ...){
-  ### Check for errors
-  if(sum(parms %in% names(params_basecase)) != length(parms)){
-    stop("parms should be in names of params_basecase")
+equal_breaks <- function(n_breaks = 3, scale_factor = 0.05, ...){
+  function(x){
+    d <- scale_factor * diff(range(x)) / (1+2*scale_factor)
+    seq(min(x)+d, max(x)-d, length = n_breaks)
   }
-  
-  if(typeof(ranges)!="list"){
-    stop("ranges should be a list")
-  }
-  
-  if(length(parms) != length(ranges)){
-    stop("The number of parameters is not the same as the number of ranges")
-  }
-  
-  if(sum(parms==names(ranges)) != length(parms)){
-    stop("The name of parameters in parms does not match the name in ranges")
-  }
-  
-  jj <- tryCatch({
-    funtest <- FUN(params_basecase, ...)  
-  }, error = function(e) NA)
-  if(is.na(sum(is.na(jj)))){
-    stop("FUN is not well defined by 'params_basecase' and ...")
-  }
-  funtest <- FUN(params_basecase, ...)
-  if(is.null(strategies)){
-    strategies <- funtest[, 1]
-    n_str <- length(strategies) 
-  }
-  else{
-    n_str <- length(strategies)
-  }
-  if(length(strategies)!=length(funtest[, 1])){
-    stop("Number of strategies not the same as in FUN")
-  }
-  v_outcomes <- colnames(funtest)[-1]
-  
-  if(!(outcome %in% v_outcomes)){
-    stop("outcome is not part of FUN outcomes")
-  }
-  
-  df_owsa_all <- NULL
-  for (i in 1:length(parms)) { # i <- 2
-    ### Generate matrix of inputs
-    v_owsa_input <- seq(ranges[[i]][1], 
-                        ranges[[i]][2], 
-                        length.out = nsamps)
-    ### Initialize matrix to store outcomes from a OWSA of the CEA
-    m_out_owsa <- matrix(0, 
-                         nrow = length(v_owsa_input), 
-                         ncol = n_str)
-    ### Run model and capture outcome
-    l_owsa_input <- params_basecase
-    for (j in 1:length(v_owsa_input)){ # j <- 1
-      l_owsa_input[names(l_owsa_input) == parms[i]] <- v_owsa_input[j]
-      m_out_owsa[j, ] <- FUN(l_owsa_input, ...)[[outcome]]
-    }
-    
-    df_owsa <- data.frame(parameter = parms[i],
-                          v_owsa_input,
-                          m_out_owsa)
-    names(df_owsa)[-1] <- c("param_val", strategies)
-    
-    df_owsa_all <- rbind(df_owsa_all, df_owsa)
-  }
-  
-  df_owsa_lng <- reshape2::melt(df_owsa_all, 
-                                id.vars = c("parameter", "param_val"), 
-                                variable.name = "strategy", 
-                                value.name = "outcome_val")
-  
-  class(df_owsa_lng) <- c("owsa", "data.frame")
-  
-  return(df_owsa_lng)
-}
-
-#---------------------------------------------------------------#
-#### Function to compute two-way sensitivity analysis (TWSA) ####
-#---------------------------------------------------------------#
-#' Two-way sensitivity analysis (TWSA)
-#'
-#' This function runs a deterministic two-way sensitivity analysis (TWSA) on a
-#' given function that produces outcomes.
-#' @param parm1 String with the name of the first parameter of interest
-#' @param parm2 String with the name of the second parameter of interest
-#' @param ranges A named list of the form list("parm1" = c(0, 1), ...) that gives 
-#' the ranges for the parameters of interest. The number of samples from this 
-#' range is determined by \code{nsamp}
-#' @param nsamps number of parameter values. If NULL, 100 parameter values are 
-#' used
-#' @param params_basecase List with parameters for the base case
-#' @param FUN Function that takes \code{params_basecase} and \code{...} and 
-#' produces \code{outcome} of interest
-#' @param outcome String with the outcome of interest produced by \code{nsamp}
-#' @param strategies vector of strategy names. The default (NULL) will use 
-#' strategy names in FUN
-#' @param ... Further arguments to FUN (not used)
-#' @keywords owsa
-#' @return 
-#' A dataframe with the results of the sensitivity analysis. Can be 
-#' visualized with \code{plot.owsa}, and \code{owsa_tornado}
-#' @section Details:
-#' FUN must return a dataframe where the first column are the strategy names
-#' and the rest of the columns must be outcomes.
-#' @export
-twsa_det <- function(parm1, parm2, ranges, nsamps = 40, params_basecase, FUN, outcome, 
-                     strategies = NULL, ...){
-  ### Check for errors
-  if(sum(c(parm1, parm2) %in% names(params_basecase)) != 2){
-    stop("parm1 and parm2 should be in names of params_basecase")
-  }
-  
-  if(typeof(ranges)!="list"){
-    stop("ranges should be a list")
-  }
-  
-  if(length(ranges)!=2){
-    stop("The number of elements in ranges has to be two")
-  }
-  
-  jj <- tryCatch({
-    funtest <- FUN(params_basecase, ...)  
-  }, error = function(e) NA)
-  if(is.na(sum(is.na(jj)))){
-    stop("FUN is not well defined by 'params_basecase' and ...")
-  }
-  funtest <- FUN(params_basecase, ...)
-  if(is.null(strategies)){
-    strategies <- funtest[,1]
-    n_str <- length(strategies) 
-  }
-  else{
-    n_str <- length(strategies)
-  }
-  if(length(strategies)!=length(funtest[, 1])){
-    stop("Number of strategies not the same as in FUN")
-  }
-  v_outcomes <- colnames(funtest)[-1]
-  
-  if(!(outcome %in% v_outcomes)){
-    stop("outcome is not part of FUN outcomes")
-  }
-  
-  ### Generate matrix of inputs
-  df_twsa_params <- expand.grid(placeholder_name1 = seq(ranges[[1]][1], 
-                                                        ranges[[1]][2], 
-                                                        length.out = nsamps), 
-                                placeholder_name2 = seq(ranges[[2]][1], 
-                                                        ranges[[2]][2], 
-                                                        length.out = nsamps))
-  names(df_twsa_params) <- c(parm1, parm2)
-  n_rows <- nrow(df_twsa_params)
-  
-  ### Initialize matrix to store outcomes from a OWSA of the CEA
-  m_out_twsa <- matrix(0, 
-                       nrow = n_rows, 
-                       ncol = n_str)
-  
-  ### Run model and capture outcome
-  l_twsa_input <- params_basecase
-  for (i in 1:n_rows){ # i <- 1
-    l_twsa_input[names(l_twsa_input) == parm1] <- df_twsa_params[i,1]
-    l_twsa_input[names(l_twsa_input) == parm2] <- df_twsa_params[i,2]
-    m_out_twsa[i, ] <- FUN(l_twsa_input, ...)[[outcome]]
-    
-    ## Display simulation progress
-    if(i/(n_rows/10) == round(i/(n_rows/10),0)) {
-      cat('\r', paste(i/n_rows * 100, "% done", sep = " "))
-    }
-  }
-  
-  df_twsa <- data.frame(df_twsa_params,
-                        m_out_twsa)
-  names(df_twsa)[-c(1:2)] <- strategies
-  
-  
-  df_twsa_lng <- reshape2::melt(df_twsa, id.vars = c(parm1, parm2), 
-                                variable.name = "strategy", 
-                                value.name = "outcome_val")
-  
-  class(df_twsa_lng) <- c("twsa", "data.frame")
-  
-  return(df_twsa_lng)
 }

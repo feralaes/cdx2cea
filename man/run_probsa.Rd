@@ -2,7 +2,8 @@
 % Please edit documentation in R/05a_probabilistic_analysis_functions.R
 \name{run_probsa}
 \alias{run_probsa}
-\title{Generate lower and upper bound of the CEA parameters}
+\title{Run a probabilistic sensitivity analysis (ProbSA) of the cost-effectiveness
+model}
 \usage{
 run_probsa(df_psa_input, n_str = 2, parallel = FALSE)
 }

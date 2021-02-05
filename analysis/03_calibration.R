@@ -9,7 +9,7 @@
 #     - Deb Schrag, MD, MPH                                                    #
 #     - Karen M. Kuntz, ScD                                                    #
 ################################################################################ 
-# The structure of this code is according to the DARTH framework               #
+# The structure of this code follows DARTH's coding framework                  #
 # https://github.com/DARTH-git/darthpack                                       #
 ################################################################################ 
 
@@ -112,16 +112,22 @@ l_fit_imis <- IMIS::IMIS(B        =  1000,      # incremental sample size at eac
                          number_k =  10,        # maximum number of iterations in IMIS
                          D        =  0)
 ### Obtain posterior
-m_calib_post <- l_fit_imis$resample
+m_calib_post    <- l_fit_imis$resample
+v_p_DieMets_3yr <- 1-exp(-m_calib_post[,"r_DieMets"]*36)
+v_p_RecurCDX2pos_3yr <- 1-exp(-m_calib_post[,"r_RecurCDX2pos"]*36)
 
 #### 03.4 Exploring posterior distribution ####
 #### 03.4.1 Summary statistics of posterior distribution ####
 ### Compute posterior mean
 v_calib_post_mean <- colMeans(m_calib_post)
+p_DieMets_3yr_mean <- mean(v_p_DieMets_3yr)
+p_RecurCDX2pos_3yr_mean <- mean(v_p_RecurCDX2pos_3yr)
 
 ### Compute posterior median and 95% credible interval
 m_calib_post_95cr <- matrixStats::colQuantiles(m_calib_post, 
                                                probs = c(0.025, 0.5, 0.975))
+quantile(v_p_DieMets_3yr, probs = c(0.025, 0.5, 0.975))
+quantile(v_p_RecurCDX2pos_3yr, probs = c(0.025, 0.5, 0.975))
 
 ### Compute posterior values for draw
 v_calib_post <- exp(log_post(m_calib_post))
