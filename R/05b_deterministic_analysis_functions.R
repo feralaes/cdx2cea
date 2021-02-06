@@ -43,8 +43,8 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     
     ### Utilities
     ## Utility for Stage 2 Colon Cancer
-    v_u_S2 <- c(rep(u_Stg2Chemo/12, 12), 
-                rep(u_Stg2/12, (n_cycles- 12 + 1))) * Trt + # If on chemotherapy
+    v_u_S2 <- c(rep(u_Stg2Chemo/12, 6), 
+                rep(u_Stg2/12, (n_cycles - 6 + 1))) * Trt + # If on chemotherapy
       rep(u_Stg2/12, n_cycles + 1) * (1 - Trt)# If not on chemotherapy
     ## Utility for Mets
     v_u_Mets <- rep(u_Stg4/12, n_cycles + 1)
@@ -79,7 +79,7 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     ## Costs of Mets 
     c_Mets <- c_CRCStg4_cont
     ## Cost when Dead
-    c_D <- 0     
+    c_D <- 0
     ### Array of age-dependent state utilities
     ## Initialize array
     a_R_c <- array(NaN, dim = c(n_states, n_states, (n_cycles + 1)),

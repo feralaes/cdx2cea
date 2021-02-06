@@ -54,7 +54,8 @@ m_M_cdx2neg_trt   <- l_cdx2neg_trt$m_M
 m_M_cdx2neg_notrt <- l_cdx2neg_notrt$m_M
 
 ### Life years gained under treatment 
-ly_gain_cdx2neg <- (ly_cdx2neg_trt - ly_cdx2neg_notrt)/ly_cdx2neg_notrt ### RESULT!
+ly_gain_cdx2neg      <- (ly_cdx2neg_trt - ly_cdx2neg_notrt)  ### RESULT!
+ly_gain_cdx2neg_prop <- (ly_cdx2neg_trt - ly_cdx2neg_notrt)/ly_cdx2neg_notrt ### RESULT!
 
 ### Time spent without and with recurrence
 df_ly_rec_cdx2neg <- data.frame(`Health State` = ordered(c("Without recurrence", "With recurrence"),
@@ -89,6 +90,7 @@ m_M_cdx2pos_trt   <- l_cdx2pos_trt$m_M
 m_M_cdx2pos_notrt <- l_cdx2pos_notrt$m_M
 
 ### Life years gained under treatment 
+ly_cdx2pos_trt ### RESULT!
 ly_gain_cdx2pos <- (ly_cdx2pos_trt - ly_cdx2pos_notrt)/ly_cdx2pos_notrt ### RESULT!
 
 ### Time spent without and with recurrence
@@ -143,7 +145,11 @@ gg_ly <- ggplot(df_ly_rec_all,
   coord_flip() +
   guides(fill = guide_legend(title = "", reverse = T)) +
   theme_bw(base_size = 17) + 
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom",
+        strip.background = element_rect(fill = "white",
+                                        color = "white"),
+        strip.text = element_text(hjust = 0, face = "bold", 
+                                  size = 14)) +
   NULL
 gg_ly
 ggsave(plot = gg_ly, filename = "figs/05b_time-states-all-patients.pdf", width = 10, height = 7)
@@ -213,6 +219,16 @@ df_owsa_icer$parameter <- ordered(df_owsa_icer$parameter,
                                              "Effectiveness of FOLFOX in CDX2-negative\npatients as a HR",
                                              "Proportion of CDX2-negative patients",
                                              "Utility of metastatic recurrence"))
+
+df_owsa_icer %>% filter(parameter == "Effectiveness of FOLFOX in CDX2-negative\npatients as a HR", 
+                        outcome_val <= 100000) %>%
+  tail(2)
+df_owsa_icer %>% filter(parameter == "Proportion of CDX2-negative patients", 
+                        param_val %in% c(0.015, 0.15))
+df_owsa_icer %>% filter(parameter == "Increased recurrence in CDX2-negative patients\nas a HR", 
+                        param_val == 1.69 | param_val > 4.320)
+df_owsa_icer %>% filter(parameter == "Utility of metastatic recurrence", 
+                        param_val %in% c(0.20, 0.70))
 ### Plot OWSA
 gg_owsa <- plot(df_owsa_icer, 
                 txtsize = 16, 

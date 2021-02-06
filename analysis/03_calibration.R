@@ -117,8 +117,8 @@ l_fit_imis <- IMIS::IMIS(B        =  1000,      # incremental sample size at eac
                          number_k =  10,        # maximum number of iterations in IMIS
                          D        =  0)
 ### Obtain posterior
-m_calib_post    <- l_fit_imis$resample
-v_p_DieMets_3yr <- 1-exp(-m_calib_post[, "r_DieMets"]*36)
+m_calib_post         <- l_fit_imis$resample
+v_p_DieMets_3yr      <- 1-exp(-m_calib_post[, "r_DieMets"]*36)
 v_p_RecurCDX2pos_3yr <- 1-exp(-m_calib_post[, "r_RecurCDX2pos"]*36)
 
 #### 03.4 Exploring posterior distribution ####

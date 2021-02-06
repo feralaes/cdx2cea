@@ -1,19 +1,16 @@
 ### code to prepare `all_cause_mortality` dataset goes here
+library(dplyr)
+file.init <- "data-raw/USA_bltper_1x1.csv" # Source: https://usa.mortality.org/uploads/lifetables/Nationals/USA/USA_bltper_1x1.csv
 
-test_all <- readHMDweb(CNTRY = "USA", 
-                       item = "fltper_1x1", 
-                       username = "feralaes@gmail.com", 
-                       password = "sip667", 
-                       fixup = TRUE)
-test_2015 <- test_all %>% 
-  filter(Year == 2015)
-test_2018 <- test_all %>% 
-  filter(Year == 2018)
+df_hmd_USA  <- read.csv(file = file.init, stringsAsFactors = F)
 
+df_hmd_USA_2018 <- df_hmd_USA %>%
+  mutate(Age = as.numeric(Age)) %>%
+  filter(Year == 2018, Age <= 100) %>%
+  select(Year, Age, Total = mx)
+df_hmd_USA_2018$Total[df_hmd_USA_2018$Age == 100] <- 1
 
-file.init <- "data-raw/01_all_cause_mortality.csv"
-
-all_cause_mortality  <- read.csv(file = file.init, stringsAsFactors = F)
+all_cause_mortality <- df_hmd_USA_2018
 
 # Create .rda object for initial set of parameters and store it in 'data' folder
 usethis::use_data(all_cause_mortality, overwrite = TRUE)
