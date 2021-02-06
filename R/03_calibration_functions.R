@@ -31,13 +31,13 @@ calibration_out <- function(v_params_calib, l_params_all){ # User defined
   v_dfs_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Dead_OC")])
   
   #### Overall Survival (OS) ####
-  v_os_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Mets")]) # "Local", REMOVE LOCAL
-  v_os_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Mets")]) # "Local", REMOVE LOCAL
+  v_os_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Mets")])
+  v_os_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Mets")])
   
   #### Disease-Specific Survival (DSS) ####
   # Definition based on: https://www.cancer.gov/publications/dictionaries/cancer-terms/def/disease-specific-survival-rate
-  v_dss_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Mets", "Dead_OC")]) # "Local", REMOVE LOCAL
-  v_dss_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Mets", "Dead_OC")]) # "Local", REMOVE LOCAL
+  v_dss_CDX2neg <- rowSums(l_out_stm_CDX2neg$m_M[, c("CDX2neg", "Mets", "Dead_OC")])
+  v_dss_CDX2pos <- rowSums(l_out_stm_CDX2pos$m_M[, c("CDX2pos", "Mets", "Dead_OC")])
   
   ####### Return Output ###########################################
   l_out <- list(v_dfs_CDX2neg = v_dfs_CDX2neg[61],

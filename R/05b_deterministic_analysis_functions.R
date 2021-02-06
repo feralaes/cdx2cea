@@ -36,7 +36,6 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     ### Life Years
     v_R_ly <- c(CDX2pos = 1/12,
                 CDX2neg = 1/12,
-                # Local   = 1/12, # REMOVE LOCAL
                 Mets    = 1/12,
                 Dead_OC = 0,
                 Dead_C  = 0)
@@ -58,14 +57,11 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     # In CDX2 positive (One alternative is to manually assign Utilities to each exiting state)
     a_R_u["CDX2pos","CDX2pos", ]  <- v_u_S2
     a_R_u["CDX2neg","CDX2pos", ]  <- v_u_S2
-    # a_R_u["Local", "CDX2pos", ]   <- v_u_S2 # REMOVE LOCAL
     a_R_u["Mets", "CDX2pos", ]    <- v_u_S2
     a_R_u["Dead_OC", "CDX2pos", ] <- v_u_S2
     a_R_u["Dead_C", "CDX2pos", ]  <- v_u_S2
     # In CDX2 negative (Another alternative is to use `rep`)
     a_R_u[, "CDX2neg", ] <- rep(v_u_S2, each = n_states)
-    # # In Local Recurrence                              # REMOVE LOCAL
-    # a_R_u[, "Local", ] <- rep(v_u_S2, each = n_states) # REMOVE LOCAL
     # In Mets Recurrence
     a_R_u[, "Mets", ] <- rep(v_u_Mets, each = n_states)
     # In Dead OC
@@ -88,14 +84,11 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     # In CDX2 positive (One alternative is to manually assign Utilities to each exiting state)
     a_R_c["CDX2pos","CDX2pos", ]  <- v_c_S2
     a_R_c["CDX2neg","CDX2pos", ]  <- v_c_S2
-    # a_R_c["Local", "CDX2pos", ]   <- v_c_S2 # REMOVE LOCAL
     a_R_c["Mets", "CDX2pos", ]    <- v_c_S2
     a_R_c["Dead_OC", "CDX2pos", ] <- v_c_S2
     a_R_c["Dead_C", "CDX2pos", ]  <- v_c_S2
     # In CDX2 negative (Another alternative is to use `rep`)
     a_R_c[, "CDX2neg", ] <- rep(v_c_S2,  each = n_states) # Or: rep(v_c_S2, each = n.s), if v_c_S2 is time dependent
-    # # In Local Recurrence # REMOVE LOCAL
-    # a_R_c[, "Local", ] <- rep(v_c_S2,  each = n_states) # Or: rep(v_c_S2, each = n.s), if v_c_S2 is time dependent # REMOVE LOCAL
     # In Mets Recurrence
     a_R_c[, "Mets", ] <- c_Mets
     # In Dead OC
@@ -107,12 +100,10 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     ## Add increment in cost due to transition from CDX2 or Mets to Dead_OC
     a_R_c["CDX2pos", "Dead_OC", ] <- a_R_c["CDX2pos", "Dead_OC", ] + ic_DeathOCStg2
     a_R_c["CDX2neg", "Dead_OC", ] <- a_R_c["CDX2neg", "Dead_OC", ] + ic_DeathOCStg2
-    # a_R_c["Local", "Dead_OC", ]   <- a_R_c["Local", "Dead_OC", ]   + ic_DeathOCStg2 # REMOVE LOCAL
     a_R_c["Mets", "Dead_OC", ]    <- a_R_c["Mets", "Dead_OC", ]    + ic_DeathOCStg2
     ## Add increment in cost due to transition from CDX2 or Mets to Dead_OC
     a_R_c["CDX2pos", "Dead_C", ] <- a_R_c["CDX2pos", "Dead_C", ] + ic_DeathCRCStg2
     a_R_c["CDX2neg", "Dead_C", ] <- a_R_c["CDX2neg", "Dead_C", ] + ic_DeathCRCStg2
-    # a_R_c["Local", "Dead_C", ]   <- a_R_c["Local", "Dead_C", ]   + ic_DeathCRCStg2 # REMOVE LOCAL
     a_R_c["Mets", "Dead_C", ]    <- a_R_c["Mets", "Dead_C", ]    + ic_DeathCRCStg2
     
     #### Expected QALYs and Costs for all transitions per cycle ####
