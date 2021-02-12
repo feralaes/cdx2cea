@@ -52,6 +52,10 @@ ggsave(plot = gg_evpi_pop, "figs/manuscript/fig05b_evpi_pop.tiff", width = 8, he
 
 evpi_pop %>% filter(WTP %in% c(50000, 100000, 150000))
 
+patched <- gg_ceac_ceaf/gg_evpi_pop
+gg_ceac_ceaf_evpi_pop <- patched + plot_annotation(tag_levels = 'A')
+gg_ceac_ceaf_evpi_pop
+
 #### 05c.4 Expected value of partial perfect information (EVPPI) ####
 
 #### 05c.5 Expected value of sample information (EVSI) ####

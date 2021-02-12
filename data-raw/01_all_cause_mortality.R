@@ -5,9 +5,9 @@ file.init <- "data-raw/USA_bltper_1x1.csv" # Source: https://usa.mortality.org/u
 df_hmd_USA  <- read.csv(file = file.init, stringsAsFactors = F)
 
 df_hmd_USA_2018 <- df_hmd_USA %>%
-  mutate(Age = as.numeric(Age)) %>%
-  filter(Year == 2018, Age <= 100) %>%
-  select(Year, Age, Total = mx)
+  dplyr::mutate(Age = as.numeric(Age)) %>%
+  dplyr::filter(Year == 2018, Age <= 100) %>%
+  dplyr::select(Year, Age, Total = mx)
 df_hmd_USA_2018$Total[df_hmd_USA_2018$Age == 100] <- 1
 
 all_cause_mortality <- df_hmd_USA_2018

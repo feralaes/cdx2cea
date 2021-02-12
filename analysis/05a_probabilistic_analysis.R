@@ -19,6 +19,8 @@ rm(list = ls()) # to clean the workspace
 # PSA functionality
 library(dampack)    # decision-analytic modeling visualization tool
 library(doParallel)
+library(ggplot2)
+library(patchwork)
 
 #### 05a.1.2 Load inputs ####
 l_params_all <- load_all_params() # function in cdx2cea
@@ -41,27 +43,10 @@ df_psa_input <- generate_psa_params(l_params_all = l_params_all)
 
 #### 05a.4 Conduct probabilistic sensitivity analysis ####
 ### Run decision model on each parameter set of PSA input dataset to produce
-### PSA outputs for cost and effects
-n_time_init_psa_series <- Sys.time()
-for(i in 1:n_sim){ # i <- 1
-  l_psa_input <- update_param_list(l_params_all, df_psa_input[i,])
-  df_out_temp <- calculate_ce_out(l_psa_input)
-  df_c[i, ] <- df_out_temp$Cost
-  df_e[i, ] <- df_out_temp$Effect
-  # Display simulation progress
-  if(i/(n_sim/100) == round(i/(n_sim/100),0)) {
-    cat('\r', paste(i/n_sim * 100, "% done", sep = " "))
-  }
-}
-n_time_end_psa_series <- Sys.time()
-n_time_total_psa_series <- n_time_end_psa_series - n_time_init_psa_series
-print(paste0("PSA with ", scales::comma(n_sim), " simulations run in series in ", 
-             round(n_time_total_psa_series, 2), " ", 
-             units(n_time_total_psa_series)))
-
 l_out_probsa <- run_probsa(df_psa_input = df_psa_input, 
                            n_str = n_str, 
                            parallel = TRUE)
+### PSA outputs for cost and effects
 df_c <- l_out_probsa$Costs
 df_e <- l_out_probsa$Effects
 
@@ -150,3 +135,45 @@ ggsave(plot = gg_elc, "figs/05a_elc.png", width = 8, height = 6)
 ggsave(plot = gg_elc, "figs/manuscript/fig05b_elc.png", width = 8, height = 6)
 ggsave(plot = gg_elc, "figs/manuscript/fig05b_elc.pdf", width = 8, height = 6)
 ggsave(plot = gg_elc, "figs/manuscript/fig05b_elc.tiff", width = 8, height = 6)
+
+#### 05a.6.4  Expected value of perfect information (EVPI) ####
+### Individual level
+evpi_ind <- calc_evpi(wtp = v_wtp, psa = l_psa)
+plot(evpi_ind, effect_units = "QALY", txtsize = 16, n_x_ticks = 8) +
+  xlab("Cost-effectiveness threshold (Thousand $/QALY)") +
+  ggsave("figs/05c_evpi_ind.png", width = 8, height = 6)
+
+### Population level
+## Population affected by the decision
+# Source: Siegel RL, Miller KD, Jemal A: Cancer statistics, 2019. CA Cancer J Clin 69:7–34, 2019
+pop_evi <- sum(101000*0.33*(1/(1+0.03)^(1:10))) # Annual cases * proportion that are Stage II * ten years
+## EVPI
+evpi_pop <- calc_evpi(wtp = v_wtp, psa = l_psa, pop = pop_evi)
+gg_evpi_pop <- plot(evpi_pop, effect_units = "QALY", txtsize = 16, n_x_ticks = 8) + 
+  scale_y_continuous(name = "EVPI (Million $)",
+                     breaks = number_ticks(9), 
+                     labels = function(x){formatC((x)/1000000, digits = 0, format = "f")}) +
+  xlab("Cost-effectiveness threshold (Thousand $/QALY)")
+gg_evpi_pop
+ggsave(plot = gg_evpi_pop, "figs/05c_evpi_pop.png", width = 8, height = 6)
+ggsave(plot = gg_evpi_pop, "figs/05c_evpi_pop.pdf", width = 8, height = 6)
+ggsave(plot = gg_evpi_pop, "figs/manuscript/fig05b_evpi_pop.png", width = 8, height = 6)
+ggsave(plot = gg_evpi_pop, "figs/manuscript/fig05b_evpi_pop.pdf", width = 8, height = 6)
+ggsave(plot = gg_evpi_pop, "figs/manuscript/fig05b_evpi_pop.tiff", width = 8, height = 6)
+
+evpi_pop %>% filter(WTP %in% c(50000, 100000, 150000))
+
+### Combine CEAC, CEAF & EVPI
+patched <- gg_ceac_ceaf/gg_evpi_pop
+gg_ceac_ceaf_evpi_pop <- patched + plot_annotation(tag_levels = 'A')
+gg_ceac_ceaf_evpi_pop
+ggsave(plot = gg_ceac_ceaf_evpi_pop,
+       filename = "figs/manuscript/Figure 5 - CEAC_CEAF_EVPI.pdf", 
+       width = 8, height = 9)
+ggsave(plot = gg_ceac_ceaf_evpi_pop,
+       filename = "figs/manuscript/Figure 5 - CEAC_CEAF_EVPI.png", 
+       width = 8, height = 9)
+ggsave(plot = gg_ceac_ceaf_evpi_pop,
+       filename = "figs/manuscript/Figure 5 - CEAC_CEAF_EVPI.tiff", 
+       width = 8, height = 9)
+ 
