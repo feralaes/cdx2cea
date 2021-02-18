@@ -1,0 +1,44 @@
+citHeader("To cite cdx2cea in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis",
+  author   = c(as.person("Fernando Alarid-Escudero"), as.person("Deb Schrag"), as.person("Karen M. Kuntz")),
+  journal  = ,
+  year     = "2021",
+  volume   = ,
+  number   = ,
+  pages    = ,
+  url      = ,
+  textVersion = paste("Alarid-Escudero F, Schrag D, Kuntz KM (2021). DX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis."
+  )
+)
+
+citEntry(
+  entry    = "R package",
+  title    = "cdx2cea: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy",
+  author   = as.person("Fernando Alarid-Escudero"),
+  journal  = ,
+  year     = "2021",
+  volume   = ,
+  number   = ,
+  pages    = ,
+  url      = ,
+  textVersion = paste("Alarid-Escudero F, Schrag D, Kuntz KM (2021). CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis."
+  )
+)
+
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Manual",
+         title = "{cdx2cea}: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy",
+         author = c(person("Fernando", "Alarid-Escudero"), person("Deb", "Schrag"), person("Karen M", "Kuntz")),
+         year = year,
+         note = note,
+	 url = "https://github.com/feralaes/cdx2cea")
+
+ textVersion = paste0("Alarid-Escudero F, Schrag D, Kuntz KM, (", year, ").",
+  "cdx2cea: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy. ",
+  note, ".",
+  " https://github.com/feralaes/cdx2cea")

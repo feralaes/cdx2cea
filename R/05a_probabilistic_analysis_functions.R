@@ -64,7 +64,7 @@ generate_psa_params <- function(l_params_all, seed = 20210202){ # User defined
     u_Stg2 = rnorm(n_sim, mean = u_Stg2, sd = l_bounds$v_se$u_Stg2),
     # Stage II with chemotherapy
     u_Stg2Chemo = rnorm(n_sim, mean = u_Stg2Chemo, sd = l_bounds$v_se$u_Stg2Chemo),
-    u_Stg4 = rnorm(n_sim, mean = u_Stg4, sd = l_bounds$v_se$u_Stg4)
+    u_Mets = rnorm(n_sim, mean = u_Mets, sd = l_bounds$v_se$u_Mets)
   )
   return(df_psa_params)
   }

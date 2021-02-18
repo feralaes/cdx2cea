@@ -33,7 +33,7 @@
 #' @param c_Test Cost of IHC staining
 #' @param u_Stg2 Utility for CRC Stage II patients
 #' @param u_Stg2Chemo Utility for CRC Stage II patients under chemotherapy
-#' @param u_Stg4 Utility for CRC Stage IV patients
+#' @param u_Mets Utility for metastatic recurrence state
 #' @return 
 #' List of all parameters 
 #' @export
@@ -90,7 +90,7 @@ load_params_init <- function(
   ## Utilities
   u_Stg2 = 0.74,      # Ness 1999, Outcome state "A" from table 3
   u_Stg2Chemo = 0.67, # Ness 1999, Outcome state "BC" from table 4
-  u_Stg4 = 0.25       # Ness 1999, Outcome state "FG" from table 3
+  u_Mets = 0.25       # Ness 1999, Outcome state "FG" from table 3
 ){
   # Number of cycles
   n_cycles <- (n_age_max - n_age_init)*n_cycles_year # Time horizon, number of monthly cycles
@@ -141,7 +141,7 @@ load_params_init <- function(
     # Utilities
     u_Stg2 = u_Stg2,
     u_Stg2Chemo = u_Stg2Chemo,
-    u_Stg4 = u_Stg4
+    u_Mets = u_Mets
   )
   return(l_params_init)
 }

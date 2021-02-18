@@ -21,11 +21,19 @@ knitr::opts_chunk$set(
 
 [`cdx2cea`](https://github.com/DARTH-git/cdx2cea) is part of the following manuscript:
 
-- Alarid-Escudero F, Schrag D, Kuntz KM. "CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis" (Under review)
+- Alarid-Escudero F, Schrag D, Kuntz KM. (2021) "CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis" (Under review)
 
 <!-- The release that accompanies the published article has been archived in zenodo: https://zenodo.org/record/3445451. -->
 
-# Preliminaries
+## How to cite this package in your article
+
+You can cite this package like this "we based our analysis using the cdx2cea R package (Alarid-Escudero F, Schrag D, and KuntzKM 2021)". Here is the full bibliographic reference to include in your reference list for the manuscript and the package (don't forget to update the 'last accessed' date):
+
+> Alarid-Escudero F, Schrag D, Kuntz KM (2021). CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis (Under review). 
+
+> Alarid-Escudero F, Schrag D, Kuntz KM (2021). {cdx2cea}: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy (Version v0.1.0). Zenodo. http://doi.org/XXX. Last accessed 28 February 2021
+
+## Preliminaries
 - Install [RStudio](https://www.rstudio.com/products/rstudio/download/)
 - Install `devtools` to install `darthpack` as a package and modify it to generate your own package
 ```{r, eval=FALSE}
@@ -36,7 +44,7 @@ install.packages("devtools")
 # devtools::install_github("r-lib/devtools")
 ```
 
-# Usage and installation 
+## Usage and installation 
 `cdx2cea` repository could be used in two different ways:
 
 1. [Regular coding template](#use-repository-as-a-regular-coding-template) for using it to generate a repository of your own model-based decision or cost-effectiveness analysis
@@ -70,3 +78,11 @@ devtools::install_github("feralaes/cdx2cea")
 ```{r, eval=FALSE}
 library(cdx2cea)
 ```
+
+## Citation
+
+Alarid-Escudero F, Schrag D, Kuntz KM (2021). cdx2cea: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy (Version v0.1.0). Zenodo. [http://doi.org/XXX](http://doi.org/XXX)
+
+## Acknowledgements
+
+This work was supported by a grant from Fulbright and the National Council of Science and Technology of Mexico (CONACYT) and a Doctoral Dissertation Fellowship from the Graduate School of the University of Minnesota as part of Dr. Alarid-Escudero's doctoral program. Drs. Kuntz and Alarid-Escudero were supported by two grants from the National Cancer Institute at the National Institutes of Health (grant numbers U01-CA-199335 and U01-CA-253913) as part of the Cancer Intervention and Surveillance Modeling Network (CISNET). The funding agencies had no role in the design of the study, interpretation of results, or writing of the manuscript. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health. The funding agreement ensured the authors' independence in designing the study, interpreting the data, writing, and publishing the report. No other funding noted.

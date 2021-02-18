@@ -27,7 +27,7 @@
 #'              \item c_Test: Cost of IHC staining
 #'              \item u_Stg2: Utility of Stage II without chemo
 #'              \item u_Stg2Chemo: Utility of Stage II with chemo
-#'              \item u_Stg4: Utility of Stage IV as Mets}}
+#'              \item u_Mets: Utility of metastatic recurrence state}}
 #'   \item{parnames}{A vector of strings with parameter names.}
 #'   \item{currency}{A string with the currency.}
 #' }

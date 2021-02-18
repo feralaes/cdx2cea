@@ -46,7 +46,7 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
                 rep(u_Stg2/12, (n_cycles - 6 + 1))) * Trt + # If on chemotherapy
       rep(u_Stg2/12, n_cycles + 1) * (1 - Trt)# If not on chemotherapy
     ## Utility for Mets
-    v_u_Mets <- rep(u_Stg4/12, n_cycles + 1)
+    v_u_Mets <- rep(u_Mets/12, n_cycles + 1)
     ## utility when Dead
     u_D <- 0
     ## Array of time-dependent state utilities
@@ -337,7 +337,7 @@ generate_params_bounds <- function(l_params_all){
       ## Utilities
       u_Stg2 = 0.69,      # Ness 1999, Outcome state "A" from table 3
       u_Stg2Chemo = 0.62, # Ness 1999, Outcome state "BC" from table 4
-      u_Stg4 = 0.20       # Ness 1999, Outcome state "FG" from table 4
+      u_Mets = 0.20       # Ness 1999, Outcome state "FG" from table 4
     ) 
     #--- Upper bounds ---#
     v_ub <- data.frame(
@@ -385,7 +385,7 @@ generate_params_bounds <- function(l_params_all){
       ## Utilities
       u_Stg2 = 0.78,      # Ness 1999, Outcome state "A" from table 3
       u_Stg2Chemo = 0.72, # Ness 1999, Outcome state "BC" from table 4
-      u_Stg4 = 0.31       # Ness 1999, Outcome state "FG" from table 3
+      u_Mets = 0.31       # Ness 1999, Outcome state "FG" from table 3
     ) 
     #--- Standard errors based on bounds ---#
     v_se <- (v_ub - v_lb)/(2*1.96)

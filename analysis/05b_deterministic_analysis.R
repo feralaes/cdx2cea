@@ -196,11 +196,11 @@ ggsave("figs/05b_cea_frontier.png", width = 8, height = 6)
 l_bounds <- generate_params_bounds(l_params_all = l_params_basecase)
 ### Define OWSA design
 df_owsa_input <- data.frame(pars = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx",
-                                     "c_Test", "u_Stg4", "hr_RecurCDX2neg"),
+                                     "c_Test", "u_Mets", "hr_RecurCDX2neg"),
                             min = c(l_bounds$v_lb$p_CDX2neg, 
                                     l_bounds$v_lb$hr_Recurr_CDXneg_Rx, 
                                     l_bounds$v_lb$c_Test,
-                                    l_bounds$v_lb$u_Stg4,
+                                    l_bounds$v_lb$u_Mets,
                                     1.69),
                             max = c(l_bounds$v_ub$p_CDX2neg, 
                                     1, 
@@ -442,6 +442,10 @@ opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- df_twsa_nmb_hrRecurCDX2neg_vs_hrC
            .data[["Effectiveness of FOLFOX in CDX2-negative patients (HR)"]]) %>%
   slice(which.max(.data$outcome_val))
 table(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k$strategy)/nrow(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)
+opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k %>% 
+  filter(`Increased recurrence in CDX2-negative patients` == 1.69) %>%
+  View()
+
 
 ### Plot TWSA
 gg_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- plot(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
