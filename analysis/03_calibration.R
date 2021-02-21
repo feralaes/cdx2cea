@@ -18,6 +18,7 @@ rm(list = ls()) # to clean the workspace
 #### 03.1 Load packages, data and functions ####
 #### 03.1.1 Load packages and functions ####
 # Dependencies have been loaded with 'cdx2cea'
+library(cdx2cea)
 library(logitnorm)
 library(ggplot2)
 library(doParallel)

@@ -19,7 +19,7 @@ ce_model(
 is NULL and will take the value of \code{p_CDX2neg} defined in
 \code{load_all_params()}}
 
-\item{Trt}{is this the Treat All strategy? (default is FALSE)}
+\item{Trt}{Treatment variable (default is FALSE)}
 
 \item{err_stop}{Logical variable to stop model run if set up as TRUE. Default
 = FALSE.}

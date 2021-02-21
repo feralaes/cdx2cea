@@ -6,7 +6,7 @@
 #' @param p_CDX2neg_init Initial proportion of CDX2-negative patients. Default 
 #' is NULL and will take the value of \code{p_CDX2neg} defined in 
 #' \code{load_all_params()}
-#' @param Trt is this the Treat All strategy? (default is FALSE)
+#' @param Trt Treatment variable (default is FALSE)
 #' @param err_stop Logical variable to stop model run if set up as TRUE. Default 
 #' = FALSE.
 #' @param verbose Logical variable to indicate print out of messages. Default 

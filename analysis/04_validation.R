@@ -16,7 +16,7 @@ rm(list = ls()) # to clean the workspace
 
 #### 04.1 Load packages and functions ####
 #### 04.1.1 Load packages ####
-# Dependencies have been loaded with 'cdx2cea'
+library(cdx2cea)
 
 #### 04.1.2 Load inputs ####
 l_params_init_valid <- load_params_init(n_age_init = 75, 
