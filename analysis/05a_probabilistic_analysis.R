@@ -16,6 +16,7 @@ rm(list = ls()) # to clean the workspace
 
 #### 05a.1 Load packages and functions ####
 #### 05a.1.1 Load packages ####
+library(cdx2cea)
 # PSA functionality
 library(dampack)    # decision-analytic modeling visualization tool
 library(doParallel)

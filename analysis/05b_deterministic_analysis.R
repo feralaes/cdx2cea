@@ -156,10 +156,10 @@ gg_ly <- ggplot(df_ly_rec_all,
   NULL
 gg_ly
 ggsave(plot = gg_ly, filename = "figs/05b_time-states-all-patients.pdf", width = 10, height = 7)
-ggsave(plot = gg_ly, filename = "figs/05b_time-states-all-patients.png", width = 10, height = 7)
-ggsave(plot = gg_ly, filename = "figs/manuscript/Figure 2 - time-states-all-patients.pdf", width = 10, height = 7)
-ggsave(plot = gg_ly, filename = "figs/manuscript/Figure 2 - time-states-all-patients.png", width = 10, height = 7)
-ggsave(plot = gg_ly, filename = "figs/manuscript/Figure 2 - time-states-all-patients.tiff", width = 10, height = 7)
+ggsave(plot = gg_ly, filename = "figs/05b_time-states-all-patients.png", width = 10, height = 7, dpi = 300)
+ggsave(plot = gg_ly, filename = "figs/manuscript/Figure 2 - time-states-all-patients.pdf", width = 10, height = 7, dpi = 300)
+ggsave(plot = gg_ly, filename = "figs/manuscript/Figure 2 - time-states-all-patients.png", width = 10, height = 7, dpi = 300)
+ggsave(plot = gg_ly, filename = "figs/manuscript/Figure 2 - time-states-all-patients.tiff", width = 10, height = 7, dpi = 300)
 
 #### 05b.3 Cost-effectiveness analysis parameters ####
 ### Strategy names
@@ -204,7 +204,7 @@ df_owsa_input <- data.frame(pars = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx",
                                     l_bounds$v_lb$u_Mets,
                                     1.69),
                             max = c(l_bounds$v_ub$p_CDX2neg, 
-                                    1, 
+                                    0.975, 
                                     l_bounds$v_ub$c_Test,
                                     0.7,
                                     l_bounds$v_ub$hr_RecurCDX2neg))
@@ -224,6 +224,9 @@ if(re_run){
                                                "Proportion of CDX2-negative patients",
                                                "Utility of metastatic recurrence"))
   
+  df_owsa_icer %>% filter(parameter == "Effectiveness of FOLFOX in CDX2-negative\npatients as a HR", 
+                          outcome_val <= 100000) %>%
+    head(6)
   df_owsa_icer %>% filter(parameter == "Effectiveness of FOLFOX in CDX2-negative\npatients as a HR", 
                           outcome_val <= 100000) %>%
     tail(6)
@@ -263,13 +266,13 @@ ggsave(plot = gg_owsa,
        width = 10, height = 8)
 ggsave(plot = gg_owsa, 
        filename = "figs/manuscript/Figure 3 - OWSA.png", 
-       width = 10, height = 8)
+       width = 10, height = 8, dpi = 300)
 ggsave(plot = gg_owsa, 
        filename = "figs/manuscript/Figure 3 - OWSA.pdf", 
-       width = 10, height = 8)
+       width = 10, height = 8, dpi = 300)
 ggsave(plot = gg_owsa, 
        filename = "figs/manuscript/Figure 3 - OWSA.tiff", 
-       width = 10, height = 8)
+       width = 10, height = 8, dpi = 300)
 
 #### 05b.7 Two-way sensitivity analysis (TWSA) on NMB ####
 
@@ -607,10 +610,10 @@ gg_twsa <- patched + plot_annotation(tag_levels = 'A')
 gg_twsa
 ggsave(plot = gg_twsa,
        filename = "figs/manuscript/Figure 4 - TWSA.pdf", 
-       width = 12, height = 14)
+       width = 12, height = 14, dpi = 300)
 ggsave(plot = gg_twsa,
        filename = "figs/manuscript/Figure 4 - TWSA.png", 
-       width = 12, height = 14)
+       width = 12, height = 14, dpi = 300)
 ggsave(plot = gg_twsa,
        filename = "figs/manuscript/Figure 4 - TWSA.tiff", 
-       width = 12, height = 14)
+       width = 12, height = 14, dpi = 300)
