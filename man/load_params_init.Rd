@@ -2,7 +2,7 @@
 % Please edit documentation in R/01_model_inputs_functions.R
 \name{load_params_init}
 \alias{load_params_init}
-\title{Base-case inital parameter set}
+\title{Base-case initial parameter set}
 \usage{
 load_params_init(
   n_age_init = 65,

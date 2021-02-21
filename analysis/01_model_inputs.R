@@ -17,12 +17,11 @@ rm(list = ls()) # to clean the workspace
 
 #### 01.1 Load packages and functions ####
 #### 01.1.1 Load packages and functions ####
-# no required packages
+library(cdx2cea)
 
 #### 01.1.2 Load functions ####
 # no required functions
 
 #### 01.2 Load all parameters ####
 l_params_all <- load_all_params()
-
-#### 01.3 Estimated parameters ####
+l_params_all

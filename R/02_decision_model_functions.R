@@ -138,7 +138,7 @@ decision_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
 #' @param l_params_all List with all model parameters
 #' @param m_M a cohort trace matrix
 #' @return a ggplot object - plot of the cohort trace
-#' 
+#' @export
 plot_trace <- function(l_params_all, m_M) {
   with(as.list(l_params_all), {
   df_M      <- data.frame(Cycle = 0:n_cycles, m_M, check.names = F)

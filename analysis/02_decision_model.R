@@ -16,6 +16,7 @@ rm(list = ls()) # to clean the workspace
 
 #### 02.1 Load packages and functions ####
 #### 02.1.1 Load packages and functions ####
+library(cdx2cea)
 library(ggplot2) # For visualization
 library(dplyr)    # For data manipulation
 library(survival) # For plotting state-transition diagram
