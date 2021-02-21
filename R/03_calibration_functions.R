@@ -6,8 +6,8 @@
 #' @param v_params_calib Vector of parameters that need to be calibrated.
 #' @param l_params_all List with all parameters of the decision model.
 #' @return 
-#' A list with Survival (Surv), Prevalence of Sick and Sicker (Prev), and 
-#' proportion of Sicker (PropSicker) out of all sick (Sick+Sicker) individuals.
+#' A list with disease-free survival (DFS), disease-specific survival (DSS), and
+#' overall survival (OS)
 #' @export
 calibration_out <- function(v_params_calib, l_params_all){ # User defined
   # Substitute values of calibrated parameters in base-case with 
@@ -342,7 +342,7 @@ log_lik_par <- function(v_params,
   ### Get OS
   os <- get_os()
   
-  no_cores <- detectCores() - 1
+  no_cores <- parallel::detectCores() - 1
   
   print(paste0("Parallelized Likelihood calculations on ", os, " using ", no_cores, " cores"))
   
@@ -350,19 +350,19 @@ log_lik_par <- function(v_params,
   
   if(os == "macosx"){
     # Initialize cluster object
-    cl <- makeForkCluster(no_cores) 
-    registerDoParallel(cl)
-    v_llk <- foreach(i = 1:n_samp, .combine = c) %dopar% {
+    cl <- parallel::makeForkCluster(no_cores) 
+    doParallel::registerDoParallel(cl)
+    v_llk <- foreach::foreach(i = 1:n_samp, .combine = c) %dopar% {
       log_lik(v_params[i, ], l_params_all) # i = 1
     }
     n_time_end_likpar <- Sys.time()
   }
   if(os == "windows"){
     # Initialize cluster object
-    cl <- makeCluster(no_cores)
-    registerDoParallel(cl)
+    cl <- parallel::makeCluster(no_cores)
+    doParallel::registerDoParallel(cl)
     opts <- list(attachExportEnv = TRUE)
-    v_llk <- foreach(i = 1:n_samp, .combine = c,
+    v_llk <- foreach::foreach(i = 1:n_samp, .combine = c,
                    .export = ls(globalenv()),
                    .packages=c(),
                    .options.snow = opts) %dopar% {
@@ -373,8 +373,8 @@ log_lik_par <- function(v_params,
   if(os == "linux"){
     # Initialize cluster object
     cl <- makeCluster(no_cores)
-    registerDoMC(cl)
-    v_llk <- foreach(i = 1:n_samp, .combine = c) %dopar% {
+    doMC::registerDoMC(cl)
+    v_llk <- foreach::foreach(i = 1:n_samp, .combine = c) %dopar% {
       log_lik(v_params[i, ], ...)
     }
     n_time_end_likpar <- Sys.time()
