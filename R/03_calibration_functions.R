@@ -372,7 +372,7 @@ log_lik_par <- function(v_params,
   }
   if(os == "linux"){
     # Initialize cluster object
-    cl <- makeCluster(no_cores)
+    cl <- parallel::makeCluster(no_cores)
     doMC::registerDoMC(cl)
     v_llk <- foreach::foreach(i = 1:n_samp, .combine = c) %dopar% {
       log_lik(v_params[i, ], ...)
@@ -380,7 +380,7 @@ log_lik_par <- function(v_params,
     n_time_end_likpar <- Sys.time()
   }
   
-  stopCluster(cl)
+  parallel::stopCluster(cl)
   n_time_total_likpar <- difftime(n_time_end_likpar, n_time_init_likpar, 
                                   units = "hours")
   print(paste0("Runtime: ", round(n_time_total_likpar, 2), " hrs."))
