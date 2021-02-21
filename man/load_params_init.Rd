@@ -18,7 +18,7 @@ load_params_init(
   hr_RecurCDX2neg = 3.601069078,
   hr_Recurr_CDXneg_Rx = 0.82,
   hr_Recurr_CDXpos_Rx = 1,
-  c_Chemo = 1392,
+  c_Chemo = 1576,
   c_ChemoAdmin = 315,
   c_CRCStg2_init = (32039 - (1391 + 315)),
   c_CRCStg2_cont = 1722,
@@ -28,7 +28,7 @@ load_params_init(
   c_Test = 112,
   u_Stg2 = 0.74,
   u_Stg2Chemo = 0.67,
-  u_Stg4 = 0.25
+  u_Mets = 0.25
 )
 }
 \arguments{
@@ -86,7 +86,7 @@ while in Stage II}
 
 \item{u_Stg2Chemo}{Utility for CRC Stage II patients under chemotherapy}
 
-\item{u_Stg4}{Utility for CRC Stage IV patients}
+\item{u_Mets}{Utility for metastatic recurrence state}
 }
 \value{
 List of all parameters

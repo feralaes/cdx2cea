@@ -27,7 +27,7 @@ generate_psa_params <- function(l_params_all, seed = 20210202){ # User defined
     
     ### External parameters
     ## Proportion of CDX2-negative patients obtained from Step 3 of Figure 1 in page 213
-    p_CDX2neg = rbeta(n_sim, (23+25), (389+232)), # (23+25)/669
+    p_CDX2neg = rbeta(n_sim, (23+25), (389+232)), 
     ## Hazard ratio for disease recurrence among patients with CDX2-negative 
     # under chemo versus CDX2-negative patients without chemotherapy. From:
     # André et al. JCO 2015 Table 1, Stage III DFS: 0.79 [0.67, 0.94]

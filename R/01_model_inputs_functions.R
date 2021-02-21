@@ -1,4 +1,4 @@
-#' Base-case inital parameter set
+#' Base-case initial parameter set
 #'
 #' \code{load_params_init} generates the initial values of the CDX2 CEA model
 #' 
@@ -49,7 +49,7 @@ load_params_init <- function(
   # Personal consumption expenditures (PCE) price index to inflate cancer costs
   index_pce = 0.018,
   # Proportion of CDX2-negative patients obtained from Step 3 of Figure 1 in page 213
-  p_CDX2neg = 0.07174887892376682, # (23+25)/669
+  p_CDX2neg = 0.07174887892376682, # (23+25)/((23+25) + (389+232))
   # Proportion of recurrence being metastatic (CALIBRATED)
   p_Mets  = 0.980840626,
   # Cancer mortality rate (CALIBRATED)
