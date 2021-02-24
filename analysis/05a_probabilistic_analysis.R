@@ -111,9 +111,9 @@ gg_ceac_ceaf <- plot(ceac_obj, txtsize = 16, col = "bw") +
   theme(legend.position = "bottom")
 gg_ceac_ceaf
 ggsave(plot = gg_ceac_ceaf, "figs/05a_ceac_ceaf.png", width = 8, height = 6)
-ggsave(plot = gg_ceac_ceaf, "figs/manuscript/fig05a_ceac_ceaf.png", width = 8, height = 6)
-ggsave(plot = gg_ceac_ceaf, "figs/manuscript/fig05a_ceac_ceaf.pdf", width = 8, height = 6)
-ggsave(plot = gg_ceac_ceaf, "figs/manuscript/fig05a_ceac_ceaf.tiff", width = 8, height = 6)
+ggsave(plot = gg_ceac_ceaf, "figs/manuscript/fig05a_ceac_ceaf.png", width = 8, height = 6, dpi = 300)
+ggsave(plot = gg_ceac_ceaf, "figs/manuscript/fig05a_ceac_ceaf.pdf", width = 8, height = 6, dpi = 300)
+ggsave(plot = gg_ceac_ceaf, "figs/manuscript/fig05a_ceac_ceaf.tiff", width = 8, height = 6, dpi = 300)
 
 #### 05a.6.3 Expected Loss Curves (ELCs) ####
 ## Population affected by the decision
@@ -127,15 +127,16 @@ gg_elc <- plot(elc_obj, log_y = TRUE, #col = "bw",
   xlab("Cost-effectiveness threshold (Thousand $/QALY)") +
   scale_y_continuous(name = "Expected Loss (Million $)",
                      breaks = c(0, 50,100, 200, 500, 1000, 2000, 5000), 
-                     trans = "log", labels = function(x){formatC((x*pop_evi)/1000000, digits = 0, format = "f")}) + 
+                     trans = "log", 
+                     labels = function(x){formatC((x*pop_evi)/1000000, digits = 0, format = "f")}) + 
   guides(color = guide_legend(nrow = 2),
          shape = guide_legend(nrow = 2)) +
   theme(legend.position = "bottom")
 gg_elc
 ggsave(plot = gg_elc, "figs/05a_elc.png", width = 8, height = 6)
-ggsave(plot = gg_elc, "figs/manuscript/fig05b_elc.png", width = 8, height = 6)
-ggsave(plot = gg_elc, "figs/manuscript/fig05b_elc.pdf", width = 8, height = 6)
-ggsave(plot = gg_elc, "figs/manuscript/fig05b_elc.tiff", width = 8, height = 6)
+ggsave(plot = gg_elc, "figs/manuscript/fig_supp03_elc.png", width = 8, height = 6, dpi = 300)
+ggsave(plot = gg_elc, "figs/manuscript/fig_supp03_elc.pdf", width = 8, height = 6, dpi = 300)
+ggsave(plot = gg_elc, "figs/manuscript/fig_supp03_elc.tiff", width = 8, height = 6, dpi = 300)
 
 #### 05a.6.4  Expected value of perfect information (EVPI) ####
 ### Individual level
@@ -170,11 +171,11 @@ gg_ceac_ceaf_evpi_pop <- patched + plot_annotation(tag_levels = 'A')
 gg_ceac_ceaf_evpi_pop
 ggsave(plot = gg_ceac_ceaf_evpi_pop,
        filename = "figs/manuscript/Figure 5 - CEAC_CEAF_EVPI.pdf", 
-       width = 8, height = 9)
+       width = 8, height = 9, dpi = 300)
 ggsave(plot = gg_ceac_ceaf_evpi_pop,
        filename = "figs/manuscript/Figure 5 - CEAC_CEAF_EVPI.png", 
-       width = 8, height = 9)
+       width = 8, height = 9, dpi = 300)
 ggsave(plot = gg_ceac_ceaf_evpi_pop,
        filename = "figs/manuscript/Figure 5 - CEAC_CEAF_EVPI.tiff", 
-       width = 8, height = 9)
+       width = 8, height = 9, dpi = 300)
  

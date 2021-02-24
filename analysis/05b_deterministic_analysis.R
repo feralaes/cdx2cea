@@ -466,6 +466,10 @@ ggsave(plot = gg_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
 
 #### 05b.7.3 Combine both TWSAs ####
 ### Proportion of CDX2-negative vs Effectiveness of FOLFOX in CDX2-negative patients (HR)
+## Create data.frame with base-case values for parameters in SA
+df_basecase_pCDX2_vs_hrCDX2negtrt <- data.frame(x = l_params_basecase$p_CDX2neg,
+                                                y = l_params_basecase$hr_Recurr_CDXneg_Rx)
+
 df_twsa_pCDX2_vs_hrCDX2negtrt <- dplyr::bind_rows(data.frame(WTP = "$50,000/QALY", 
                                                       df_twsa_nmb_pCDX2_vs_hrCDX2negtrt_50k, 
                                                       check.names = FALSE),
@@ -505,7 +509,11 @@ gg_twsa_pCDX2_vs_hrCDX2negtrt <- add_common_aes(gg_twsa_pCDX2_vs_hrCDX2negtrt, 1
         strip.background = element_rect(fill = "white",
                                         color = "white"),
         strip.text = element_text(hjust = 0, face = "bold", 
-                                  size = 14))
+                                  size = 14)) +
+  annotate("text", label = "*", 
+           x = df_basecase_pCDX2_vs_hrCDX2negtrt$x, 
+           y = df_basecase_pCDX2_vs_hrCDX2negtrt$y, 
+           size = 14, colour = "yellow")
 gg_twsa_pCDX2_vs_hrCDX2negtrt
 
 gg_twsa_pCDX2_vs_hrCDX2negtrt_alt <- ggplot(opt_df, aes_(x = as.name(param1), 
@@ -536,6 +544,10 @@ gg_twsa_pCDX2_vs_hrCDX2negtrt_alt <- add_common_aes(gg_twsa_pCDX2_vs_hrCDX2negtr
 gg_twsa_pCDX2_vs_hrCDX2negtrt_alt
 
 ### Increased recurrence in CDX2-negative patients vs Effectiveness of FOLFOX in CDX2-negative patients (HR)
+### Create data.frame with base-case values for parameters in SA
+df_basecase_hr_RecurCDX2neg_vs_hrCDX2negtrt <- data.frame(x = l_params_basecase$hr_RecurCDX2neg,
+                                                          y = l_params_basecase$hr_Recurr_CDXneg_Rx)
+
 df_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt <- dplyr::bind_rows(data.frame(WTP = "$50,000/QALY", 
                                                       df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k, 
                                                       check.names = FALSE),
@@ -575,7 +587,11 @@ gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt <- add_common_aes(gg_twsa_hrRecurCDX2neg_
         strip.background = element_rect(fill = "white",
                                         color = "white"),
         strip.text = element_text(hjust = 0, face = "bold", 
-                                  size = 14))
+                                  size = 14)) +
+  annotate("text", label = "*", 
+           x = df_basecase_hr_RecurCDX2neg_vs_hrCDX2negtrt$x, 
+           y = df_basecase_hr_RecurCDX2neg_vs_hrCDX2negtrt$y, 
+           size = 14, colour = "yellow")
 gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt
 
 gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt_alt <- ggplot(opt_df, aes_(x = as.name(param1), 
@@ -605,6 +621,7 @@ gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt_alt <- add_common_aes(gg_twsa_hrRecurCDX2
                               size = 14))
 gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt_alt
 
+### COmbine all TWSA into one ggplot
 patched <- gg_twsa_pCDX2_vs_hrCDX2negtrt/gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt
 gg_twsa <- patched + plot_annotation(tag_levels = 'A')
 gg_twsa
