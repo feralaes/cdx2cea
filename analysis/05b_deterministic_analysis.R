@@ -392,7 +392,7 @@ if(re_run){
                                                                      c("(1) No CDX2 testing and no FOLFOX",
                                                                        "(2) CDX2 testing and FOLFOX if CDX2-negative"))
   ### Rename parameters for plotting
-  colnames(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k)[1:2] <- c("Increased recurrence in CDX2-negative patients",
+  colnames(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k)[1:2] <- c("Increased recurrence in CDX2-negative patients as a HR",
                                                                      "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
   save(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
        file = "data/05b_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k.RData")
@@ -400,7 +400,7 @@ if(re_run){
 ### Load TWSA
 load(file = "data/05b_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k.RData")
 opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k %>%
-  group_by(.data[["Increased recurrence in CDX2-negative patients"]],
+  group_by(.data[["Increased recurrence in CDX2-negative patients as a HR"]],
            .data[["Effectiveness of FOLFOX in CDX2-negative patients (HR)"]]) %>%
   slice(which.max(.data$outcome_val))
 table(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k$strategy)/nrow(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k)
@@ -434,7 +434,7 @@ if(re_run){
                                                                      c("(1) No CDX2 testing and no FOLFOX",
                                                                        "(2) CDX2 testing and FOLFOX if CDX2-negative"))
   ### Rename parameters for plotting
-  colnames(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)[1:2] <- c("Increased recurrence in CDX2-negative patients",
+  colnames(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)[1:2] <- c("Increased recurrence in CDX2-negative patients as a HR",
                                                                       "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
   save(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
        file = "data/05b_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k.RData")
@@ -442,12 +442,12 @@ if(re_run){
 ### Load TWSA
 load(file = "data/05b_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k.RData")
 opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k %>%
-  group_by(.data[["Increased recurrence in CDX2-negative patients"]],
+  group_by(.data[["Increased recurrence in CDX2-negative patients as a HR"]],
            .data[["Effectiveness of FOLFOX in CDX2-negative patients (HR)"]]) %>%
   slice(which.max(.data$outcome_val))
 table(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k$strategy)/nrow(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)
 opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k %>% 
-  filter(`Increased recurrence in CDX2-negative patients` == 1.69) %>%
+  filter(`Increased recurrence in CDX2-negative patients as a HR` == 1.69) %>%
   View()
 
 
