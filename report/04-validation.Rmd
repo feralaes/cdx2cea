@@ -6,14 +6,14 @@ library(kableExtra)
 library(dplyr)
 library(reshape2)
 library(ggplot2)
-library(darthpack)
+library(cdx2cea)
 ```
 
 # Validation  {#validation}
 
-In this forth component, we check the internal validity of our Sick-Sicker model before we move on to the analysis components. To internally validate the Sick-Sicker model, we compare the model-predicted output evaluated at posterior parameters against the calibration targets. This is all done in the *04_validation.R* script in the `analysis` folder. 
+In this fourth component, we check our decision model's internal validity before we move on to the analysis components. We compared the model-predicted output evaluated at posterior parameters against the calibration targets to internally validate the decision model [@Alarid-Escudero2020b]. This is all done in the *04_validation.R* script in the `analysis` folder.
 
-In section _04.2 Compute model-predicted outputs_, we compute the model-predicted outputs for each sample of posterior distribution as well as for the MAP estimate. We then use the function `data_summary` to summarize the model-predicted posterior outputs into different summary statistics. 
+In section _04.2 Compute model-predicted outputs_, we compute the model-predicted outputs for each posterior distribution sample and the MAP estimate. We then use the function `data_summary` to summarize the model-predicted posterior outputs into different summary statistics. 
 ```{r}
 print.function(data_summary)
 ```

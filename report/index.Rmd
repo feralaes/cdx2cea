@@ -1,6 +1,6 @@
 --- 
-title: 'Sick-Sicker case-study using darthpack, an R package with DARTH''s decision modeling coding framework'
-author: "DARTH"
+title: Description of `R` code for the analysis conducted for the manuscript: 'CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis'
+author: "Fernando Alarid-Escudero, PhD"
 date: "`r Sys.Date()`"
 output: 
   pdf_document:
@@ -10,14 +10,13 @@ description: This is a minimal description of a report of a model-based cost-eff
   analysis of a health technology example of using the bookdown package to write a
   book.
 documentclass: book
-github-repo: DARTH-git/darthpack/report
+github-repo: feralaes/cdx2cea/report
 link-citations: yes
 bibliography:
 - book.bib
 - packages.bib
 site: bookdown::bookdown_site
-subtitle: Supplementary Material to "A need for change! A coding framework for improving
-  transparency in decision modeling"
+# subtitle: Supplementary Material to "CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis"
 biblio-style: apalike
 header-includes:
 - \usepackage{float}
@@ -39,7 +38,7 @@ knitr::write_bib(c(
 # knitr::opts_knit$set(root.dir = '../') 
 ## Load packages
 library(png)
-if(!require(darthpack)) devtools::install_github("DARTH-git/darthpack"); library(darthpack)
+if(!require(cdx2cea)) devtools::install_github("feralaes/cdx2cea"); library(cdx2cea)
 # all the figures will be 6.5 x 4 inches and centered in the text.
 knitr::opts_chunk$set(fig.width=6.5,
                       fig.height=4,
