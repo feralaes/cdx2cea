@@ -626,6 +626,9 @@ patched <- gg_twsa_pCDX2_vs_hrCDX2negtrt/gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt
 gg_twsa <- patched + plot_annotation(tag_levels = 'A')
 gg_twsa
 ggsave(plot = gg_twsa,
+       filename = "figs/Figure 4 - TWSA.png", 
+       width = 8, height = 6)
+ggsave(plot = gg_twsa,
        filename = "figs/manuscript/Figure 4 - TWSA.pdf", 
        width = 12, height = 14, dpi = 300)
 ggsave(plot = gg_twsa,

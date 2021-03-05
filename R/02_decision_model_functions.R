@@ -19,7 +19,7 @@ decision_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
                            err_stop = FALSE, verbose = FALSE){ # User defined
   with(as.list(l_params_all), {
     #### Error checking ####
-    if (n_cycles != length(v_r_mort_by_age_month)) {
+    if (n_cycles > length(v_r_mort_by_age_month)) {
       stop("Not all the ages in the age range have a corresponding mortality rate")
     }
     

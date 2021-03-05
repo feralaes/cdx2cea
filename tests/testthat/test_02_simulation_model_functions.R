@@ -1,7 +1,7 @@
 context("testing 02_simulation_model_functions.R")
 
 library(dplyr)    # For data manipulation
-library(darthpack)
+library(cdx2cea)
 
 # load inputs
 l_params_all <- load_all_params()
@@ -11,15 +11,15 @@ test_that("invalid inputs", {
 
   # We use an inaccurate input to raise a specific error message 
   # "Not all the age in the age range have a corresponding mortality rate" 
-  l_params_all$n_t <- 90
+  l_params_all$n_cycles <- 421
   expect_error(decision_model(l_params_all), 
-               "Not all the age in the age range have a corresponding mortality rate")
+               "Not all the ages in the age range have a corresponding mortality rate")
   
   
   # We use an inaccurate input to raise a specific error message 
   # "vector of initial states (v_s_init) is not valid" 
-  l_params_all$n_t <- 75
-  l_params_all$v_s_init <- c(H = -1, S1 = 0, S2 = 0, D = 0)
+  l_params_all$n_cycles <- 75
+  l_params_all$p_CDX2neg <- -1
   expect_error(decision_model(l_params_all), 
                "vector of initial states \\(v_s_init\\) is not valid")
 })
