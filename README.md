@@ -9,8 +9,8 @@
 [`cdx2cea`](https://github.com/feralaes/cdx2cea) is an R package that
 implements the cost-effectiveness analysis (CEA) of the of testin
 avereag-risk Stage II colon cancer patients for the absence of CDX2
-biomarker followed by adjuvant chemotherapy. The main website of
-`cdx2cea` can be [found here](https://darth-git.github.io/cdx2cea/).
+biomarker followed by adjuvant chemotherapy.
+<!-- The main website of `cdx2cea` can be [found here](https://darth-git.github.io/cdx2cea/). -->
 
 [`cdx2cea`](https://github.com/DARTH-git/cdx2cea) is part of the
 following manuscript:

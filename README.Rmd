@@ -17,7 +17,8 @@ knitr::opts_chunk$set(
 # cdx2cea <img src='man/figures/logo.png' align="right" height="139" />
 <!-- <img src="docs/figs/under_const.jpeg" align="center" alt="" width="360" /> -->
 
-[`cdx2cea`](https://github.com/feralaes/cdx2cea) is an R package that implements the cost-effectiveness analysis (CEA) of the of testin avereag-risk Stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy. The main website of `cdx2cea` can be [found here](https://darth-git.github.io/cdx2cea/).
+[`cdx2cea`](https://github.com/feralaes/cdx2cea) is an R package that implements the cost-effectiveness analysis (CEA) of the of testin avereag-risk Stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy. 
+<!-- The main website of `cdx2cea` can be [found here](https://darth-git.github.io/cdx2cea/). -->
 
 [`cdx2cea`](https://github.com/DARTH-git/cdx2cea) is part of the following manuscript:
 
