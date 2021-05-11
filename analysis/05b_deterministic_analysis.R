@@ -14,7 +14,7 @@
 
 rm(list = ls()) # to clean the workspace
 
-re_run <- FALSE
+re_run <- FALSE # TRUE
 
 #### 05b.1 Load packages and functions ####
 #### 05b.1.1 Load packages ####
@@ -202,7 +202,7 @@ df_owsa_input <- data.frame(pars = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx",
                                     l_bounds$v_lb$hr_Recurr_CDXneg_Rx, 
                                     l_bounds$v_lb$c_Test,
                                     l_bounds$v_lb$u_Mets,
-                                    1.69),
+                                    1.00),
                             max = c(l_bounds$v_ub$p_CDX2neg, 
                                     0.975, 
                                     l_bounds$v_ub$c_Test,
@@ -373,7 +373,7 @@ ggsave(plot = gg_twsa_nmb_pCDX2_vs_hrCDX2negtrt_100k,
 ### Define TWSA designs
 df_twsa_input_hrRecurCDX2neg_vs_hrCDX2negtrt <- data.frame(pars = c("hr_RecurCDX2neg",
                                                                     "hr_Recurr_CDXneg_Rx"),
-                                                  min = c(1.69, 0.630),
+                                                  min = c(1.00, 0.630),
                                                   max = c(4.38, 1.000))
 
 ### $50K/QALY
@@ -404,6 +404,9 @@ opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- df_twsa_nmb_hrRecurCDX2neg_vs_hrCD
            .data[["Effectiveness of FOLFOX in CDX2-negative patients (HR)"]]) %>%
   slice(which.max(.data$outcome_val))
 table(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k$strategy)/nrow(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k)
+opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k %>% 
+  filter(`Increased recurrence in CDX2-negative patients as a HR` == 1.00) %>%
+  View()
 
 ### Plot TWSA
 gg_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- plot(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
@@ -447,7 +450,7 @@ opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- df_twsa_nmb_hrRecurCDX2neg_vs_hrC
   slice(which.max(.data$outcome_val))
 table(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k$strategy)/nrow(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)
 opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k %>% 
-  filter(`Increased recurrence in CDX2-negative patients as a HR` == 1.69) %>%
+  filter(`Increased recurrence in CDX2-negative patients as a HR` == 1.00) %>%
   View()
 
 
