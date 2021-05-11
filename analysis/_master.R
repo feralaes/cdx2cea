@@ -20,18 +20,7 @@
 ### Uncomment if you don't have all required packages installed
 # source("analysis/app0_package_setup.R", echo = TRUE) 
 ## Install IMIS
-url <- "https://cran.r-project.org/src/contrib/Archive/IMIS/IMIS_0.1.tar.gz"
-pkgFile <- "IMIS_0.1.tar.gz"
-download.file(url = url, destfile = pkgFile)
-
-# Install dependencies
-install.packages(c("ada", "ipred", "evd"))
-
-# Install package
-install.packages(pkgs=pkgFile, type="source", repos=NULL)
-
-# Delete package tarball
-unlink(pkgFile)
+devtools::install_version("IMIS", version = "0.1", repos = "http://cran.us.r-project.org")
 
 #### 01 Load inputs ####
 source("analysis/01_model_inputs.R", echo = TRUE)
