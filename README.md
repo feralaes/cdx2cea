@@ -7,9 +7,9 @@
 <!-- <img src="docs/figs/under_const.jpeg" align="center" alt="" width="360" /> -->
 
 [`cdx2cea`](https://github.com/feralaes/cdx2cea) is an R package that
-implements the cost-effectiveness analysis (CEA) of the of testin
-avereag-risk Stage II colon cancer patients for the absence of CDX2
-biomarker followed by adjuvant chemotherapy.
+implements the cost-effectiveness analysis (CEA) of testing average-risk
+Stage II colon cancer patients for the absence of CDX2 biomarker
+expression followed by adjuvant chemotherapy.
 <!-- The main website of `cdx2cea` can be [found here](https://darth-git.github.io/cdx2cea/). -->
 
 [`cdx2cea`](https://github.com/DARTH-git/cdx2cea) is part of the
@@ -24,10 +24,10 @@ following manuscript:
 ## How to cite this package in your article
 
 You can cite this package like this “we based our analysis using the
-cdx2cea R package (Alarid-Escudero F, Schrag D, and KuntzKM 2021)”. Here
-is the full bibliographic reference to include in your reference list
-for the manuscript and the package (don’t forget to update the ‘last
-accessed’ date):
+cdx2cea R package (Alarid-Escudero F, Schrag D, and Kuntz KM 2021)”.
+Here is the full bibliographic reference to include in your reference
+list for the manuscript and the package (don’t forget to update the
+‘last accessed’ date):
 
 > Alarid-Escudero F, Schrag D, Kuntz KM (2021). CDX2 biomarker testing
 > and adjuvant therapy for stage II colon cancer: An exploratory
@@ -43,7 +43,7 @@ accessed’ date):
 
 -   Install
     [RStudio](https://www.rstudio.com/products/rstudio/download/)
--   Install `devtools` to install `darthpack` as a package and modify it
+-   Install `devtools` to install `cdx2cea` as a package and modify it
     to generate your own package
 
 ``` r
@@ -63,10 +63,9 @@ install.packages("devtools")
     to generate a repository of your own model-based decision or
     cost-effectiveness analysis
 2.  [R package](#use-as-an-r-package) for using it as a standalone
-    package to run current functions of `darthpack`
+    package to run current functions of `cdx2cea`
 
-The main website of the package could be found in:
-<https://darth-git.github.io/darthpack/>
+<!-- The main website of the package could be found in: https://darth-git.github.io/darthpack/ -->
 
 ## Use repository as a regular coding template
 
@@ -81,16 +80,16 @@ The main website of the package could be found in:
 4.  Install all the required and suggested packages listed in the
     [*DESCRIPTION*](https://github.com/feralaes/cdx2cea/blob/master/DESCRIPTION)
     file in the main folder of the repository
-    -   To install `dampack`, please follow these instructions:
+    -   To install `cdx2cea`, please follow these instructions:
 
 ``` r
 # Install development version from GitHub
 devtools::install_github("feralaes/cdx2cea")
 ```
 
-1.  In RStudio, load all the functions and data from the repository by
+5.  In RStudio, load all the functions and data from the repository by
     typing `devtools::load_all(".")`
-2.  Run all the decision modeling modules in the analysis folder.
+6.  Run all the decision modeling modules in the analysis folder.
 
 ## Use as an R package
 
@@ -101,7 +100,7 @@ devtools::install_github("feralaes/cdx2cea")
 devtools::install_github("feralaes/cdx2cea")
 ```
 
-1.  Load all the functions and data from the repository by typing
+2.  Load all the functions and data from the repository by typing
 
 ``` r
 library(cdx2cea)
