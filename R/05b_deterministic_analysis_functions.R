@@ -54,7 +54,7 @@ ce_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     a_R_u <- array(NaN, dim = c(n_states, n_states, (n_cycles + 1)),
                  dimnames = list(v_names_states, v_names_states, 0:n_cycles))
     ## Fill in array
-    # In CDX2 positive (One alternative is to manually assign Utilities to each exiting state)
+    # In CDX2 positive (One alternative is to manually assign utilities to each exiting state)
     a_R_u["CDX2pos","CDX2pos", ]  <- v_u_S2
     a_R_u["CDX2neg","CDX2pos", ]  <- v_u_S2
     a_R_u["Mets", "CDX2pos", ]    <- v_u_S2

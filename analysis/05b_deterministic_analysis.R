@@ -234,6 +234,7 @@ if(re_run){
                           param_val %in% c(0.015, 0.15))
   df_owsa_icer %>% filter(parameter == "Increased recurrence in CDX2-negative patients\nas a HR", 
                           param_val == 1.69 | param_val > 4.320)
+  df_owsa_icer %>% filter(parameter == "Increased recurrence in CDX2-negative patients\nas a HR")
   df_owsa_icer %>% filter(parameter == "Utility of metastatic recurrence", 
                           param_val %in% c(0.20, 0.70))
   save(df_owsa_icer,
