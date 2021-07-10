@@ -14,7 +14,7 @@
 
 rm(list = ls()) # to clean the workspace
 
-re_run <- FALSE
+re_run <- FALSE # TRUE
 
 #### 05b.1 Load packages and functions ####
 #### 05b.1.1 Load packages ####
@@ -202,7 +202,7 @@ df_owsa_input <- data.frame(pars = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx",
                                     l_bounds$v_lb$hr_Recurr_CDXneg_Rx, 
                                     l_bounds$v_lb$c_Test,
                                     l_bounds$v_lb$u_Mets,
-                                    1.69),
+                                    1.00),
                             max = c(l_bounds$v_ub$p_CDX2neg, 
                                     0.975, 
                                     l_bounds$v_ub$c_Test,
@@ -234,6 +234,7 @@ if(re_run){
                           param_val %in% c(0.015, 0.15))
   df_owsa_icer %>% filter(parameter == "Increased recurrence in CDX2-negative patients\nas a HR", 
                           param_val == 1.69 | param_val > 4.320)
+  df_owsa_icer %>% filter(parameter == "Increased recurrence in CDX2-negative patients\nas a HR")
   df_owsa_icer %>% filter(parameter == "Utility of metastatic recurrence", 
                           param_val %in% c(0.20, 0.70))
   save(df_owsa_icer,
@@ -373,7 +374,7 @@ ggsave(plot = gg_twsa_nmb_pCDX2_vs_hrCDX2negtrt_100k,
 ### Define TWSA designs
 df_twsa_input_hrRecurCDX2neg_vs_hrCDX2negtrt <- data.frame(pars = c("hr_RecurCDX2neg",
                                                                     "hr_Recurr_CDXneg_Rx"),
-                                                  min = c(1.69, 0.630),
+                                                  min = c(1.00, 0.630),
                                                   max = c(4.38, 1.000))
 
 ### $50K/QALY
@@ -392,7 +393,7 @@ if(re_run){
                                                                      c("(1) No CDX2 testing and no FOLFOX",
                                                                        "(2) CDX2 testing and FOLFOX if CDX2-negative"))
   ### Rename parameters for plotting
-  colnames(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k)[1:2] <- c("Increased recurrence in CDX2-negative patients",
+  colnames(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k)[1:2] <- c("Increased recurrence in CDX2-negative patients as a HR",
                                                                      "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
   save(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
        file = "data/05b_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k.RData")
@@ -400,10 +401,13 @@ if(re_run){
 ### Load TWSA
 load(file = "data/05b_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k.RData")
 opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k %>%
-  group_by(.data[["Increased recurrence in CDX2-negative patients"]],
+  group_by(.data[["Increased recurrence in CDX2-negative patients as a HR"]],
            .data[["Effectiveness of FOLFOX in CDX2-negative patients (HR)"]]) %>%
   slice(which.max(.data$outcome_val))
 table(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k$strategy)/nrow(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k)
+opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k %>% 
+  filter(`Increased recurrence in CDX2-negative patients as a HR` == 1.00) %>%
+  View()
 
 ### Plot TWSA
 gg_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- plot(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
@@ -434,7 +438,7 @@ if(re_run){
                                                                      c("(1) No CDX2 testing and no FOLFOX",
                                                                        "(2) CDX2 testing and FOLFOX if CDX2-negative"))
   ### Rename parameters for plotting
-  colnames(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)[1:2] <- c("Increased recurrence in CDX2-negative patients",
+  colnames(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)[1:2] <- c("Increased recurrence in CDX2-negative patients as a HR",
                                                                       "Effectiveness of FOLFOX in CDX2-negative patients (HR)")
   save(df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
        file = "data/05b_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k.RData")
@@ -442,12 +446,12 @@ if(re_run){
 ### Load TWSA
 load(file = "data/05b_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k.RData")
 opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k %>%
-  group_by(.data[["Increased recurrence in CDX2-negative patients"]],
+  group_by(.data[["Increased recurrence in CDX2-negative patients as a HR"]],
            .data[["Effectiveness of FOLFOX in CDX2-negative patients (HR)"]]) %>%
   slice(which.max(.data$outcome_val))
 table(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k$strategy)/nrow(opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k)
 opt_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k %>% 
-  filter(`Increased recurrence in CDX2-negative patients` == 1.69) %>%
+  filter(`Increased recurrence in CDX2-negative patients as a HR` == 1.00) %>%
   View()
 
 
@@ -466,6 +470,10 @@ ggsave(plot = gg_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k,
 
 #### 05b.7.3 Combine both TWSAs ####
 ### Proportion of CDX2-negative vs Effectiveness of FOLFOX in CDX2-negative patients (HR)
+## Create data.frame with base-case values for parameters in SA
+df_basecase_pCDX2_vs_hrCDX2negtrt <- data.frame(x = l_params_basecase$p_CDX2neg,
+                                                y = l_params_basecase$hr_Recurr_CDXneg_Rx)
+
 df_twsa_pCDX2_vs_hrCDX2negtrt <- dplyr::bind_rows(data.frame(WTP = "$50,000/QALY", 
                                                       df_twsa_nmb_pCDX2_vs_hrCDX2negtrt_50k, 
                                                       check.names = FALSE),
@@ -505,7 +513,11 @@ gg_twsa_pCDX2_vs_hrCDX2negtrt <- add_common_aes(gg_twsa_pCDX2_vs_hrCDX2negtrt, 1
         strip.background = element_rect(fill = "white",
                                         color = "white"),
         strip.text = element_text(hjust = 0, face = "bold", 
-                                  size = 14))
+                                  size = 14)) +
+  annotate("text", label = "*", 
+           x = df_basecase_pCDX2_vs_hrCDX2negtrt$x, 
+           y = df_basecase_pCDX2_vs_hrCDX2negtrt$y, 
+           size = 14, colour = "yellow")
 gg_twsa_pCDX2_vs_hrCDX2negtrt
 
 gg_twsa_pCDX2_vs_hrCDX2negtrt_alt <- ggplot(opt_df, aes_(x = as.name(param1), 
@@ -536,6 +548,10 @@ gg_twsa_pCDX2_vs_hrCDX2negtrt_alt <- add_common_aes(gg_twsa_pCDX2_vs_hrCDX2negtr
 gg_twsa_pCDX2_vs_hrCDX2negtrt_alt
 
 ### Increased recurrence in CDX2-negative patients vs Effectiveness of FOLFOX in CDX2-negative patients (HR)
+### Create data.frame with base-case values for parameters in SA
+df_basecase_hr_RecurCDX2neg_vs_hrCDX2negtrt <- data.frame(x = l_params_basecase$hr_RecurCDX2neg,
+                                                          y = l_params_basecase$hr_Recurr_CDXneg_Rx)
+
 df_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt <- dplyr::bind_rows(data.frame(WTP = "$50,000/QALY", 
                                                       df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k, 
                                                       check.names = FALSE),
@@ -575,7 +591,11 @@ gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt <- add_common_aes(gg_twsa_hrRecurCDX2neg_
         strip.background = element_rect(fill = "white",
                                         color = "white"),
         strip.text = element_text(hjust = 0, face = "bold", 
-                                  size = 14))
+                                  size = 14)) +
+  annotate("text", label = "*", 
+           x = df_basecase_hr_RecurCDX2neg_vs_hrCDX2negtrt$x, 
+           y = df_basecase_hr_RecurCDX2neg_vs_hrCDX2negtrt$y, 
+           size = 14, colour = "yellow")
 gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt
 
 gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt_alt <- ggplot(opt_df, aes_(x = as.name(param1), 
@@ -605,9 +625,13 @@ gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt_alt <- add_common_aes(gg_twsa_hrRecurCDX2
                               size = 14))
 gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt_alt
 
+### COmbine all TWSA into one ggplot
 patched <- gg_twsa_pCDX2_vs_hrCDX2negtrt/gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt
 gg_twsa <- patched + plot_annotation(tag_levels = 'A')
 gg_twsa
+ggsave(plot = gg_twsa,
+       filename = "figs/Figure 4 - TWSA.png", 
+       width = 8, height = 6)
 ggsave(plot = gg_twsa,
        filename = "figs/manuscript/Figure 4 - TWSA.pdf", 
        width = 12, height = 14, dpi = 300)

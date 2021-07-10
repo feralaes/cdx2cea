@@ -1,4 +1,4 @@
 library(testthat)
-library(darthpack)
+library(cdx2cea)
 
-test_check("darthpack")
+test_check("cdx2cea")

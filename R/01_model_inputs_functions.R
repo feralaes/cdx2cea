@@ -75,15 +75,15 @@ load_params_init <- function(
   c_Chemo =  1576,
   # Cost of chemotherapy administration
   c_ChemoAdmin = 315, 
-  # Initial costs in CRC Stage II (minus chemo and chemo admin) inflated from 2004 USD to 2018 USD using price index from PCE
+  # Initial costs in CRC Stage II (minus chemo and chemo admin) in 2004 USD
   c_CRCStg2_init = (32039 - (1391+315)),
-  # Continuing costs in CRC Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+  # Continuing costs in CRC Stage II in 2004 USD
   c_CRCStg2_cont = 1722,
-  # Continuing costs in CRC Stage IV inflated from 2004 USD to 2018 USD using price index from PCE
+  # Continuing costs in CRC Stage IV in 2004 USD
   c_CRCStg4_cont = 7629,
-  # Increase in cost when dying from cancer while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+  # Increase in cost when dying from cancer while in Stage II in 2004 USD
   ic_DeathCRCStg2 = 41500,
-  # Increase in cost when dying from Other Causes (OC) while in Stage II inflated from 2004 USD to 2018 USD using price index from PCE
+  # Increase in cost when dying from Other Causes (OC) while in Stage II in 2004 USD
   ic_DeathOCStg2  = 8969,
   # Cost of IHC staining
   c_Test = 112,

@@ -19,7 +19,7 @@ decision_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
                            err_stop = FALSE, verbose = FALSE){ # User defined
   with(as.list(l_params_all), {
     #### Error checking ####
-    if (n_cycles != length(v_r_mort_by_age_month)) {
+    if (n_cycles > length(v_r_mort_by_age_month)) {
       stop("Not all the ages in the age range have a corresponding mortality rate")
     }
     
@@ -97,7 +97,7 @@ decision_model <- function(l_params_all, p_CDX2neg_init = NULL, Trt = FALSE,
     ## Check that transition probabilities are [0, 1]
     darthtools::check_transition_probability(a_P, err_stop = err_stop, verbose = verbose)
     ## Check that all rows sum to 1
-    darthtools::check_sum_of_transition_array(a_P, n_states, n_cycles, err_stop = err_stop, verbose = verbose)
+    darthtools::check_sum_of_transition_array(a_P, n_states = n_states, n_cycles = n_cycles, err_stop = err_stop, verbose = verbose)
     
     #### Compute cohort trace matrix and dynamic transition array for age-dependent STM ####
     # Initialize cohort trace matrix

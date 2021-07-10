@@ -4,9 +4,6 @@
     <loc>https://darth-git.github.io/darthpack/index.html</loc>
   </url>
   <url>
-    <loc>https://darth-git.github.io/darthpack/reference/SickSicker_targets.html</loc>
-  </url>
-  <url>
     <loc>https://darth-git.github.io/darthpack/reference/all_cause_mortality.html</loc>
   </url>
   <url>
@@ -16,10 +13,7 @@
     <loc>https://darth-git.github.io/darthpack/reference/calibration_out.html</loc>
   </url>
   <url>
-    <loc>https://darth-git.github.io/darthpack/reference/check_sum_of_transition_array.html</loc>
-  </url>
-  <url>
-    <loc>https://darth-git.github.io/darthpack/reference/check_transition_probability.html</loc>
+    <loc>https://darth-git.github.io/darthpack/reference/ce_model.html</loc>
   </url>
   <url>
     <loc>https://darth-git.github.io/darthpack/reference/darthpack.html</loc>
@@ -31,16 +25,25 @@
     <loc>https://darth-git.github.io/darthpack/reference/decision_model.html</loc>
   </url>
   <url>
-    <loc>https://darth-git.github.io/darthpack/reference/df_cea_psa.html</loc>
+    <loc>https://darth-git.github.io/darthpack/reference/df_calibration_targets.html</loc>
   </url>
   <url>
-    <loc>https://darth-git.github.io/darthpack/reference/df_params_init.html</loc>
+    <loc>https://darth-git.github.io/darthpack/reference/df_cea_psa.html</loc>
   </url>
   <url>
     <loc>https://darth-git.github.io/darthpack/reference/df_posterior_summ.html</loc>
   </url>
   <url>
+    <loc>https://darth-git.github.io/darthpack/reference/equal_breaks.html</loc>
+  </url>
+  <url>
+    <loc>https://darth-git.github.io/darthpack/reference/generate_params_bounds.html</loc>
+  </url>
+  <url>
     <loc>https://darth-git.github.io/darthpack/reference/generate_psa_params.html</loc>
+  </url>
+  <url>
+    <loc>https://darth-git.github.io/darthpack/reference/get_os.html</loc>
   </url>
   <url>
     <loc>https://darth-git.github.io/darthpack/reference/l_psa.html</loc>
@@ -55,7 +58,13 @@
     <loc>https://darth-git.github.io/darthpack/reference/load_mort_data.html</loc>
   </url>
   <url>
+    <loc>https://darth-git.github.io/darthpack/reference/load_params_init.html</loc>
+  </url>
+  <url>
     <loc>https://darth-git.github.io/darthpack/reference/log_lik.html</loc>
+  </url>
+  <url>
+    <loc>https://darth-git.github.io/darthpack/reference/log_lik_par.html</loc>
   </url>
   <url>
     <loc>https://darth-git.github.io/darthpack/reference/log_post.html</loc>
@@ -70,7 +79,10 @@
     <loc>https://darth-git.github.io/darthpack/reference/open_guide.html</loc>
   </url>
   <url>
-    <loc>https://darth-git.github.io/darthpack/reference/owsa_det.html</loc>
+    <loc>https://darth-git.github.io/darthpack/reference/pipe.html</loc>
+  </url>
+  <url>
+    <loc>https://darth-git.github.io/darthpack/reference/plot_trace.html</loc>
   </url>
   <url>
     <loc>https://darth-git.github.io/darthpack/reference/posterior.html</loc>
@@ -79,10 +91,10 @@
     <loc>https://darth-git.github.io/darthpack/reference/prior.html</loc>
   </url>
   <url>
-    <loc>https://darth-git.github.io/darthpack/reference/sample.prior.html</loc>
+    <loc>https://darth-git.github.io/darthpack/reference/run_probsa.html</loc>
   </url>
   <url>
-    <loc>https://darth-git.github.io/darthpack/reference/twsa_det.html</loc>
+    <loc>https://darth-git.github.io/darthpack/reference/sample.prior.html</loc>
   </url>
   <url>
     <loc>https://darth-git.github.io/darthpack/reference/update_param_list.html</loc>

@@ -19,6 +19,8 @@
 #### 00 Install and load packages ####
 ### Uncomment if you don't have all required packages installed
 # source("analysis/app0_package_setup.R", echo = TRUE) 
+## Install IMIS
+devtools::install_version("IMIS", version = "0.1", repos = "http://cran.us.r-project.org")
 
 #### 01 Load inputs ####
 source("analysis/01_model_inputs.R", echo = TRUE)
