@@ -10,14 +10,15 @@
 implements the cost-effectiveness analysis (CEA) of testing average-risk
 Stage II colon cancer patients for the absence of CDX2 biomarker
 expression followed by adjuvant chemotherapy.
-<!-- The main website of `cdx2cea` can be [found here](https://darth-git.github.io/cdx2cea/). -->
+<!-- The main website of `cdx2cea` can be [found here](https://feralaes.github.io/cdx2cea/). -->
 
-[`cdx2cea`](https://github.com/DARTH-git/cdx2cea) is part of the
+[`cdx2cea`](https://github.com/feralaes/cdx2cea) is part of the
 following manuscript:
 
 -   Alarid-Escudero F, Schrag D, Kuntz KM. (2021) “CDX2 biomarker
     testing and adjuvant therapy for stage II colon cancer: An
-    exploratory cost-effectiveness analysis” (Under review)
+    exploratory cost-effectiveness analysis” *Value in Health* (In
+    press).
 
 <!-- The release that accompanies the published article has been archived in zenodo: https://zenodo.org/record/3445451. -->
 
@@ -31,7 +32,7 @@ list for the manuscript and the package (don’t forget to update the
 
 > Alarid-Escudero F, Schrag D, Kuntz KM (2021). CDX2 biomarker testing
 > and adjuvant therapy for stage II colon cancer: An exploratory
-> cost-effectiveness analysis (Under review).
+> cost-effectiveness analysis. *Value in Health* (In press).
 
 > Alarid-Escudero F, Schrag D, Kuntz KM (2021). {cdx2cea}: A
 > cost-efectiveness analysis of testing stage II colon cancer patients
@@ -65,7 +66,7 @@ install.packages("devtools")
 2.  [R package](#use-as-an-r-package) for using it as a standalone
     package to run current functions of `cdx2cea`
 
-<!-- The main website of the package could be found in: https://darth-git.github.io/darthpack/ -->
+<!-- The main website of the package could be found in: https://feralaes.github.io/feralaes/ -->
 
 ## Use repository as a regular coding template
 
@@ -87,9 +88,9 @@ install.packages("devtools")
 devtools::install_github("feralaes/cdx2cea")
 ```
 
-5.  In RStudio, load all the functions and data from the repository by
+1.  In RStudio, load all the functions and data from the repository by
     typing `devtools::load_all(".")`
-6.  Run all the decision modeling modules in the analysis folder.
+2.  Run all the decision modeling modules in the analysis folder.
 
 ## Use as an R package
 
@@ -100,7 +101,7 @@ devtools::install_github("feralaes/cdx2cea")
 devtools::install_github("feralaes/cdx2cea")
 ```
 
-2.  Load all the functions and data from the repository by typing
+1.  Load all the functions and data from the repository by typing
 
 ``` r
 library(cdx2cea)

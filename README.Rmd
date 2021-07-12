@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 <!-- <img src="docs/figs/under_const.jpeg" align="center" alt="" width="360" /> -->
 
 [`cdx2cea`](https://github.com/feralaes/cdx2cea) is an R package that implements the cost-effectiveness analysis (CEA) of testing average-risk Stage II colon cancer patients for the absence of CDX2 biomarker expression followed by adjuvant chemotherapy. 
-<!-- The main website of `cdx2cea` can be [found here](https://darth-git.github.io/cdx2cea/). -->
+<!-- The main website of `cdx2cea` can be [found here](https://feralaes.github.io/cdx2cea/). -->
 
-[`cdx2cea`](https://github.com/DARTH-git/cdx2cea) is part of the following manuscript:
+[`cdx2cea`](https://github.com/feralaes/cdx2cea) is part of the following manuscript:
 
-- Alarid-Escudero F, Schrag D, Kuntz KM. (2021) "CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis" (Under review)
+- Alarid-Escudero F, Schrag D, Kuntz KM. (2021) "CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis" *Value in Health* (In press).
 
 <!-- The release that accompanies the published article has been archived in zenodo: https://zenodo.org/record/3445451. -->
 
@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 
 You can cite this package like this "we based our analysis using the cdx2cea R package (Alarid-Escudero F, Schrag D, and Kuntz KM 2021)". Here is the full bibliographic reference to include in your reference list for the manuscript and the package (don't forget to update the 'last accessed' date):
 
-> Alarid-Escudero F, Schrag D, Kuntz KM (2021). CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis (Under review). 
+> Alarid-Escudero F, Schrag D, Kuntz KM (2021). CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis. *Value in Health* (In press). 
 
 > Alarid-Escudero F, Schrag D, Kuntz KM (2021). {cdx2cea}: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy (Version v0.1.0). Zenodo. http://doi.org/XXX. Last accessed 28 February 2021
 
@@ -51,7 +51,7 @@ install.packages("devtools")
 1. [Regular coding template](#use-repository-as-a-regular-coding-template) for using it to generate a repository of your own model-based decision or cost-effectiveness analysis
 2. [R package](#use-as-an-r-package) for using it as a standalone package to run current functions of `cdx2cea`
 
-<!-- The main website of the package could be found in: https://darth-git.github.io/darthpack/ -->
+<!-- The main website of the package could be found in: https://feralaes.github.io/feralaes/ -->
 
 ## Use repository as a regular coding template
 1. On the `cdx2cea` GitHub repository, navigate to the main page of the repository (https://github.com/feralaes/cdx2cea).
