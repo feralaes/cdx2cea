@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-<!-- [![DOI](https://zenodo.org/badge/197059951.svg)](https://zenodo.org/badge/latestdoi/197059951) -->
+[![DOI](https://zenodo.org/badge/331070175.svg)](https://zenodo.org/badge/latestdoi/331070175)
 
 # cdx2cea <img src='man/figures/logo.png' align="right" height="139" />
 <!-- <img src="docs/figs/under_const.jpeg" align="center" alt="" width="360" /> -->
@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 - Alarid-Escudero F, Schrag D, Kuntz KM. (2021) "CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis" *Value in Health* (In press).
 
-<!-- The release that accompanies the published article has been archived in zenodo: https://zenodo.org/record/3445451. -->
+<!-- The release that accompanies the published article has been archived in zenodo: https://zenodo.org/record/5093594#.YOyBjS1h3T8. -->
 
 ## How to cite this package in your article
 
@@ -32,7 +32,7 @@ You can cite this package like this "we based our analysis using the cdx2cea R p
 
 > Alarid-Escudero F, Schrag D, Kuntz KM (2021). CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis. *Value in Health* (In press). 
 
-> Alarid-Escudero F, Schrag D, Kuntz KM (2021). {cdx2cea}: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy (Version v0.1.0). Zenodo. http://doi.org/XXX. Last accessed 28 February 2021
+> Alarid-Escudero F, Schrag D, Kuntz KM (2021). {cdx2cea}: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy (Version v1.0.0). Zenodo. http://10.5281/zenodo.5093594. Last accessed 12 July 2021
 
 ## Preliminaries
 - Install [RStudio](https://www.rstudio.com/products/rstudio/download/)
@@ -82,7 +82,7 @@ library(cdx2cea)
 
 ## Citation
 
-Alarid-Escudero F, Schrag D, Kuntz KM (2021). cdx2cea: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy (Version v0.1.0). Zenodo. [http://doi.org/XXX](http://doi.org/XXX)
+Alarid-Escudero F, Schrag D, Kuntz KM (2021). cdx2cea: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy (Version v1.0.0). Zenodo. [http://doi.org/10.5281/zenodo.5093594](http://doi.org/10.5281/zenodo.5093594)
 
 ## Acknowledgements
 

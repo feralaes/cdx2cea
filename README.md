@@ -1,6 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<!-- [![DOI](https://zenodo.org/badge/197059951.svg)](https://zenodo.org/badge/latestdoi/197059951) -->
+
+[![DOI](https://zenodo.org/badge/331070175.svg)](https://zenodo.org/badge/latestdoi/331070175)
 
 # cdx2cea <img src='man/figures/logo.png' align="right" height="139" />
 
@@ -20,7 +21,7 @@ following manuscript:
     exploratory cost-effectiveness analysis” *Value in Health* (In
     press).
 
-<!-- The release that accompanies the published article has been archived in zenodo: https://zenodo.org/record/3445451. -->
+<!-- The release that accompanies the published article has been archived in zenodo: https://zenodo.org/record/5093594#.YOyBjS1h3T8. -->
 
 ## How to cite this package in your article
 
@@ -37,8 +38,8 @@ list for the manuscript and the package (don’t forget to update the
 > Alarid-Escudero F, Schrag D, Kuntz KM (2021). {cdx2cea}: A
 > cost-efectiveness analysis of testing stage II colon cancer patients
 > for the absence of CDX2 biomarker followed by adjuvant chemotherapy
-> (Version v0.1.0). Zenodo. <http://doi.org/XXX>. Last accessed 28
-> February 2021
+> (Version v1.0.0). Zenodo. <http://10.5281/zenodo.5093594>. Last
+> accessed 12 July 2021
 
 ## Preliminaries
 
@@ -112,7 +113,7 @@ library(cdx2cea)
 Alarid-Escudero F, Schrag D, Kuntz KM (2021). cdx2cea: A
 cost-efectiveness analysis of testing stage II colon cancer patients for
 the absence of CDX2 biomarker followed by adjuvant chemotherapy (Version
-v0.1.0). Zenodo. <http://doi.org/XXX>
+v1.0.0). Zenodo. <http://doi.org/10.5281/zenodo.5093594>
 
 ## Acknowledgements
 
