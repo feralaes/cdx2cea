@@ -21,7 +21,8 @@ following manuscript:
     exploratory cost-effectiveness analysis” *Value in Health* (In
     press).
 
-<!-- The release that accompanies the published article has been archived in zenodo: https://zenodo.org/record/5093594#.YOyBjS1h3T8. -->
+The release that accompanies the published article has been archived in
+zenodo: <https://zenodo.org/record/5093594#.YPYyDy1h1qs>
 
 ## How to cite this package in your article
 
@@ -89,9 +90,9 @@ install.packages("devtools")
 devtools::install_github("feralaes/cdx2cea")
 ```
 
-1.  In RStudio, load all the functions and data from the repository by
+5.  In RStudio, load all the functions and data from the repository by
     typing `devtools::load_all(".")`
-2.  Run all the decision modeling modules in the analysis folder.
+6.  Run all the decision modeling modules in the analysis folder.
 
 ## Use as an R package
 
@@ -102,7 +103,7 @@ devtools::install_github("feralaes/cdx2cea")
 devtools::install_github("feralaes/cdx2cea")
 ```
 
-1.  Load all the functions and data from the repository by typing
+2.  Load all the functions and data from the repository by typing
 
 ``` r
 library(cdx2cea)
