@@ -21,6 +21,8 @@
 # source("analysis/app0_package_setup.R", echo = TRUE) 
 ## Install IMIS
 devtools::install_version("IMIS", version = "0.1", repos = "http://cran.us.r-project.org")
+## Install darthtools
+devtools::install_github(repo = "DARTH-git/darthtools")
 
 #### 01 Load inputs ####
 source("analysis/01_model_inputs.R", echo = TRUE)
