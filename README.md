@@ -16,10 +16,11 @@ expression followed by adjuvant chemotherapy.
 [`cdx2cea`](https://github.com/feralaes/cdx2cea) is part of the
 following manuscript:
 
--   Alarid-Escudero F, Schrag D, Kuntz KM. (2021) “CDX2 biomarker
+-   Alarid-Escudero F, Schrag D, Kuntz KM. (2021) [“CDX2 biomarker
     testing and adjuvant therapy for stage II colon cancer: An
-    exploratory cost-effectiveness analysis” *Value in Health* (In
-    press).
+    exploratory cost-effectiveness
+    analysis”](https://www.sciencedirect.com/science/article/pii/S1098301521017472)
+    *Value in Health* (Online First).
 
 The release that accompanies the published article has been archived in
 zenodo: <https://zenodo.org/record/5093594#.YPYyDy1h1qs>
@@ -32,9 +33,11 @@ Here is the full bibliographic reference to include in your reference
 list for the manuscript and the package (don’t forget to update the
 ‘last accessed’ date):
 
-> Alarid-Escudero F, Schrag D, Kuntz KM (2021). CDX2 biomarker testing
+> Alarid-Escudero F, Schrag D, Kuntz KM (2021). [“CDX2 biomarker testing
 > and adjuvant therapy for stage II colon cancer: An exploratory
-> cost-effectiveness analysis. *Value in Health* (In press).
+> cost-effectiveness
+> analysis”](https://www.sciencedirect.com/science/article/pii/S1098301521017472).
+> *Value in Health* (In press).
 
 > Alarid-Escudero F, Schrag D, Kuntz KM (2021). {cdx2cea}: A
 > cost-efectiveness analysis of testing stage II colon cancer patients
