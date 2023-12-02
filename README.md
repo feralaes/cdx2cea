@@ -61,6 +61,48 @@ install.packages("devtools")
 # devtools::install_github("r-lib/devtools")
 ```
 
+We recommend reading the tutorials on cohort state-rtansition models
+(cSTMs) in R:
+
+- Alarid-Escudero F, Krijkamp EM, Enns EA, Yang A, Hunink MGM,
+  Pechlivanoglou P, Jalal H. [An Introductory Tutorial on Cohort
+  State-Transition Models in R Using a Cost-Effectiveness Analysis
+  Example](https://journals.sagepub.com/doi/full/10.1177/0272989X221103163).
+  [Medical Decision Making](https://journals.sagepub.com/home/mdm),
+  2023;43(1):3-20. <https://doi.org/10.1177/0272989X221103163>
+
+- Alarid-Escudero F, Krijkamp EM, Enns EA, Yang A, Hunink MGM,
+  Pechlivanoglou P, Jalal H. [A Tutorial on Time-Dependent Cohort
+  State-Transition Models in R using a Cost-Effectiveness Analysis
+  Example](https://journals.sagepub.com/doi/full/10.1177/0272989X221121747).
+  [Medical Decision Making](https://journals.sagepub.com/home/mdm).
+  2023;43(1):21-41. <https://doi.org/10.1177/0272989X221121747>
+
+and understanding the use of multidimensional arrays to represent cSTM
+dynamics in R described in:
+
+- Krijkamp EM, Alarid-Escudero F, Enns EA, Pechlivanoglou P, Hunink MGM,
+  Yang A, Jalal HJ. [A multidimensional array representation of
+  state-transition model
+  dynamics](https://journals.sagepub.com/doi/full/10.1177/0272989X19893973).
+  [Medical Decision Making](https://journals.sagepub.com/home/mdm),
+  2020;40(2):242-248. <https://doi.org/10.1177/0272989X19893973>,
+
+and familiarizing with the [DARTH](http://darthworkgroup.com) coding
+framework described in:
+
+- Alarid-Escudero F, Krijkamp EM, Pechlivanoglou P, Jalal HJ, Kao SYZ,
+  Yang A, Enns EA. [A Need for Change! A Coding Framework for Improving
+  Transparency in Decision
+  Modeling](https://link.springer.com/article/10.1007/s40273-019-00837-x).
+  [PharmacoEconomics](https://www.springer.com/journal/40273),
+  2190;37(11):1329–1339. <https://doi.org/10.1007/s40273-019-00837-x>
+
+To run the CEA, you require [`dampack`: Decision-Analytic Modeling
+Package](https://cran.r-project.org/web/packages/dampack/index.html), an
+R package for analyzing and visualizing the health economic outputs of
+decision models.
+
 ## Usage and installation
 
 `cdx2cea` repository could be used in two different ways:
