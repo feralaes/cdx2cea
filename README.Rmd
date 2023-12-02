@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 [`cdx2cea`](https://github.com/feralaes/cdx2cea) is part of the following manuscript:
 
-- Alarid-Escudero F, Schrag D, Kuntz KM. (2021) ["CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis"](https://www.sciencedirect.com/science/article/pii/S1098301521017472) *Value in Health* (Online First).
+- Alarid-Escudero F, Schrag D, Kuntz KM. ["CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis"](https://www.sciencedirect.com/science/article/pii/S1098301521017472) *Value in Health* 2022; 25(3):409-418. https://doi.org/10.1016/j.jval.2021.07.019
 
 The release that accompanies the published article has been archived in zenodo: https://zenodo.org/record/5093594#.YPYyDy1h1qs
 
@@ -30,7 +30,7 @@ The release that accompanies the published article has been archived in zenodo: 
 
 You can cite this package like this "we based our analysis using the cdx2cea R package (Alarid-Escudero F, Schrag D, and Kuntz KM 2021)". Here is the full bibliographic reference to include in your reference list for the manuscript and the package (don't forget to update the 'last accessed' date):
 
-> Alarid-Escudero F, Schrag D, Kuntz KM (2021). ["CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis"](https://www.sciencedirect.com/science/article/pii/S1098301521017472). *Value in Health* (In press). 
+> Alarid-Escudero F, Schrag D, Kuntz KM. ["CDX2 biomarker testing and adjuvant therapy for stage II colon cancer: An exploratory cost-effectiveness analysis"](https://www.sciencedirect.com/science/article/pii/S1098301521017472). *Value in Health* 2022; 25(3):409-418.
 
 > Alarid-Escudero F, Schrag D, Kuntz KM (2021). {cdx2cea}: A cost-efectiveness analysis of testing stage II colon cancer patients for the absence of CDX2 biomarker followed by adjuvant chemotherapy (Version v1.0.0). Zenodo. [10.5281/zenodo.5093594](https://www.doi.org/10.5281/zenodo.5093594). Last accessed 12 July 2021
 
