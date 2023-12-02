@@ -16,11 +16,12 @@ expression followed by adjuvant chemotherapy.
 [`cdx2cea`](https://github.com/feralaes/cdx2cea) is part of the
 following manuscript:
 
--   Alarid-Escudero F, Schrag D, Kuntz KM. (2021) [“CDX2 biomarker
-    testing and adjuvant therapy for stage II colon cancer: An
-    exploratory cost-effectiveness
-    analysis”](https://www.sciencedirect.com/science/article/pii/S1098301521017472)
-    *Value in Health* (Online First).
+- Alarid-Escudero F, Schrag D, Kuntz KM. [“CDX2 biomarker testing and
+  adjuvant therapy for stage II colon cancer: An exploratory
+  cost-effectiveness
+  analysis”](https://www.sciencedirect.com/science/article/pii/S1098301521017472)
+  *Value in Health* 2022; 25(3):409-418.
+  <https://doi.org/10.1016/j.jval.2021.07.019>
 
 The release that accompanies the published article has been archived in
 zenodo: <https://zenodo.org/record/5093594#.YPYyDy1h1qs>
@@ -33,11 +34,11 @@ Here is the full bibliographic reference to include in your reference
 list for the manuscript and the package (don’t forget to update the
 ‘last accessed’ date):
 
-> Alarid-Escudero F, Schrag D, Kuntz KM (2021). [“CDX2 biomarker testing
-> and adjuvant therapy for stage II colon cancer: An exploratory
+> Alarid-Escudero F, Schrag D, Kuntz KM. [“CDX2 biomarker testing and
+> adjuvant therapy for stage II colon cancer: An exploratory
 > cost-effectiveness
 > analysis”](https://www.sciencedirect.com/science/article/pii/S1098301521017472).
-> *Value in Health* (In press).
+> *Value in Health* 2022; 25(3):409-418.
 
 > Alarid-Escudero F, Schrag D, Kuntz KM (2021). {cdx2cea}: A
 > cost-efectiveness analysis of testing stage II colon cancer patients
@@ -48,10 +49,9 @@ list for the manuscript and the package (don’t forget to update the
 
 ## Preliminaries
 
--   Install
-    [RStudio](https://www.rstudio.com/products/rstudio/download/)
--   Install `devtools` to install `cdx2cea` as a package and modify it
-    to generate your own package
+- Install [RStudio](https://www.rstudio.com/products/rstudio/download/)
+- Install `devtools` to install `cdx2cea` as a package and modify it to
+  generate your own package
 
 ``` r
 # Install release version from CRAN
@@ -87,7 +87,7 @@ install.packages("devtools")
 4.  Install all the required and suggested packages listed in the
     [*DESCRIPTION*](https://github.com/feralaes/cdx2cea/blob/master/DESCRIPTION)
     file in the main folder of the repository
-    -   To install `cdx2cea`, please follow these instructions:
+    - To install `cdx2cea`, please follow these instructions:
 
 ``` r
 # Install development version from GitHub
