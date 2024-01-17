@@ -4,7 +4,7 @@
 # from Dalerba et al. (2016)                                                   #
 #                                                                              # 
 # Authors:                                                                     #
-#     - Fernando Alarid-Escudero, PhD, <fernando.alarid@cide.edu>              #
+#     - Fernando Alarid-Escudero, PhD, <falarid@stanford.edu>                  #
 #     - Deb Schrag, MD, MPH                                                    #
 #     - Karen M. Kuntz, ScD                                                    #
 ################################################################################ 
