@@ -17,6 +17,9 @@ rm(list = ls()) # to clean the workspace
 
 #### 03.1 Load packages, data and functions ####
 #### 03.1.1 Load packages and functions ####
+# Install IMIS from CRAN archive
+# devtools::install_version("IMIS", version = "0.1", repos = "http://cran.us.r-project.org")
+library(IMIS)
 # Dependencies have been loaded with 'cdx2cea'
 library(cdx2cea)
 library(logitnorm)
