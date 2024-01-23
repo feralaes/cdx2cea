@@ -122,8 +122,8 @@ l_fit_imis <- IMIS::IMIS(B        =  1000,      # incremental sample size at eac
                          D        =  0)
 ### Obtain posterior
 m_calib_post         <- l_fit_imis$resample
-v_p_DieMets_3yr      <- 1-exp(-m_calib_post[, "r_DieMets"]*36)
-v_p_RecurCDX2pos_3yr <- 1-exp(-m_calib_post[, "r_RecurCDX2pos"]*36)
+v_p_DieMets_3yr      <- 1 - exp(-m_calib_post[, "r_DieMets"]*36)
+v_p_RecurCDX2pos_3yr <- 1 - exp(-m_calib_post[, "r_RecurCDX2pos"]*36)
 
 #### 03.4 Exploring posterior distribution ####
 #### 03.4.1 Summary statistics of posterior distribution ####
@@ -143,8 +143,8 @@ v_calib_post <- exp(log_post(m_calib_post))
 
 ### Compute maximum-a-posteriori (MAP) as the mode of the sampled values
 v_calib_post_map  <- m_calib_post[which.max(v_calib_post), ]
-p_DieMets_3yr_map <- 1-exp(-v_calib_post_map["r_DieMets"]*36)
-p_RecurCDX2pos_3yr_map <- 1-exp(-v_calib_post_map["r_RecurCDX2pos"]*36)
+p_DieMets_3yr_map <- 1 - exp(-v_calib_post_map["r_DieMets"]*36)
+p_RecurCDX2pos_3yr_map <- 1 - exp(-v_calib_post_map["r_RecurCDX2pos"]*36)
 
 # Summary statistics
 df_posterior_summ <- data.frame(
@@ -172,7 +172,7 @@ write.csv(df_posterior_summ,
 ### Rescale posterior to plot density of plots
 v_calib_alpha <- scales::rescale(v_calib_post)
 df_calib_post <- data.frame(m_calib_post)
-colnames(df_calib_post) <-v_param_names_labels
+colnames(df_calib_post) <- v_param_names_labels
 
 ### Plot the 1000 draws from the posterior
 gg_post_pairs_corr <- GGally::ggpairs(data.frame(m_calib_post),
@@ -210,9 +210,9 @@ ggsave(filename = "figs/03_posterior-IMIS-correlation-1k.png",
 
 ### Plot the 1000 draws from the posterior with marginal histograms
 m_samp_prior <- sample.prior(n_resamp)
-df_samp_prior<- reshape2::melt(cbind(PDF = "Prior", 
-                           as.data.frame(m_samp_prior)), 
-                     variable.name = "Parameter")
+df_samp_prior <- reshape2::melt(cbind(PDF = "Prior", 
+                                      as.data.frame(m_samp_prior)), 
+                                variable.name = "Parameter")
 df_samp_post_imis <- reshape2::melt(cbind(PDF = "Posterior IMIS",
                                 as.data.frame(m_calib_post)),
                           variable.name = "Parameter")
