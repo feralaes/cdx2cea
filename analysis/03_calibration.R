@@ -231,14 +231,14 @@ gg_post_imis <- ggplot(df_samp_prior_post,
   facet_wrap(~Parameter, scales = "free", 
              ncol = 4,
              labeller = label_parsed) +
-  scale_x_continuous(breaks = dampack::number_ticks(4)) +
-  geom_density(alpha=0.5) +
+  scale_x_continuous(n.breaks = 4) +
+  geom_density(alpha = 0.5) +
   theme_bw(base_size = 16) +
   theme(legend.position = "bottom",
-        axis.title.x=element_blank(),
-        axis.title.y=element_blank(),
-        axis.text.y=element_blank(),
-        axis.ticks.y=element_blank())
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y =element_blank())
 gg_post_imis
 
 ggsave(gg_post_imis,
