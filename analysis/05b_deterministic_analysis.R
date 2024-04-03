@@ -116,9 +116,11 @@ df_charts_ly_rec_cdx2pos
 
 #### 05b.2.3 For both types of patients ####
 v_p_CDX2_names <- c(paste0("CDX2-negative patients (", 
-                           scales::percent(round(l_params_basecase$p_CDX2neg, 3), accuracy = 0.1), ")"),
+                           scales::percent(round(l_params_basecase$p_CDX2neg, 3), 
+                                           accuracy = 0.1), ")"),
                     paste0("CDX2-positive patients (", 
-                           scales::percent(round(1-l_params_basecase$p_CDX2neg, 3), accuracy = 0.1), ")")) 
+                           scales::percent(round(1 - l_params_basecase$p_CDX2neg, 3), 
+                                           accuracy = 0.1), ")")) 
 df_ly_rec_all <- rbind(
   cbind(Group = v_p_CDX2_names[1], 
         df_ly_rec_cdx2neg_lng),
@@ -135,16 +137,17 @@ df_charts_ly_rec_all <- rbind(
 gg_ly <- ggplot(df_ly_rec_all, 
        aes(x = Strategy, y = Years, fill = `Health State`)) +
   facet_wrap(~ Group, ncol = 1, scales = "free_y") +
-  geom_bar(stat="identity", position = "stack") +
+  geom_bar(stat = "identity", position = "stack") +
   geom_text(data = df_charts_ly_rec_all, 
             aes(x = Strategy, y = pos, 
-                label = format(round(Years, 2), nsmall = 2), group = `Health State`),
-            size=5) +
+                label = format(round(Years, 2), nsmall = 2), 
+                group = `Health State`),
+            size = 5) +
   # scale_fill_manual(values=c("#E69F00", "#56B4E9")) +
   scale_fill_grey(start = 0.8, end = 0.5) +
   xlab("") + 
   scale_y_continuous("Life expectancy (years)", 
-                     breaks = dampack::number_ticks(8)) +
+                     n.breaks = 8) +
   coord_flip() +
   guides(fill = guide_legend(title = "", reverse = T)) +
   theme_bw(base_size = 17) + 
@@ -209,7 +212,7 @@ df_owsa_input <- data.frame(pars = c("p_CDX2neg", "hr_Recurr_CDXneg_Rx",
                                     0.7,
                                     l_bounds$v_ub$hr_RecurCDX2neg))
 ### Run OWSA
-if(re_run){
+if (re_run) {
   df_owsa_icer <- run_owsa_det(params_range = df_owsa_input,
                               params_basecase = l_params_basecase,
                               FUN = calculate_ce_out, # Function to compute outputs
@@ -249,7 +252,7 @@ gg_owsa <- plot(df_owsa_icer,
                 facet_ncol = 2,
                 facet_scales = "free") +
   scale_y_continuous("$/QALY",
-                     breaks = equal_breaks(n=5, s=0.05), 
+                     breaks = equal_breaks(n = 5, s = 0.05), 
                      label = function(x){scales::comma(x)}, 
                      expand = c(0.05, 0)) + 
   theme(legend.position = "",
@@ -286,7 +289,7 @@ df_twsa_input_pCDX2_vs_hrCDX2negtrt <- data.frame(pars = c("p_CDX2neg",
 
 ### $50K/QALY
 ## Run TWSA
-if(re_run){
+if (re_run) {
   df_twsa_nmb_pCDX2_vs_hrCDX2negtrt_50k <- run_twsa_det(params_range = df_twsa_input_pCDX2_vs_hrCDX2negtrt,
                               params_basecase = l_params_basecase,
                               FUN = calculate_ce_out, # Function to compute outputs
@@ -379,7 +382,7 @@ df_twsa_input_hrRecurCDX2neg_vs_hrCDX2negtrt <- data.frame(pars = c("hr_RecurCDX
 
 ### $50K/QALY
 ## Run TWSA
-if(re_run){
+if (re_run) {
   df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k <- run_twsa_det(params_range = df_twsa_input_hrRecurCDX2neg_vs_hrCDX2negtrt,
                                                          params_basecase = l_params_basecase,
                                                          FUN = calculate_ce_out, # Function to compute outputs
@@ -424,7 +427,7 @@ ggsave(plot = gg_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_50k,
 
 ### $100K/QALY
 ## Run TWSA
-if(re_run){
+if (re_run) {
   df_twsa_nmb_hrRecurCDX2neg_vs_hrCDX2negtrt_100k <- run_twsa_det(params_range = df_twsa_input_hrRecurCDX2neg_vs_hrCDX2negtrt,
                                                                   params_basecase = l_params_basecase,
                                                                   FUN = calculate_ce_out, # Function to compute outputs
@@ -494,7 +497,7 @@ opt_df <- df_twsa_pCDX2_vs_hrCDX2negtrt %>%
 gg_twsa_pCDX2_vs_hrCDX2negtrt <- ggplot(opt_df, aes_(x = as.name(param1), y = as.name(param2))) +
   geom_tile(aes_(fill = as.name("strategy"))) +
   facet_wrap(~ WTP) + 
-  theme_bw()+ 
+  theme_bw() + 
   xlab(param1) +
   ylab(param2) +
   theme(strip.background = element_rect(fill = "white",
@@ -572,7 +575,7 @@ opt_df <- df_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt %>%
 gg_twsa_hrRecurCDX2neg_vs_hrCDX2negtrt <- ggplot(opt_df, aes_(x = as.name(param1), y = as.name(param2))) +
   geom_tile(aes_(fill = as.name("strategy"))) +
   facet_wrap(~ WTP) + 
-  theme_bw()+ 
+  theme_bw() +
   xlab(param1) +
   ylab(param2) +
   theme(strip.background = element_rect(fill = "white",
