@@ -118,7 +118,7 @@ ggsave(plot = gg_ceac_ceaf, "figs/manuscript/fig05a_ceac_ceaf.tiff", width = 8, 
 #### 05a.6.3 Expected Loss Curves (ELCs) ####
 ## Population affected by the decision
 # Source: Siegel RL, Miller KD, Jemal A: Cancer statistics, 2019. CA Cancer J Clin 69:7–34, 2019
-pop_evi <- sum(101000*0.33*(1/(1+0.03)^(1:10))) # Annual cases * proportion that are Stage II * ten years
+pop_evi <- sum(101000*0.33*(1/(1 + 0.03)^(1:10))) # Annual cases * proportion that are Stage II * ten years
 
 elc_obj <- calc_exp_loss(wtp = v_wtp, psa = l_psa)
 elc_obj
@@ -144,13 +144,13 @@ ggsave(plot = gg_elc, "figs/manuscript/fig05c_elc.tiff", width = 8, height = 6, 
 ### Individual level
 evpi_ind <- calc_evpi(wtp = v_wtp, psa = l_psa)
 plot(evpi_ind, effect_units = "QALY", txtsize = 16, n_x_ticks = 8) +
-  xlab("Cost-effectiveness threshold (Thousand $/QALY)") +
-  ggsave("figs/05c_evpi_ind.png", width = 8, height = 6)
+  xlab("Cost-effectiveness threshold (Thousand $/QALY)")
+ggsave("figs/05c_evpi_ind.png", width = 8, height = 6)
 
 ### Population level
 ## Population affected by the decision
 # Source: Siegel RL, Miller KD, Jemal A: Cancer statistics, 2019. CA Cancer J Clin 69:7–34, 2019
-pop_evi <- sum(101000*0.33*(1/(1+0.03)^(1:10))) # Annual cases * proportion that are Stage II * ten years
+pop_evi <- sum(101000*0.33*(1/(1 + 0.03)^(1:10))) # Annual cases * proportion that are Stage II * ten years
 ## EVPI
 evpi_pop <- calc_evpi(wtp = v_wtp, psa = l_psa, pop = pop_evi)
 gg_evpi_pop <- plot(evpi_pop, effect_units = "QALY", txtsize = 16, n_x_ticks = 8) + 
