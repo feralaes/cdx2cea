@@ -293,7 +293,7 @@ log_lik <- function(v_params,
       ## weighted sum
       v_llik_overall[j] <- v_llik[j, ] %*% v_weights
     }, error = function(e) NA) 
-    if(is.na(jj)) { v_llik_overall <- -Inf }
+    if(is.na(jj)) { v_llik_overall[j] <- -Inf }
   } ## End loop over sampled parameter sets
   
   ## return GOF
